@@ -82,6 +82,7 @@ export default async function AdminMatchesPage() {
                   <input
                     name="starts_at"
                     type="datetime-local"
+                    step={300}
                     defaultValue={toLocalDatetime(m.starts_at)}
                     className="rounded border px-2 py-1"
                   />
@@ -99,9 +100,9 @@ export default async function AdminMatchesPage() {
                   />
                 </label>
 
-                <label className="text-xs">
-                  <span className="block text-neutral-500">Skóre 60′</span>
-                  <span className="flex items-center gap-1">
+                <div className="flex flex-col items-center text-xs">
+                  <span className="text-neutral-500">Skóre 60′</span>
+                  <div className="mt-1 flex items-center gap-1">
                     <input
                       name="home_score"
                       type="number"
@@ -117,12 +118,12 @@ export default async function AdminMatchesPage() {
                       defaultValue={m.away_score ?? ""}
                       className="w-12 rounded border px-2 py-1 text-center"
                     />
-                  </span>
-                </label>
+                  </div>
+                </div>
 
-                <label className="text-xs">
-                  <span className="block text-neutral-500">1. třetina</span>
-                  <span className="flex items-center gap-1">
+                <div className="flex flex-col items-center text-xs">
+                  <span className="text-neutral-500">1. třetina</span>
+                  <div className="mt-1 flex items-center gap-1">
                     <input
                       name="home_score_p1"
                       type="number"
@@ -138,8 +139,8 @@ export default async function AdminMatchesPage() {
                       defaultValue={m.away_score_p1 ?? ""}
                       className="w-12 rounded border px-2 py-1 text-center"
                     />
-                  </span>
-                </label>
+                  </div>
+                </div>
 
                 <label className="flex items-center gap-1.5 text-xs">
                   <input
