@@ -35,7 +35,13 @@ export default async function AdminMatchesPage() {
       away_score_p1: num("away_score_p1"),
       finalized: formData.get("finalized") === "on",
     };
-    if (dt) update.starts_at = new Date(dt).toISOString();
+    if (dt) {
+      const d = new Date(dt);
+      // Snap minutes to nearest 5 (independent of browser step support when typing)
+      const rounded = Math.round(d.getMinutes() / 5) * 5;
+      d.setMinutes(rounded, 0, 0);
+      update.starts_at = d.toISOString();
+    }
 
     await sb.from("matches").update(update).eq("id", id);
     revalidatePath("/admin/matches");
@@ -93,10 +99,12 @@ export default async function AdminMatchesPage() {
                   <input
                     name="home_handicap"
                     type="number"
-                    step="0.5"
+                    step={1}
+                    min={-9.5}
+                    max={9.5}
                     defaultValue={m.home_handicap ?? ""}
                     className="w-20 rounded border px-2 py-1 text-center"
-                    placeholder="±x.x"
+                    placeholder="±x.5"
                   />
                 </label>
 
