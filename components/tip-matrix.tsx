@@ -139,7 +139,7 @@ export function TipMatrix({
 
   return (
     <main>
-      <div className="-mx-4 overflow-x-auto px-4">
+      <div className="-mx-4 px-4">
         <table className="min-w-full text-xs border-separate border-spacing-0">
           <thead>
             <tr>
