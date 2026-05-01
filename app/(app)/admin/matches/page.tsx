@@ -2,11 +2,17 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { STAGE_LABEL, type Match, type Team } from "@/lib/types";
 
-// Convert ISO timestamp to local <input type="datetime-local"> format
-function toLocalDatetime(iso: string) {
+const pad = (n: number) => String(n).padStart(2, "0");
+function toDateStr(iso: string) {
   const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+function toHour(iso: string) {
+  return pad(new Date(iso).getHours());
+}
+function nearestFiveMin(iso: string) {
+  const m = new Date(iso).getMinutes();
+  return pad(Math.round(m / 5) * 5 % 60);
 }
 
 export default async function AdminMatchesPage() {
@@ -25,7 +31,9 @@ export default async function AdminMatchesPage() {
       const v = formData.get(k);
       return v === "" || v == null ? null : Number(v);
     };
-    const dt = String(formData.get("starts_at") ?? "");
+    const dateStr = String(formData.get("starts_date") ?? "");
+    const hourStr = String(formData.get("starts_hour") ?? "");
+    const minStr = String(formData.get("starts_min") ?? "");
 
     const update: Record<string, unknown> = {
       home_handicap: num("home_handicap"),
@@ -35,11 +43,12 @@ export default async function AdminMatchesPage() {
       away_score_p1: num("away_score_p1"),
       finalized: formData.get("finalized") === "on",
     };
-    if (dt) {
-      const d = new Date(dt);
-      // Snap minutes to nearest 5 (independent of browser step support when typing)
-      const rounded = Math.round(d.getMinutes() / 5) * 5;
-      d.setMinutes(rounded, 0, 0);
+    if (dateStr && hourStr !== "" && minStr !== "") {
+      // Build local-time date from parts, snap minute to multiple of 5
+      const [yr, mo, da] = dateStr.split("-").map(Number);
+      const hh = Number(hourStr);
+      const mm = Math.round(Number(minStr) / 5) * 5 % 60;
+      const d = new Date(yr, mo - 1, da, hh, mm, 0, 0);
       update.starts_at = d.toISOString();
     }
 
@@ -83,16 +92,37 @@ export default async function AdminMatchesPage() {
               </header>
 
               <div className="flex flex-wrap items-end gap-3">
-                <label className="text-xs">
-                  <span className="block text-neutral-500">Datum & čas</span>
-                  <input
-                    name="starts_at"
-                    type="datetime-local"
-                    step={300}
-                    defaultValue={toLocalDatetime(m.starts_at)}
-                    className="rounded border px-2 py-1"
-                  />
-                </label>
+                <div className="flex flex-col items-start text-xs">
+                  <span className="text-neutral-500">Datum & čas</span>
+                  <div className="mt-1 flex items-center gap-1">
+                    <input
+                      name="starts_date"
+                      type="date"
+                      defaultValue={toDateStr(m.starts_at)}
+                      className="rounded border px-2 py-1"
+                    />
+                    <select
+                      name="starts_hour"
+                      defaultValue={toHour(m.starts_at)}
+                      className="rounded border px-1.5 py-1"
+                    >
+                      {Array.from({ length: 24 }).map((_, h) => (
+                        <option key={h} value={pad(h)}>{pad(h)}</option>
+                      ))}
+                    </select>
+                    <span>:</span>
+                    <select
+                      name="starts_min"
+                      defaultValue={nearestFiveMin(m.starts_at)}
+                      className="rounded border px-1.5 py-1"
+                    >
+                      {Array.from({ length: 12 }).map((_, i) => {
+                        const v = pad(i * 5);
+                        return <option key={v} value={v}>{v}</option>;
+                      })}
+                    </select>
+                  </div>
+                </div>
 
                 <label className="text-xs">
                   <span className="block text-neutral-500">Hcp domácích</span>
