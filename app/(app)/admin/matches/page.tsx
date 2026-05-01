@@ -100,7 +100,7 @@ export default async function AdminMatchesPage() {
             <form
               key={m.id}
               action={saveMatch}
-              className="rounded border bg-white p-3 text-sm"
+              className="w-fit rounded border bg-white p-3 text-sm"
             >
               <input type="hidden" name="id" value={m.id} />
 
