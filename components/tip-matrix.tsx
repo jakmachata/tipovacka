@@ -143,11 +143,10 @@ export function TipMatrix({
         <table className="min-w-full text-xs">
           <thead>
             <tr>
-              <th className={headerBase + " bg-neutral-900 text-left"}>#</th>
               <th className={headerBase + " bg-neutral-900 text-left"}>Datum</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[170px]"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[170px]"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-right min-w-[110px]"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[160px]"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[160px]"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-center min-w-[110px]"}>Výsledek</th>
               {players.map((p) => {
                 const color = colorForUser(p.id);
                 return (
@@ -165,27 +164,40 @@ export function TipMatrix({
             </tr>
           </thead>
           <tbody>
-            {matches.map((m) => {
+            {matches.flatMap((m, idx) => {
               const home = teamMap.get(m.home_code);
               const away = teamMap.get(m.away_code);
               const started = new Date(m.starts_at).getTime() <= Date.now();
               const result = m.finalized ? `${m.home_score}:${m.away_score}` : "—";
-              return (
+              const prev = idx > 0 ? matches[idx - 1] : null;
+              const isNewDay =
+                !!prev &&
+                new Date(prev.starts_at).toDateString() !==
+                  new Date(m.starts_at).toDateString();
+              const rowSpan = 4 + players.length;
+              const rows: React.ReactNode[] = [];
+              if (isNewDay) {
+                rows.push(
+                  <tr key={`gap-${m.id}`} aria-hidden="true">
+                    <td colSpan={rowSpan} className="h-1.5 bg-neutral-100 p-0" />
+                  </tr>,
+                );
+              }
+              rows.push(
                 <tr
                   key={m.id}
                   className="border-b odd:bg-white even:bg-neutral-50 hover:bg-neutral-100"
                 >
-                  <td className="px-2 py-2 text-neutral-400">{m.game_no}</td>
                   <td className="px-2 py-2 whitespace-nowrap text-neutral-600">
                     {fmt(m.starts_at)}
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[170px]">
+                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[160px]">
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[170px]">
+                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[160px]">
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className="px-2 py-2 text-right whitespace-nowrap min-w-[110px]">
+                  <td className="px-2 py-2 text-center whitespace-nowrap min-w-[110px]">
                     <span className="font-semibold">{result}</span>
                     {m.finalized && m.home_score_p1 != null && (
                       <span className="ml-1 text-neutral-400">({m.home_score_p1}:{m.away_score_p1})</span>
@@ -268,8 +280,9 @@ export function TipMatrix({
                       </td>
                     );
                   })}
-                </tr>
+                </tr>,
               );
+              return rows;
             })}
           </tbody>
         </table>
