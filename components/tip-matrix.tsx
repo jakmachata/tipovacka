@@ -10,6 +10,7 @@ interface PlayerWithTotal extends Profile {
 
 interface Props {
   myUserId: string;
+  isAdmin?: boolean;
   matches: Match[];
   teams: Team[];
   players: PlayerWithTotal[];
@@ -115,6 +116,7 @@ function hcpSideLabel(
 
 export function TipMatrix({
   myUserId,
+  isAdmin = false,
   matches,
   teams,
   players,
@@ -208,7 +210,7 @@ export function TipMatrix({
                     const pick = pickMap.get(k(p.id, m.id));
                     const score = scoreMap.get(k(p.id, m.id));
                     const isMine = p.id === myUserId;
-                    const visible = isMine || started;
+                    const visible = isMine || started || isAdmin;
                     const clickable = isMine && !started;
 
                     let content: React.ReactNode;

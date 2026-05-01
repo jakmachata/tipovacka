@@ -8,6 +8,13 @@ export default async function SchedulePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: meProfile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user!.id)
+    .single();
+  const isAdmin = !!meProfile?.is_admin;
+
   const [matchesRes, teamsRes, profilesRes, picksRes, scoresRes, leaderboardRes] =
     await Promise.all([
       supabase.from("matches").select("*").order("starts_at"),
@@ -46,6 +53,7 @@ export default async function SchedulePage() {
   return (
     <TipMatrix
       myUserId={myId}
+      isAdmin={isAdmin}
       matches={matchesRes.data ?? []}
       teams={teamsRes.data ?? []}
       players={players}
