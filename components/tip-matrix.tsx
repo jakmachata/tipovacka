@@ -41,6 +41,19 @@ function colorForUser(userId: string) {
   return HEADER_COLORS[h % HEADER_COLORS.length];
 }
 
+// Mapování IIHF 3-písmenných kódů na ISO 3166-1 alpha-2 kódy (pro flagcdn.com)
+const TEAM_ISO2: Record<string, string> = {
+  CAN: "ca", USA: "us", FIN: "fi", SWE: "se", CZE: "cz",
+  SUI: "ch", GER: "de", SVK: "sk", LAT: "lv", DEN: "dk",
+  FRA: "fr", ITA: "it", AUT: "at", NOR: "no", KAZ: "kz",
+  HUN: "hu", SLO: "si", POL: "pl", BLR: "by",
+};
+
+function flagUrl(code: string): string | null {
+  const iso = TEAM_ISO2[code];
+  return iso ? `https://flagcdn.com/w20/${iso}.png` : null;
+}
+
 function fmt(iso: string) {
   return new Date(iso).toLocaleString("cs-CZ", {
     day: "numeric",
@@ -50,11 +63,37 @@ function fmt(iso: string) {
   });
 }
 
-function teamLabel(t: Team | undefined, hcp: number | null, isHome: boolean) {
-  if (!t) return "?";
+function TeamCell({
+  t,
+  hcp,
+  isHome,
+}: {
+  t: Team | undefined;
+  hcp: number | null;
+  isHome: boolean;
+}) {
+  if (!t) return <>?</>;
   const v = hcp == null ? null : isHome ? hcp : -hcp;
   const sign = v === null ? "" : v > 0 ? `+${v}` : `${v}`;
-  return `${t.flag_emoji ?? ""} ${t.name_cs}${v === null ? "" : ` (${sign})`}`;
+  const url = flagUrl(t.code);
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+      {url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          width={20}
+          height={15}
+          alt={t.code}
+          className="inline-block rounded-sm shadow-sm"
+        />
+      )}
+      <span>
+        {t.name_cs}
+        {v === null ? "" : ` (${sign})`}
+      </span>
+    </span>
+  );
 }
 
 function hcpSideLabel(
@@ -100,8 +139,6 @@ export function TipMatrix({
 
   return (
     <main>
-      <h1 className="mb-3 text-2xl font-semibold">Zápasy</h1>
-
       <div className="-mx-4 overflow-x-auto px-4">
         <table className="min-w-full text-xs">
           <thead>
@@ -114,16 +151,10 @@ export function TipMatrix({
               <th className={headerBase + " bg-neutral-900 text-right"}>1. tř.</th>
               {players.map((p) => {
                 const color = colorForUser(p.id);
-                const isMine = p.id === myUserId;
                 return (
                   <th
                     key={p.id}
-                    className={
-                      headerBase +
-                      " text-center " +
-                      color +
-                      (isMine ? " ring-2 ring-amber-300 ring-inset" : "")
-                    }
+                    className={headerBase + " text-center " + color}
                   >
                     <div className="font-semibold">{p.display_name}</div>
                     <div className="text-[10px] font-normal opacity-80">
@@ -154,10 +185,10 @@ export function TipMatrix({
                     {fmt(m.starts_at)}
                   </td>
                   <td className="px-2 py-2 whitespace-nowrap font-medium">
-                    {teamLabel(home, m.home_handicap, true)}
+                    <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
                   <td className="px-2 py-2 whitespace-nowrap font-medium">
-                    {teamLabel(away, m.home_handicap, false)}
+                    <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className="px-2 py-2 text-right font-semibold">{result}</td>
                   <td className="px-2 py-2 text-right text-neutral-500">{result1}</td>
@@ -310,6 +341,9 @@ function TipModal({
     else onSaved();
   }
 
+  const homeFlag = flagUrl(match.home_code);
+  const awayFlag = flagUrl(match.away_code);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -323,8 +357,12 @@ function TipModal({
           <p className="text-xs uppercase tracking-wide text-neutral-500">
             Tip — zápas {match.game_no}
           </p>
-          <h2 className="mt-1 text-lg font-semibold">
-            {home?.flag_emoji} {home?.name_cs} vs {away?.flag_emoji} {away?.name_cs}
+          <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
+            {homeFlag && <img src={homeFlag} alt={match.home_code} width={20} height={15} className="rounded-sm shadow-sm" />}
+            {home?.name_cs}
+            <span className="text-neutral-400">vs</span>
+            {awayFlag && <img src={awayFlag} alt={match.away_code} width={20} height={15} className="rounded-sm shadow-sm" />}
+            {away?.name_cs}
           </h2>
           <p className="mt-1 text-sm text-neutral-600">
             {new Date(match.starts_at).toLocaleString("cs-CZ", {

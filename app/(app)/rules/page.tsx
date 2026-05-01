@@ -1,9 +1,7 @@
 export default function RulesPage() {
   return (
     <main className="prose max-w-none">
-      <h1 className="mb-4 text-2xl font-semibold">Pravidla</h1>
-
-      <h2 className="mt-6 mb-2 text-lg font-semibold">Handicap</h2>
+      <h2 className="mt-2 mb-2 text-lg font-semibold">Handicap</h2>
       <p>
         Tip vyplníš jako finální skóre po 60. min. Strana, na kterou „vsadíš",
         se odvodí ze tvého rozdílu skóre a handicapu domácích.
