@@ -135,7 +135,7 @@ export function TipMatrix({
   const myExisting =
     editingMatchId == null ? null : pickMap.get(k(myUserId, editingMatchId)) ?? null;
 
-  const headerBase = "sticky top-0 z-10 px-2 py-2 whitespace-nowrap text-white";
+  const headerBase = "sticky top-12 z-10 px-2 py-2 whitespace-nowrap text-white";
 
   return (
     <main>
