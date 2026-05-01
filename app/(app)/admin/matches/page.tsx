@@ -1,18 +1,44 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { STAGE_LABEL, type Match, type Team } from "@/lib/types";
+import { TimePicker } from "@/components/time-picker";
 
 const pad = (n: number) => String(n).padStart(2, "0");
+
+const TEAM_ISO2: Record<string, string> = {
+  CAN: "ca", USA: "us", FIN: "fi", SWE: "se", CZE: "cz",
+  SUI: "ch", GER: "de", SVK: "sk", LAT: "lv", DEN: "dk",
+  FRA: "fr", ITA: "it", AUT: "at", NOR: "no", KAZ: "kz",
+  HUN: "hu", SLO: "si", POL: "pl", BLR: "by",
+};
+function flagUrl(code: string): string | null {
+  const iso = TEAM_ISO2[code];
+  return iso ? `https://flagcdn.com/w20/${iso}.png` : null;
+}
+
 function toDateStr(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
-function toHour(iso: string) {
-  return pad(new Date(iso).getHours());
+function toTimeStr(iso: string) {
+  const d = new Date(iso);
+  const m = Math.round(d.getMinutes() / 5) * 5 % 60;
+  return `${pad(d.getHours())}:${pad(m)}`;
 }
-function toFiveMin(iso: string) {
-  const m = new Date(iso).getMinutes();
-  return pad(Math.round(m / 5) * 5 % 60);
+
+function TeamFlag({ code }: { code: string }) {
+  const url = flagUrl(code);
+  if (!url) return null;
+  // eslint-disable-next-line @next/next/no-img-element
+  return (
+    <img
+      src={url}
+      width={20}
+      height={15}
+      alt={code}
+      className="inline-block rounded-sm shadow-sm align-middle"
+    />
+  );
 }
 
 export default async function AdminMatchesPage() {
@@ -32,8 +58,7 @@ export default async function AdminMatchesPage() {
       return v === "" || v == null ? null : Number(v);
     };
     const dateStr = String(formData.get("starts_date") ?? "");
-    const hourStr = String(formData.get("starts_hour") ?? "");
-    const minStr = String(formData.get("starts_min") ?? "");
+    const timeStr = String(formData.get("starts_time") ?? "");
 
     const home_score = num("home_score");
     const away_score = num("away_score");
@@ -44,14 +69,12 @@ export default async function AdminMatchesPage() {
       away_score,
       home_score_p1: num("home_score_p1"),
       away_score_p1: num("away_score_p1"),
-      // Auto-finalize: jakmile je zadán výsledek 60. min, zápas je finalizován.
       finalized: home_score != null && away_score != null,
     };
-    if (dateStr && hourStr !== "" && minStr !== "") {
+    if (dateStr && timeStr) {
       const [yr, mo, da] = dateStr.split("-").map(Number);
-      const hh = Number(hourStr);
-      const mm = Math.round(Number(minStr) / 5) * 5 % 60;
-      const d = new Date(yr, mo - 1, da, hh, mm, 0, 0);
+      const [hh, mm] = timeStr.split(":").map(Number);
+      const d = new Date(yr, mo - 1, da, hh, Math.round(mm / 5) * 5 % 60, 0, 0);
       update.starts_at = d.toISOString();
     }
 
@@ -65,7 +88,7 @@ export default async function AdminMatchesPage() {
     <main>
       <h1 className="mb-1 text-xl font-semibold">Zápasy & výsledky</h1>
       <p className="mb-4 text-sm text-neutral-600">
-        Uprav datum/čas, handicap, výsledky a finalizaci. Po uložení se body přepočítají.
+        Uprav datum/čas, handicap a výsledky. Po uložení se body přepočítají.
       </p>
 
       <div className="space-y-2">
@@ -85,13 +108,13 @@ export default async function AdminMatchesPage() {
                 <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700">
                   {STAGE_LABEL[m.stage]}
                 </span>
-                <span className="font-medium">
-                  {home?.flag_emoji} {home?.name_cs} vs {away?.flag_emoji}{" "}
-                  {away?.name_cs}
+                <span className="inline-flex items-center gap-1.5 font-medium">
+                  <TeamFlag code={m.home_code} />
+                  <span>{home?.name_cs}</span>
+                  <span className="text-neutral-400">vs</span>
+                  <TeamFlag code={m.away_code} />
+                  <span>{away?.name_cs}</span>
                 </span>
-                {m.finalized && (
-                  <span className="text-xs text-emerald-700">✓ finalizováno</span>
-                )}
               </header>
 
               <div className="flex flex-wrap items-end gap-3">
@@ -104,26 +127,10 @@ export default async function AdminMatchesPage() {
                       defaultValue={toDateStr(m.starts_at)}
                       className="rounded border px-2 py-1"
                     />
-                    <select
-                      name="starts_hour"
-                      defaultValue={toHour(m.starts_at)}
-                      className="rounded border px-1.5 py-1"
-                    >
-                      {Array.from({ length: 24 }).map((_, h) => (
-                        <option key={h} value={pad(h)}>{pad(h)}</option>
-                      ))}
-                    </select>
-                    <span>:</span>
-                    <select
-                      name="starts_min"
-                      defaultValue={toFiveMin(m.starts_at)}
-                      className="rounded border px-1.5 py-1"
-                    >
-                      {Array.from({ length: 12 }).map((_, i) => {
-                        const v = pad(i * 5);
-                        return <option key={v} value={v}>{v}</option>;
-                      })}
-                    </select>
+                    <TimePicker
+                      name="starts_time"
+                      defaultValue={toTimeStr(m.starts_at)}
+                    />
                   </div>
                 </div>
 
@@ -183,7 +190,7 @@ export default async function AdminMatchesPage() {
                   </div>
                 </div>
 
-                <button className="ml-auto rounded bg-neutral-900 px-3 py-1.5 text-xs text-white hover:bg-neutral-800">
+                <button className="rounded bg-neutral-900 px-3 py-1.5 text-xs text-white hover:bg-neutral-800">
                   Uložit
                 </button>
               </div>
