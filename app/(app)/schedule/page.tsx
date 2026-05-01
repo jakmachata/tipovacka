@@ -23,7 +23,7 @@ export default async function SchedulePage() {
         .from("profiles")
         .select("*")
         .eq("is_approved", true)
-        .eq("is_admin", false)
+        .eq("is_player", true)
         .order("display_name"),
       supabase.from("picks").select("*"),
       supabase.from("scores").select("*"),

@@ -124,6 +124,7 @@ export function TipMatrix({
   scores,
 }: Props) {
   const [editingMatchId, setEditingMatchId] = useState<number | null>(null);
+  const [hidePast, setHidePast] = useState(false);
 
   const teamMap = new Map(teams.map((t) => [t.code, t]));
   const k = (uid: string, mid: number) => `${uid}|${mid}`;
@@ -139,8 +140,23 @@ export function TipMatrix({
 
   const headerBase = "sticky top-12 z-10 px-2 py-2 whitespace-nowrap text-white";
 
+  const now = Date.now();
+  const visibleMatches = hidePast
+    ? matches.filter((m) => new Date(m.starts_at).getTime() > now)
+    : matches;
+
   return (
     <main>
+      <div className="mb-2 flex items-center justify-end">
+        <label className="flex items-center gap-2 text-xs text-neutral-600">
+          <input
+            type="checkbox"
+            checked={hidePast}
+            onChange={(e) => setHidePast(e.target.checked)}
+          />
+          Skrýt odehrané zápasy
+        </label>
+      </div>
       <div className="-mx-4 px-4">
         <table className="min-w-full text-xs border-separate border-spacing-0">
           <thead>
@@ -166,12 +182,12 @@ export function TipMatrix({
             </tr>
           </thead>
           <tbody>
-            {matches.flatMap((m, idx) => {
+            {visibleMatches.flatMap((m, idx) => {
               const home = teamMap.get(m.home_code);
               const away = teamMap.get(m.away_code);
               const started = new Date(m.starts_at).getTime() <= Date.now();
               const result = m.finalized ? `${m.home_score}:${m.away_score}` : "—";
-              const prev = idx > 0 ? matches[idx - 1] : null;
+              const prev = idx > 0 ? visibleMatches[idx - 1] : null;
               const isNewDay =
                 !!prev &&
                 new Date(prev.starts_at).toDateString() !==

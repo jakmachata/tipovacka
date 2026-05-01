@@ -17,6 +17,7 @@ export interface Profile {
   display_name: string;
   is_approved: boolean;
   is_admin: boolean;
+  is_player: boolean;
   has_paid: boolean;
   created_at: string;
 }
