@@ -140,7 +140,7 @@ export function TipMatrix({
   return (
     <main>
       <div className="-mx-4 overflow-x-auto px-4">
-        <table className="min-w-full text-xs">
+        <table className="min-w-full text-xs border-separate border-spacing-0">
           <thead>
             <tr>
               <th className={headerBase + " bg-neutral-900 text-left"}>Datum</th>
