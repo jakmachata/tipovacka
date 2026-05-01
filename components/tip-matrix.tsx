@@ -153,7 +153,7 @@ export function TipMatrix({
                 return (
                   <th
                     key={p.id}
-                    className={headerBase + " text-center " + color}
+                    className={headerBase + " text-center min-w-[72px] " + color}
                   >
                     <div className="font-semibold">{p.display_name}</div>
                     <div className="text-[10px] font-normal opacity-80">
@@ -221,7 +221,7 @@ export function TipMatrix({
                                 className={
                                   "ml-1 " +
                                   (score && score.p1_points > 0
-                                    ? "text-fuchsia-600 font-bold"
+                                    ? "text-fuchsia-400"
                                     : "text-neutral-500")
                                 }
                               >
@@ -230,7 +230,7 @@ export function TipMatrix({
                             )}
                           </div>
                           {hcpLine && (
-                            <div className="text-[10px] text-neutral-500">{hcpLine}</div>
+                            <div className="text-neutral-500">{hcpLine}</div>
                           )}
                           {score && (
                             <div
@@ -259,7 +259,7 @@ export function TipMatrix({
                         key={p.id}
                         onClick={clickable ? () => setEditingMatchId(m.id) : undefined}
                         className={
-                          "px-2 py-2 text-center " +
+                          "px-2 py-2 text-center min-w-[72px] " +
                           (isMine ? "bg-amber-50 " : "") +
                           (clickable ? "cursor-pointer hover:bg-amber-100" : "")
                         }
