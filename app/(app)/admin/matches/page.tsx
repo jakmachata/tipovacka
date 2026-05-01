@@ -7,10 +7,12 @@ function toDateStr(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
-function toTime(iso: string) {
-  const d = new Date(iso);
-  const m = Math.round(d.getMinutes() / 5) * 5 % 60;
-  return `${pad(d.getHours())}:${pad(m)}`;
+function toHour(iso: string) {
+  return pad(new Date(iso).getHours());
+}
+function toFiveMin(iso: string) {
+  const m = new Date(iso).getMinutes();
+  return pad(Math.round(m / 5) * 5 % 60);
 }
 
 export default async function AdminMatchesPage() {
@@ -30,7 +32,8 @@ export default async function AdminMatchesPage() {
       return v === "" || v == null ? null : Number(v);
     };
     const dateStr = String(formData.get("starts_date") ?? "");
-    const timeStr = String(formData.get("starts_time") ?? "");
+    const hourStr = String(formData.get("starts_hour") ?? "");
+    const minStr = String(formData.get("starts_min") ?? "");
 
     const home_score = num("home_score");
     const away_score = num("away_score");
@@ -44,10 +47,11 @@ export default async function AdminMatchesPage() {
       // Auto-finalize: jakmile je zadán výsledek 60. min, zápas je finalizován.
       finalized: home_score != null && away_score != null,
     };
-    if (dateStr && timeStr) {
+    if (dateStr && hourStr !== "" && minStr !== "") {
       const [yr, mo, da] = dateStr.split("-").map(Number);
-      const [hh, mm] = timeStr.split(":").map(Number);
-      const d = new Date(yr, mo - 1, da, hh, Math.round(mm / 5) * 5 % 60, 0, 0);
+      const hh = Number(hourStr);
+      const mm = Math.round(Number(minStr) / 5) * 5 % 60;
+      const d = new Date(yr, mo - 1, da, hh, mm, 0, 0);
       update.starts_at = d.toISOString();
     }
 
@@ -101,12 +105,22 @@ export default async function AdminMatchesPage() {
                       className="rounded border px-2 py-1"
                     />
                     <select
-                      name="starts_time"
-                      defaultValue={toTime(m.starts_at)}
+                      name="starts_hour"
+                      defaultValue={toHour(m.starts_at)}
                       className="rounded border px-1.5 py-1"
                     >
-                      {Array.from({ length: 24 * 12 }).map((_, i) => {
-                        const v = `${pad(Math.floor(i / 12))}:${pad((i % 12) * 5)}`;
+                      {Array.from({ length: 24 }).map((_, h) => (
+                        <option key={h} value={pad(h)}>{pad(h)}</option>
+                      ))}
+                    </select>
+                    <span>:</span>
+                    <select
+                      name="starts_min"
+                      defaultValue={toFiveMin(m.starts_at)}
+                      className="rounded border px-1.5 py-1"
+                    >
+                      {Array.from({ length: 12 }).map((_, i) => {
+                        const v = pad(i * 5);
                         return <option key={v} value={v}>{v}</option>;
                       })}
                     </select>
