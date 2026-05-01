@@ -17,6 +17,31 @@ interface Props {
   scores: Score[];
 }
 
+// Tailwind classes for player headers — listed as literal strings so JIT picks them up.
+const HEADER_COLORS = [
+  "bg-rose-600",
+  "bg-orange-600",
+  "bg-amber-600",
+  "bg-yellow-600",
+  "bg-lime-600",
+  "bg-green-600",
+  "bg-emerald-600",
+  "bg-teal-600",
+  "bg-cyan-600",
+  "bg-sky-600",
+  "bg-blue-600",
+  "bg-indigo-600",
+  "bg-violet-600",
+  "bg-fuchsia-600",
+  "bg-pink-600",
+];
+
+function colorForUser(userId: string) {
+  let h = 0;
+  for (const c of userId) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return HEADER_COLORS[h % HEADER_COLORS.length];
+}
+
 function fmt(iso: string) {
   return new Date(iso).toLocaleString("cs-CZ", {
     day: "numeric",
@@ -33,7 +58,6 @@ function teamLabel(t: Team | undefined, hcp: number | null, isHome: boolean) {
   return `${t.flag_emoji ?? ""} ${t.name_cs}${v === null ? "" : ` (${sign})`}`;
 }
 
-// Given a pick + match, return label like "FIN -2.5" of the side the pick is on
 function hcpSideLabel(
   pick: { home_score: number; away_score: number },
   match: Match,
@@ -73,38 +97,44 @@ export function TipMatrix({
   const myExisting =
     editingMatchId == null ? null : pickMap.get(k(myUserId, editingMatchId)) ?? null;
 
+  // shared header cell classes
+  const headerBase =
+    "sticky top-0 z-10 px-2 py-2 whitespace-nowrap text-white";
+
   return (
     <main>
-      <h1 className="mb-2 text-2xl font-semibold">Zápasy</h1>
-      <p className="mb-4 text-sm text-neutral-600">
-        Klikni do svého políčka u zápasu — zadáš skóre po 60. min a (volitelně) po 1. třetině.
-        Cizí tipy se odhalí v okamžiku startu zápasu (zámeček). Handicap se z tvého rozdílu skóre odvodí sám.
-      </p>
+      <h1 className="mb-3 text-2xl font-semibold">Zápasy</h1>
 
       <div className="-mx-4 overflow-x-auto px-4">
         <table className="min-w-full text-xs">
-          <thead className="sticky top-0 z-10 bg-white border-b text-neutral-500">
+          <thead>
             <tr>
-              <th className="px-2 py-2 text-left">#</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Datum</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Domácí</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Hosté</th>
-              <th className="px-2 py-2 text-right">60′</th>
-              <th className="px-2 py-2 text-right whitespace-nowrap">1. tř.</th>
-              {players.map((p) => (
-                <th
-                  key={p.id}
-                  className={
-                    "px-2 py-2 text-center whitespace-nowrap " +
-                    (p.id === myUserId ? "bg-amber-50" : "")
-                  }
-                >
-                  <div>{p.display_name}</div>
-                  <div className="text-[10px] font-normal text-neutral-400">
-                    ({p.total ?? 0})
-                  </div>
-                </th>
-              ))}
+              <th className={headerBase + " bg-neutral-900 text-left"}>#</th>
+              <th className={headerBase + " bg-neutral-900 text-left"}>Datum</th>
+              <th className={headerBase + " bg-neutral-900 text-left"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-right"}>60′</th>
+              <th className={headerBase + " bg-neutral-900 text-right"}>1. tř.</th>
+              {players.map((p) => {
+                const color = colorForUser(p.id);
+                const isMine = p.id === myUserId;
+                return (
+                  <th
+                    key={p.id}
+                    className={
+                      headerBase +
+                      " text-center " +
+                      color +
+                      (isMine ? " ring-2 ring-amber-300 ring-inset" : "")
+                    }
+                  >
+                    <div className="font-semibold">{p.display_name}</div>
+                    <div className="text-[10px] font-normal opacity-80">
+                      ({p.total ?? 0})
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
@@ -120,7 +150,10 @@ export function TipMatrix({
                   ? `${m.home_score_p1}:${m.away_score_p1}`
                   : "—";
               return (
-                <tr key={m.id} className="border-b hover:bg-neutral-50">
+                <tr
+                  key={m.id}
+                  className="border-b odd:bg-white even:bg-neutral-50 hover:bg-neutral-100"
+                >
                   <td className="px-2 py-2 text-neutral-400">{m.game_no}</td>
                   <td className="px-2 py-2 whitespace-nowrap text-neutral-600">
                     {fmt(m.starts_at)}
@@ -147,7 +180,8 @@ export function TipMatrix({
                     if (!visible) {
                       content = <span className="text-neutral-400">🔒</span>;
                     } else if (pick) {
-                      const hcpLine = m.home_handicap != null ? hcpSideLabel(pick, m) : "";
+                      const hcpLine =
+                        m.home_handicap != null ? hcpSideLabel(pick, m) : "";
                       content = (
                         <div className="leading-tight">
                           <div className="font-medium">
@@ -159,23 +193,40 @@ export function TipMatrix({
                             )}
                           </div>
                           {hcpLine && (
-                            <div className="text-[10px] text-neutral-500">{hcpLine}</div>
+                            <div className="text-[10px] text-neutral-500">
+                              {hcpLine}
+                            </div>
                           )}
-                          {score && score.total_points > 0 && (
-                            <div className="text-[10px] font-semibold text-emerald-700">
-                              +{score.total_points}
+                          {score && (
+                            <div
+                              className={
+                                "text-[10px] font-semibold " +
+                                (score.total_points > 0
+                                  ? "text-emerald-700"
+                                  : "text-neutral-400")
+                              }
+                            >
+                              {score.total_points > 0
+                                ? `+${score.total_points}`
+                                : "—"}
                             </div>
                           )}
                         </div>
                       );
                     } else {
-                      content = <span className="text-neutral-400">{isMine ? "+ tip" : "—"}</span>;
+                      content = (
+                        <span className="text-neutral-400">
+                          {isMine ? "+ tip" : "—"}
+                        </span>
+                      );
                     }
 
                     return (
                       <td
                         key={p.id}
-                        onClick={clickable ? () => setEditingMatchId(m.id) : undefined}
+                        onClick={
+                          clickable ? () => setEditingMatchId(m.id) : undefined
+                        }
                         className={
                           "px-2 py-2 text-center " +
                           (isMine ? "bg-amber-50 " : "") +
@@ -343,44 +394,4 @@ function TipModal({
               <input
                 type="number"
                 min={0}
-                value={h1}
-                onChange={(e) => setH1(e.target.value)}
-                className="w-16 rounded border px-3 py-2 text-center"
-                placeholder="—"
-              />
-              <span>:</span>
-              <input
-                type="number"
-                min={0}
-                value={a1}
-                onChange={(e) => setA1(e.target.value)}
-                className="w-16 rounded border px-3 py-2 text-center"
-                placeholder="—"
-              />
-            </div>
-          </div>
-        </div>
-
-        {err && <p className="mt-3 text-sm text-rose-600 text-center">{err}</p>}
-
-        <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded border px-4 py-2 text-sm hover:bg-neutral-50"
-          >
-            Zrušit
-          </button>
-          <button
-            type="button"
-            onClick={save}
-            disabled={saving}
-            className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-          >
-            {saving ? "Ukládám…" : "Uložit tip"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+                v
