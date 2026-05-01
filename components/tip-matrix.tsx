@@ -145,9 +145,9 @@ export function TipMatrix({
             <tr>
               <th className={headerBase + " bg-neutral-900 text-left"}>#</th>
               <th className={headerBase + " bg-neutral-900 text-left"}>Datum</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[180px]"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[180px]"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-right"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[170px]"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[170px]"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-right min-w-[110px]"}>Výsledek</th>
               {players.map((p) => {
                 const color = colorForUser(p.id);
                 return (
@@ -179,13 +179,13 @@ export function TipMatrix({
                   <td className="px-2 py-2 whitespace-nowrap text-neutral-600">
                     {fmt(m.starts_at)}
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[180px]">
+                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[170px]">
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[180px]">
+                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[170px]">
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className="px-2 py-2 text-right whitespace-nowrap">
+                  <td className="px-2 py-2 text-right whitespace-nowrap min-w-[110px]">
                     <span className="font-semibold">{result}</span>
                     {m.finalized && m.home_score_p1 != null && (
                       <span className="ml-1 text-neutral-400">({m.home_score_p1}:{m.away_score_p1})</span>
@@ -207,9 +207,24 @@ export function TipMatrix({
                       content = (
                         <div className="leading-tight">
                           <div className="font-medium">
-                            {pick.home_score}:{pick.away_score}
+                            <span
+                              className={
+                                score && score.exact_points > 0
+                                  ? "text-fuchsia-600 font-bold"
+                                  : ""
+                              }
+                            >
+                              {pick.home_score}:{pick.away_score}
+                            </span>
                             {pick.home_score_p1 != null && (
-                              <span className="ml-1 text-[10px] text-neutral-500">
+                              <span
+                                className={
+                                  "ml-1 " +
+                                  (score && score.p1_points > 0
+                                    ? "text-fuchsia-600 font-bold"
+                                    : "text-neutral-500")
+                                }
+                              >
                                 ({pick.home_score_p1}:{pick.away_score_p1})
                               </span>
                             )}
