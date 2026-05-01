@@ -17,7 +17,6 @@ interface Props {
   scores: Score[];
 }
 
-// Tailwind classes for player headers — listed as literal strings so JIT picks them up.
 const HEADER_COLORS = [
   "bg-rose-600",
   "bg-orange-600",
@@ -97,9 +96,7 @@ export function TipMatrix({
   const myExisting =
     editingMatchId == null ? null : pickMap.get(k(myUserId, editingMatchId)) ?? null;
 
-  // shared header cell classes
-  const headerBase =
-    "sticky top-0 z-10 px-2 py-2 whitespace-nowrap text-white";
+  const headerBase = "sticky top-0 z-10 px-2 py-2 whitespace-nowrap text-white";
 
   return (
     <main>
@@ -142,9 +139,7 @@ export function TipMatrix({
               const home = teamMap.get(m.home_code);
               const away = teamMap.get(m.away_code);
               const started = new Date(m.starts_at).getTime() <= Date.now();
-              const result = m.finalized
-                ? `${m.home_score}:${m.away_score}`
-                : "—";
+              const result = m.finalized ? `${m.home_score}:${m.away_score}` : "—";
               const result1 =
                 m.finalized && m.home_score_p1 != null
                   ? `${m.home_score_p1}:${m.away_score_p1}`
@@ -165,9 +160,7 @@ export function TipMatrix({
                     {teamLabel(away, m.home_handicap, false)}
                   </td>
                   <td className="px-2 py-2 text-right font-semibold">{result}</td>
-                  <td className="px-2 py-2 text-right text-neutral-500">
-                    {result1}
-                  </td>
+                  <td className="px-2 py-2 text-right text-neutral-500">{result1}</td>
 
                   {players.map((p) => {
                     const pick = pickMap.get(k(p.id, m.id));
@@ -180,8 +173,7 @@ export function TipMatrix({
                     if (!visible) {
                       content = <span className="text-neutral-400">🔒</span>;
                     } else if (pick) {
-                      const hcpLine =
-                        m.home_handicap != null ? hcpSideLabel(pick, m) : "";
+                      const hcpLine = m.home_handicap != null ? hcpSideLabel(pick, m) : "";
                       content = (
                         <div className="leading-tight">
                           <div className="font-medium">
@@ -193,9 +185,7 @@ export function TipMatrix({
                             )}
                           </div>
                           {hcpLine && (
-                            <div className="text-[10px] text-neutral-500">
-                              {hcpLine}
-                            </div>
+                            <div className="text-[10px] text-neutral-500">{hcpLine}</div>
                           )}
                           {score && (
                             <div
@@ -206,9 +196,7 @@ export function TipMatrix({
                                   : "text-neutral-400")
                               }
                             >
-                              {score.total_points > 0
-                                ? `+${score.total_points}`
-                                : "—"}
+                              {score.total_points > 0 ? `+${score.total_points}` : "—"}
                             </div>
                           )}
                         </div>
@@ -224,9 +212,7 @@ export function TipMatrix({
                     return (
                       <td
                         key={p.id}
-                        onClick={
-                          clickable ? () => setEditingMatchId(m.id) : undefined
-                        }
+                        onClick={clickable ? () => setEditingMatchId(m.id) : undefined}
                         className={
                           "px-2 py-2 text-center " +
                           (isMine ? "bg-amber-50 " : "") +
@@ -304,9 +290,7 @@ function TipModal({
     setSaving(true);
     setErr("");
     const sb = createClient();
-    const {
-      data: { user },
-    } = await sb.auth.getUser();
+    const { data: { user } } = await sb.auth.getUser();
     if (!user) {
       setErr("Nepřihlášen");
       setSaving(false);
@@ -394,4 +378,44 @@ function TipModal({
               <input
                 type="number"
                 min={0}
-                v
+                value={h1}
+                onChange={(e) => setH1(e.target.value)}
+                className="w-16 rounded border px-3 py-2 text-center"
+                placeholder="—"
+              />
+              <span>:</span>
+              <input
+                type="number"
+                min={0}
+                value={a1}
+                onChange={(e) => setA1(e.target.value)}
+                className="w-16 rounded border px-3 py-2 text-center"
+                placeholder="—"
+              />
+            </div>
+          </div>
+        </div>
+
+        {err && <p className="mt-3 text-sm text-rose-600 text-center">{err}</p>}
+
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded border px-4 py-2 text-sm hover:bg-neutral-50"
+          >
+            Zrušit
+          </button>
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving}
+            className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
+          >
+            {saving ? "Ukládám…" : "Uložit tip"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
