@@ -145,10 +145,9 @@ export function TipMatrix({
             <tr>
               <th className={headerBase + " bg-neutral-900 text-left"}>#</th>
               <th className={headerBase + " bg-neutral-900 text-left"}>Datum</th>
-              <th className={headerBase + " bg-neutral-900 text-left"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-right"}>60′</th>
-              <th className={headerBase + " bg-neutral-900 text-right"}>1. tř.</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[180px]"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[180px]"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-right"}>Výsledek</th>
               {players.map((p) => {
                 const color = colorForUser(p.id);
                 return (
@@ -171,10 +170,6 @@ export function TipMatrix({
               const away = teamMap.get(m.away_code);
               const started = new Date(m.starts_at).getTime() <= Date.now();
               const result = m.finalized ? `${m.home_score}:${m.away_score}` : "—";
-              const result1 =
-                m.finalized && m.home_score_p1 != null
-                  ? `${m.home_score_p1}:${m.away_score_p1}`
-                  : "—";
               return (
                 <tr
                   key={m.id}
@@ -184,14 +179,18 @@ export function TipMatrix({
                   <td className="px-2 py-2 whitespace-nowrap text-neutral-600">
                     {fmt(m.starts_at)}
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium">
+                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[180px]">
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium">
+                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[180px]">
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className="px-2 py-2 text-right font-semibold">{result}</td>
-                  <td className="px-2 py-2 text-right text-neutral-500">{result1}</td>
+                  <td className="px-2 py-2 text-right whitespace-nowrap">
+                    <span className="font-semibold">{result}</span>
+                    {m.finalized && m.home_score_p1 != null && (
+                      <span className="ml-1 text-neutral-400">({m.home_score_p1}:{m.away_score_p1})</span>
+                    )}
+                  </td>
 
                   {players.map((p) => {
                     const pick = pickMap.get(k(p.id, m.id));
