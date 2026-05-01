@@ -7,12 +7,10 @@ function toDateStr(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
-function toHour(iso: string) {
-  return pad(new Date(iso).getHours());
-}
-function nearestFiveMin(iso: string) {
-  const m = new Date(iso).getMinutes();
-  return pad(Math.round(m / 5) * 5 % 60);
+function toTime(iso: string) {
+  const d = new Date(iso);
+  const m = Math.round(d.getMinutes() / 5) * 5 % 60;
+  return `${pad(d.getHours())}:${pad(m)}`;
 }
 
 export default async function AdminMatchesPage() {
@@ -32,23 +30,24 @@ export default async function AdminMatchesPage() {
       return v === "" || v == null ? null : Number(v);
     };
     const dateStr = String(formData.get("starts_date") ?? "");
-    const hourStr = String(formData.get("starts_hour") ?? "");
-    const minStr = String(formData.get("starts_min") ?? "");
+    const timeStr = String(formData.get("starts_time") ?? "");
+
+    const home_score = num("home_score");
+    const away_score = num("away_score");
 
     const update: Record<string, unknown> = {
       home_handicap: num("home_handicap"),
-      home_score: num("home_score"),
-      away_score: num("away_score"),
+      home_score,
+      away_score,
       home_score_p1: num("home_score_p1"),
       away_score_p1: num("away_score_p1"),
-      finalized: formData.get("finalized") === "on",
+      // Auto-finalize: jakmile je zadán výsledek 60. min, zápas je finalizován.
+      finalized: home_score != null && away_score != null,
     };
-    if (dateStr && hourStr !== "" && minStr !== "") {
-      // Build local-time date from parts, snap minute to multiple of 5
+    if (dateStr && timeStr) {
       const [yr, mo, da] = dateStr.split("-").map(Number);
-      const hh = Number(hourStr);
-      const mm = Math.round(Number(minStr) / 5) * 5 % 60;
-      const d = new Date(yr, mo - 1, da, hh, mm, 0, 0);
+      const [hh, mm] = timeStr.split(":").map(Number);
+      const d = new Date(yr, mo - 1, da, hh, Math.round(mm / 5) * 5 % 60, 0, 0);
       update.starts_at = d.toISOString();
     }
 
@@ -102,22 +101,12 @@ export default async function AdminMatchesPage() {
                       className="rounded border px-2 py-1"
                     />
                     <select
-                      name="starts_hour"
-                      defaultValue={toHour(m.starts_at)}
+                      name="starts_time"
+                      defaultValue={toTime(m.starts_at)}
                       className="rounded border px-1.5 py-1"
                     >
-                      {Array.from({ length: 24 }).map((_, h) => (
-                        <option key={h} value={pad(h)}>{pad(h)}</option>
-                      ))}
-                    </select>
-                    <span>:</span>
-                    <select
-                      name="starts_min"
-                      defaultValue={nearestFiveMin(m.starts_at)}
-                      className="rounded border px-1.5 py-1"
-                    >
-                      {Array.from({ length: 12 }).map((_, i) => {
-                        const v = pad(i * 5);
+                      {Array.from({ length: 24 * 12 }).map((_, i) => {
+                        const v = `${pad(Math.floor(i / 12))}:${pad((i % 12) * 5)}`;
                         return <option key={v} value={v}>{v}</option>;
                       })}
                     </select>
@@ -179,15 +168,6 @@ export default async function AdminMatchesPage() {
                     />
                   </div>
                 </div>
-
-                <label className="flex items-center gap-1.5 text-xs">
-                  <input
-                    type="checkbox"
-                    name="finalized"
-                    defaultChecked={m.finalized}
-                  />
-                  Finalizovat
-                </label>
 
                 <button className="ml-auto rounded bg-neutral-900 px-3 py-1.5 text-xs text-white hover:bg-neutral-800">
                   Uložit
