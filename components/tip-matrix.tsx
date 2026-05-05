@@ -14,6 +14,15 @@ interface ActiveUser {
   last_seen_at: string | null;
 }
 
+interface PendingPick {
+  user_id: string;
+  match_id: number;
+  home_score: number;
+  away_score: number;
+  home_score_p1: number | null;
+  away_score_p1: number | null;
+}
+
 interface Props {
   myUserId: string;
   isAdmin?: boolean;
@@ -23,6 +32,7 @@ interface Props {
   picks: Pick[];
   scores: Score[];
   activeUsers?: ActiveUser[];
+  pendingPicks?: PendingPick[];
 }
 
 const HEADER_COLORS = [
@@ -105,21 +115,18 @@ function TeamCell({
   );
 }
 
-function hcpSideLabel(
+function hcpSideCode(
   pick: { home_score: number; away_score: number },
   match: Match,
-): string {
+): string | null {
   const hcp = match.home_handicap;
-  if (hcp == null) return "";
+  if (hcp == null) return null;
   const diff = pick.home_score - pick.away_score;
   let sideHome: boolean;
   if (diff > 0) sideHome = true;
   else if (diff < 0) sideHome = false;
   else sideHome = hcp >= 0;
-  const code = sideHome ? match.home_code : match.away_code;
-  const v = sideHome ? hcp : -hcp;
-  const sign = v > 0 ? `+${v}` : `${v}`;
-  return `${code} ${sign}`;
+  return sideHome ? match.home_code : match.away_code;
 }
 
 export function TipMatrix({
@@ -131,6 +138,7 @@ export function TipMatrix({
   picks,
   scores,
   activeUsers = [],
+  pendingPicks = [],
 }: Props) {
   const [editingTarget, setEditingTarget] = useState<
     { matchId: number; userId: string } | null
@@ -141,6 +149,9 @@ export function TipMatrix({
   const k = (uid: string, mid: number) => `${uid}|${mid}`;
   const pickMap = new Map(picks.map((p) => [k(p.user_id, p.match_id), p]));
   const scoreMap = new Map(scores.map((s) => [k(s.user_id, s.match_id), s]));
+  const pendingMap = new Map(
+    pendingPicks.map((p) => [k(p.user_id, p.match_id), p]),
+  );
 
   const editingMatch =
     editingTarget == null
@@ -274,6 +285,7 @@ export function TipMatrix({
 
                   {players.map((p) => {
                     const pick = pickMap.get(k(p.id, m.id));
+                    const pendingPick = pendingMap.get(k(p.id, m.id));
                     const score = scoreMap.get(k(p.id, m.id));
                     const isMine = p.id === myUserId;
                     const visible = isMine || started || isAdmin;
@@ -285,7 +297,8 @@ export function TipMatrix({
                     if (!visible) {
                       content = <span className="text-neutral-400">🔒</span>;
                     } else if (pick) {
-                      const hcpLine = m.home_handicap != null ? hcpSideLabel(pick, m) : "";
+                      const sideCode = hcpSideCode(pick, m);
+                      const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       content = (
                         <div className="leading-tight">
                           <div className="font-medium">
@@ -311,8 +324,17 @@ export function TipMatrix({
                               </span>
                             )}
                           </div>
-                          {hcpLine && (
-                            <div className="text-neutral-500">{hcpLine}</div>
+                          {sideFlag && (
+                            <div className="mt-0.5 flex justify-center">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={sideFlag}
+                                alt={sideCode ?? ""}
+                                width={20}
+                                height={15}
+                                className="rounded-sm shadow-sm"
+                              />
+                            </div>
                           )}
                           {score && (
                             <div
@@ -324,6 +346,35 @@ export function TipMatrix({
                               }
                             >
                               {score.total_points > 0 ? `+${score.total_points}` : "-"}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    } else if (pendingPick) {
+                      // tip čeká na schválení Masterem
+                      const sideCode = hcpSideCode(pendingPick, m);
+                      const sideFlag = sideCode ? flagUrl(sideCode) : null;
+                      content = (
+                        <div title="Tip čeká na schválení Masterem" className="leading-tight text-rose-600">
+                          <div className="font-medium">
+                            <span className="mr-0.5">?</span>
+                            {pendingPick.home_score}:{pendingPick.away_score}
+                            {pendingPick.home_score_p1 != null && (
+                              <span className="ml-1 text-rose-400">
+                                ({pendingPick.home_score_p1}:{pendingPick.away_score_p1})
+                              </span>
+                            )}
+                          </div>
+                          {sideFlag && (
+                            <div className="mt-0.5 flex justify-center opacity-70">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={sideFlag}
+                                alt={sideCode ?? ""}
+                                width={20}
+                                height={15}
+                                className="rounded-sm shadow-sm"
+                              />
                             </div>
                           )}
                         </div>
@@ -414,25 +465,32 @@ function TipModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  // Inputs default to empty (mobile UX) — existing pick je vidět v matici, modal je čistá tabulka.
-  const [hs, setHs] = useState<string>("");
-  const [as_, setAs] = useState<string>("");
-  const [h1, setH1] = useState<string>("");
-  const [a1, setA1] = useState<string>("");
+  // Pokud existuje tip, předvyplnit. Jinak prázdné (mobile UX).
+  const [hs, setHs] = useState<string>(
+    existing?.home_score != null ? String(existing.home_score) : "",
+  );
+  const [as_, setAs] = useState<string>(
+    existing?.away_score != null ? String(existing.away_score) : "",
+  );
+  const [h1, setH1] = useState<string>(
+    existing?.home_score_p1 != null ? String(existing.home_score_p1) : "",
+  );
+  const [a1, setA1] = useState<string>(
+    existing?.away_score_p1 != null ? String(existing.away_score_p1) : "",
+  );
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
   const home = teamMap.get(match.home_code);
   const away = teamMap.get(match.away_code);
-  const p1Filled = h1 !== "" || a1 !== "";
 
   async function save() {
     if (hs === "" || as_ === "") {
       setErr("Vyplň skóre po 60 minutách.");
       return;
     }
-    if (p1Filled && (h1 === "" || a1 === "")) {
-      setErr("U 1. třetiny vyplň obě čísla, nebo nech obě prázdná.");
+    if (h1 === "" || a1 === "") {
+      setErr("Vyplň skóre po 1. třetině.");
       return;
     }
     setSaving(true);
@@ -443,8 +501,8 @@ function TipModal({
       match_id: match.id,
       home_score: Number(hs),
       away_score: Number(as_),
-      home_score_p1: p1Filled ? Number(h1) : null,
-      away_score_p1: p1Filled ? Number(a1) : null,
+      home_score_p1: Number(h1),
+      away_score_p1: Number(a1),
     };
 
     const startMs = new Date(match.starts_at).getTime();
@@ -618,4 +676,4 @@ function TipModal({
     </div>
   );
 }
-               
+   

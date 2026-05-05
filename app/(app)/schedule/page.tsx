@@ -16,26 +16,35 @@ export default async function SchedulePage() {
   const isAdmin = !!meProfile?.is_admin;
 
   const threeMinAgo = new Date(Date.now() - 3 * 60 * 1000).toISOString();
-  const [matchesRes, teamsRes, profilesRes, picksRes, scoresRes, leaderboardRes, activeRes] =
-    await Promise.all([
-      supabase.from("matches").select("*").order("starts_at"),
-      supabase.from("teams").select("*"),
-      supabase
-        .from("profiles")
-        .select("*")
-        .eq("is_approved", true)
-        .eq("is_player", true)
-        .order("display_name"),
-      supabase.from("picks").select("*"),
-      supabase.from("scores").select("*"),
-      supabase.from("leaderboard").select("*"),
-      supabase
-        .from("profiles")
-        .select("id, display_name, last_seen_at")
-        .eq("is_approved", true)
-        .gte("last_seen_at", threeMinAgo)
-        .order("last_seen_at", { ascending: false }),
-    ]);
+  const [
+    matchesRes,
+    teamsRes,
+    profilesRes,
+    picksRes,
+    scoresRes,
+    leaderboardRes,
+    activeRes,
+    pendingRes,
+  ] = await Promise.all([
+    supabase.from("matches").select("*").order("starts_at"),
+    supabase.from("teams").select("*"),
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("is_approved", true)
+      .eq("is_player", true)
+      .order("display_name"),
+    supabase.from("picks").select("*"),
+    supabase.from("scores").select("*"),
+    supabase.from("leaderboard").select("*"),
+    supabase
+      .from("profiles")
+      .select("id, display_name, last_seen_at")
+      .eq("is_approved", true)
+      .gte("last_seen_at", threeMinAgo)
+      .order("last_seen_at", { ascending: false }),
+    supabase.from("pending_picks").select("*").eq("status", "pending"),
+  ]);
 
   const totals = new Map(
     (leaderboardRes.data ?? []).map((r: { user_id: string; total: number }) => [
@@ -73,6 +82,7 @@ export default async function SchedulePage() {
       picks={picksRes.data ?? []}
       scores={scoresRes.data ?? []}
       activeUsers={activeUsers}
+      pendingPicks={pendingRes.data ?? []}
     />
   );
 }

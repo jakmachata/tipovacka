@@ -79,27 +79,12 @@ export default async function HraciPage() {
   return (
     <main>
       <h1 className="mb-4 text-xl font-semibold">Hráči</h1>
-      {isAdmin && (
-        <p className="mb-3 text-sm text-neutral-600">
-          Klikni na status pro cyklický přepínač:{" "}
-          <span className="rounded bg-neutral-100 px-1.5 py-0.5">Ne</span> →{" "}
-          <span className="rounded bg-sky-100 px-1.5 py-0.5 text-sky-800">
-            Netipující
-          </span>{" "}
-          (vidí, ale nemá sloupec) →{" "}
-          <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-emerald-800">
-            Tipující
-          </span>{" "}
-          (má sloupec, tipuje) → Ne…
-        </p>
-      )}
 
       <table className="w-full text-sm">
         <thead className="border-b text-left text-neutral-500">
           <tr>
             <th className="py-2">Přezdívka</th>
             <th>Status</th>
-            <th>Admin</th>
             <th>Zaplatil</th>
             <th>Poslední login</th>
           </tr>
@@ -129,7 +114,6 @@ export default async function HraciPage() {
                     </span>
                   )}
                 </td>
-                <td className="text-neutral-500">{p.is_admin ? "✓" : ""}</td>
                 <td>
                   {isAdmin ? (
                     <form action={togglePaid} className="inline">

@@ -59,10 +59,7 @@ export default async function AdminPendingPage() {
 
   return (
     <main>
-      <h1 className="mb-1 text-xl font-semibold">Pozdě zadané tipy</h1>
-      <p className="mb-4 text-sm text-neutral-600">
-        Tipy zaslané do 10 min po začátku zápasu. Schvaluješ jako Master.
-      </p>
+      <h1 className="mb-4 text-xl font-semibold">Pozdě zadané tipy</h1>
 
       <table className="w-full text-sm">
         <thead className="border-b text-left text-neutral-500">

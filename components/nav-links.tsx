@@ -26,11 +26,11 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
       <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
         🏒 Tipovačka
       </Link>
-      <Link href="/hraci" className={cls("/hraci")}>
-        Hráči
-      </Link>
       <Link href="/rules" className={cls("/rules")}>
         Pravidla
+      </Link>
+      <Link href="/hraci" className={cls("/hraci")}>
+        Hráči
       </Link>
       {isAdmin && (
         <>
