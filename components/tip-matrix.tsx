@@ -119,12 +119,10 @@ function hcpSideCode(
 ): string | null {
   const hcp = match.home_handicap;
   if (hcp == null) return null;
-  const diff = pick.home_score - pick.away_score;
-  let sideHome: boolean;
-  if (diff > 0) sideHome = true;
-  else if (diff < 0) sideHome = false;
-  else sideHome = hcp >= 0;
-  return sideHome ? match.home_code : match.away_code;
+  // Strana, která vyhrává handicapový tip podle pick + handicapu domácích.
+  // Handicap je vždy půlový, takže adjusted není nikdy 0.
+  const adjusted = pick.home_score - pick.away_score + hcp;
+  return adjusted > 0 ? match.home_code : match.away_code;
 }
 
 export function TipMatrix({
@@ -387,13 +385,19 @@ export function TipMatrix({
                       );
                     }
 
-                    const cellBg = isMine
-                      ? "bg-amber-50 "
-                      : adminClickable && !ownClickable
-                        ? "bg-amber-50/30 "
-                        : "";
+                    const cellBg = m.is_czech
+                      ? isMine
+                        ? "bg-red-100 "
+                        : ""
+                      : isMine
+                        ? "bg-amber-50 "
+                        : adminClickable && !ownClickable
+                          ? "bg-amber-50/30 "
+                          : "";
                     const cellHover = clickable
-                      ? "cursor-pointer hover:bg-amber-100 "
+                      ? m.is_czech
+                        ? "cursor-pointer hover:bg-red-200 "
+                        : "cursor-pointer hover:bg-amber-100 "
                       : "";
 
                     return (
@@ -667,15 +671,4 @@ function TipModal({
             <button
               type="button"
               onClick={save}
-              disabled={saving}
-              className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-            >
-              {saving ? "Ukládám…" : "Uložit tip"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-  
+     
