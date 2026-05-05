@@ -177,8 +177,12 @@ export function TipMatrix({
     { matchId: number; userId: string } | null
   >(null);
   const [hidePast, setHidePast] = useState(false);
-  const [pickingColor, setPickingColor] = useState(false);
+  const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
   const me = players.find((p) => p.id === myUserId) ?? null;
+  const colorTarget =
+    pickingColorFor == null
+      ? null
+      : players.find((p) => p.id === pickingColorFor) ?? null;
   // Pro non-Master: filter view + email pref. Pro Master: hidePast.
   const [filterMode, setFilterMode] = useState<"all" | "near" | "future">("all");
   const [emailPref, setEmailPref] = useState(false);
@@ -333,14 +337,24 @@ export function TipMatrix({
                 return (
                   <th
                     key={p.id}
-                    onClick={isMineHeader ? () => setPickingColor(true) : undefined}
-                    title={isMineHeader ? "Kliknutím změň svou barvu" : undefined}
+                    onClick={
+                      isMineHeader || isAdmin
+                        ? () => setPickingColorFor(p.id)
+                        : undefined
+                    }
+                    title={
+                      isMineHeader
+                        ? "Kliknutím změň svou barvu"
+                        : isAdmin
+                          ? `Změnit barvu hráče ${p.display_name}`
+                          : undefined
+                    }
                     className={
                       headerBase +
                       " text-center min-w-[72px] " +
                       (hasCustom ? "" : fallbackColor + " ") +
                       ownBorder +
-                      (isMineHeader ? " cursor-pointer" : "")
+                      (isMineHeader || isAdmin ? " cursor-pointer" : "")
                     }
                     style={inlineStyle}
                   >
@@ -581,15 +595,15 @@ export function TipMatrix({
         />
       )}
 
-      {pickingColor && me && (
+      {colorTarget && (
         <ColorPickerModal
-          userId={me.id}
-          displayName={me.display_name}
-          initialBg={me.bg_color}
-          initialText={me.text_color}
-          onClose={() => setPickingColor(false)}
+          userId={colorTarget.id}
+          displayName={colorTarget.display_name}
+          initialBg={colorTarget.bg_color}
+          initialText={colorTarget.text_color}
+          onClose={() => setPickingColorFor(null)}
           onSaved={() => {
-            setPickingColor(false);
+            setPickingColorFor(null);
             location.reload();
           }}
         />
