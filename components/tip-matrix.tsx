@@ -150,6 +150,18 @@ function hcpSideCode(
   return adjusted > 0 ? match.home_code : match.away_code;
 }
 
+function hcpSideValue(
+  pick: { home_score: number; away_score: number },
+  match: Match,
+): string | null {
+  const hcp = match.home_handicap;
+  if (hcp == null) return null;
+  const adjusted = pick.home_score - pick.away_score + hcp;
+  const sideHome = adjusted > 0;
+  const v = sideHome ? hcp : -hcp;
+  return v > 0 ? `+${v}` : `${v}`;
+}
+
 export function TipMatrix({
   myUserId,
   isAdmin = false,
@@ -332,9 +344,9 @@ export function TipMatrix({
                     }
                     style={inlineStyle}
                   >
-                    <div className="text-sm font-semibold">{p.display_name}</div>
-                    <div className="text-[10px] font-normal opacity-80">
-                      ({p.total ?? 0})
+                    <div className="text-xs font-semibold">{p.display_name}</div>
+                    <div className="text-lg font-normal opacity-90 leading-none">
+                      {p.total ?? 0}
                     </div>
                   </th>
                 );
@@ -414,6 +426,7 @@ export function TipMatrix({
                     } else if (pick) {
                       const sideCode = hcpSideCode(pick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
+                      const sideHcp = hcpSideValue(pick, m);
                       content = (
                         <div className="leading-tight">
                           <div className="font-medium">
@@ -440,13 +453,14 @@ export function TipMatrix({
                             )}
                           </div>
                           {sideFlag && (
-                            <div className="mt-0.5 flex justify-center">
+                            <div className="mt-0.5 flex items-center justify-center gap-1 text-[10px] text-neutral-500">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[15px] w-auto rounded-sm shadow-sm"
+                                className="h-[10px] w-auto rounded-sm shadow-sm"
                               />
+                              {sideHcp && <span>{sideHcp}</span>}
                             </div>
                           )}
                           {score && (
@@ -467,6 +481,7 @@ export function TipMatrix({
                       // tip čeká na schválení Masterem
                       const sideCode = hcpSideCode(pendingPick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
+                      const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
                         <div title="Tip čeká na schválení Masterem" className="leading-tight text-rose-600">
                           <div className="font-medium">
@@ -479,13 +494,14 @@ export function TipMatrix({
                             )}
                           </div>
                           {sideFlag && (
-                            <div className="mt-0.5 flex justify-center opacity-70">
+                            <div className="mt-0.5 flex items-center justify-center gap-1 text-[10px] opacity-70">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[15px] w-auto rounded-sm shadow-sm"
+                                className="h-[10px] w-auto rounded-sm shadow-sm"
                               />
+                              {sideHcp && <span>{sideHcp}</span>}
                             </div>
                           )}
                         </div>
@@ -818,3 +834,5 @@ function TipModal({
     </div>
   );
 }
+}
+   
