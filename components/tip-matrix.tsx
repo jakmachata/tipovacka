@@ -210,7 +210,7 @@ export function TipMatrix({
                   </tr>,
                 );
               }
-              const czechBg = m.is_czech ? "bg-red-50 hover:bg-red-100" : "odd:bg-white even:bg-neutral-50 hover:bg-neutral-100";
+              const czechBg = m.is_czech ? "bg-red-50 hover:bg-red-100" : "odd:bg-white even:bg-yellow-50 hover:bg-yellow-100";
               rows.push(
                 <tr
                   key={m.id}
@@ -562,3 +562,4 @@ function TipModal({
     </div>
   );
 }
+  
