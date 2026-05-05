@@ -666,6 +666,7 @@ function TipModal({
             </button>
             <button
               type="button"
+              onClick={save}
               disabled={saving}
               className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
             >
@@ -673,7 +674,4 @@ function TipModal({
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
+  
