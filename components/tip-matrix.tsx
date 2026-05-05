@@ -674,4 +674,8 @@ function TipModal({
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
   
