@@ -562,4 +562,3 @@ function TipModal({
     </div>
   );
 }
-  
