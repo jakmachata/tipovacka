@@ -301,11 +301,11 @@ export function TipMatrix({
                         </div>
                       );
                     } else {
-                      // prázdná buňka — clickable cursor naznačí, že lze tipovat
-                      content = clickable ? (
-                        <span>&nbsp;</span>
-                      ) : (
-                        <span className="text-neutral-400">-</span>
+                      // chybějící tip = malá pomlčka (světle šedá pokud klikatelné)
+                      content = (
+                        <span className={clickable ? "text-neutral-300" : "text-neutral-400"}>
+                          -
+                        </span>
                       );
                     }
 

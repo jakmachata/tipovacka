@@ -117,7 +117,7 @@ export default async function AdminMatchesPage() {
               key={m.id}
               action={saveMatch}
               className={
-                "w-fit rounded border p-3 text-sm " +
+                "w-[680px] max-w-full rounded border p-3 text-sm " +
                 (isCzech ? "bg-red-50 border-l-4 border-l-red-600" : "bg-white")
               }
             >
@@ -134,7 +134,7 @@ export default async function AdminMatchesPage() {
                   <TeamFlag code={m.away_code} />
                   <span>{away?.name_cs}</span>
                 </span>
-                <span className="ml-2 inline-flex items-center gap-1 text-xs">
+                <span className="ml-auto inline-flex items-center gap-1 text-xs">
                   <span className="text-neutral-500">Hcp domácích:</span>
                   <input
                     name="home_handicap"
@@ -154,11 +154,6 @@ export default async function AdminMatchesPage() {
                     ×
                   </button>
                 </span>
-                {m.finalized && (
-                  <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
-                    finalizováno
-                  </span>
-                )}
               </header>
 
               <div className="flex flex-wrap items-end gap-3">
@@ -226,7 +221,10 @@ export default async function AdminMatchesPage() {
               </div>
 
               {m.finalized && (
-                <div className="mt-2">
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                    finalizováno
+                  </span>
                   <button
                     formAction={clearResult}
                     className="rounded border border-rose-300 bg-white px-2 py-1 text-xs text-rose-700 hover:bg-rose-50"
@@ -242,4 +240,4 @@ export default async function AdminMatchesPage() {
     </main>
   );
 }
-            
+             
