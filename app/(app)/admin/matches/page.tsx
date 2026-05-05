@@ -50,6 +50,9 @@ export default async function AdminMatchesPage() {
     const home_score = num("home_score");
     const away_score = num("away_score");
 
+    const homeCode = String(formData.get("home_code") ?? "");
+    const awayCode = String(formData.get("away_code") ?? "");
+
     const update: Record<string, unknown> = {
       home_handicap: num("home_handicap"),
       home_score,
@@ -58,6 +61,8 @@ export default async function AdminMatchesPage() {
       away_score_p1: num("away_score_p1"),
       finalized: home_score != null && away_score != null,
     };
+    if (homeCode) update.home_code = homeCode;
+    if (awayCode) update.away_code = awayCode;
     if (dateStr && timeStr) {
       const [yr, mo, da] = dateStr.split("-").map(Number);
       const [hh, mmRaw] = timeStr.split(":").map(Number);
@@ -127,10 +132,30 @@ export default async function AdminMatchesPage() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 font-medium">
                   <TeamFlag code={m.home_code} />
-                  <span>{home?.name_cs}</span>
+                  <select
+                    name="home_code"
+                    defaultValue={m.home_code}
+                    className="rounded border px-1.5 py-0.5 text-sm"
+                  >
+                    {(teams ?? []).map((t) => (
+                      <option key={t.code} value={t.code}>
+                        {t.name_cs}
+                      </option>
+                    ))}
+                  </select>
                   <span className="text-neutral-400">vs</span>
                   <TeamFlag code={m.away_code} />
-                  <span>{away?.name_cs}</span>
+                  <select
+                    name="away_code"
+                    defaultValue={m.away_code}
+                    className="rounded border px-1.5 py-0.5 text-sm"
+                  >
+                    {(teams ?? []).map((t) => (
+                      <option key={t.code} value={t.code}>
+                        {t.name_cs}
+                      </option>
+                    ))}
+                  </select>
                 </span>
                 <span className="ml-auto inline-flex items-center gap-1 text-xs">
                   <span className="text-neutral-500">Hcp domácích:</span>
@@ -238,3 +263,4 @@ export default async function AdminMatchesPage() {
     </main>
   );
 }
+             

@@ -258,7 +258,7 @@ export function TipMatrix({
     <main>
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <span className="text-xs text-neutral-500">
-          Aktivních za poslední 3 min:
+          Aktivní uživatelé:
         </span>
         {activeUsers.length === 0 ? (
           <span className="text-xs text-neutral-400">nikdo</span>
@@ -467,7 +467,7 @@ export function TipMatrix({
                             )}
                           </div>
                           {sideFlag && (
-                            <div className="mt-0.5 flex items-center justify-center gap-1 text-[10px] text-neutral-500">
+                            <div className="mt-0.5 flex items-center justify-center gap-0 text-[10px] text-neutral-500">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={sideFlag}
@@ -508,7 +508,7 @@ export function TipMatrix({
                             )}
                           </div>
                           {sideFlag && (
-                            <div className="mt-0.5 flex items-center justify-center gap-1 text-[10px] opacity-70">
+                            <div className="mt-0.5 flex items-center justify-center gap-0 text-[10px] opacity-70">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={sideFlag}
@@ -848,3 +848,5 @@ function TipModal({
     </div>
   );
 }
+
+        

@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-16">
-      <h1 className="mb-8 text-3xl font-bold">Tipovačka - přihlášení</h1>
+      <h1 className="mb-8 text-3xl font-bold">Natipovals? - přihlášení</h1>
       <form action={login} className="space-y-4">
         <input
           name="email"
@@ -41,6 +41,12 @@ export default function LoginPage() {
         <Link href="/auth/register" className="underline">
           Zaregistrovat se
         </Link>
+      </p>
+      <p className="mt-2 text-sm text-neutral-500">
+        Zapomenuté heslo{" "}
+        <span className="text-neutral-400">
+          (zatím nefunkční - kontaktuj Mastera)
+        </span>
       </p>
     </main>
   );

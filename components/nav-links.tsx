@@ -30,7 +30,7 @@ export function NavLinks({
   return (
     <>
       <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
-        🏒 Tipovačka
+        🏒 Natipovals?
       </Link>
       <Link href="/rules" className={cls("/rules")}>
         Pravidla

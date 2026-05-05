@@ -76,6 +76,17 @@ export default async function HraciPage() {
     revalidatePath("/hraci");
   }
 
+  async function updateDisplayName(formData: FormData) {
+    "use server";
+    const sb = await createClient();
+    const id = String(formData.get("id"));
+    const name = String(formData.get("display_name") ?? "").trim();
+    if (!name) return;
+    await sb.from("profiles").update({ display_name: name }).eq("id", id);
+    revalidatePath("/hraci");
+    revalidatePath("/schedule");
+  }
+
   return (
     <main>
       <h1 className="mb-4 text-xl font-semibold">Hráči</h1>
@@ -94,7 +105,23 @@ export default async function HraciPage() {
             const s = statusOf(p);
             return (
               <tr key={p.id} className="border-b">
-                <td className="py-2 font-medium">{p.display_name}</td>
+                <td className="py-2 font-medium">
+                  {isAdmin && !p.is_admin ? (
+                    <form action={updateDisplayName} className="inline-flex items-center gap-1">
+                      <input type="hidden" name="id" value={p.id} />
+                      <input
+                        name="display_name"
+                        defaultValue={p.display_name ?? ""}
+                        className="w-32 rounded border px-2 py-0.5 text-sm"
+                      />
+                      <button className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs hover:bg-neutral-200">
+                        ✓
+                      </button>
+                    </form>
+                  ) : (
+                    p.display_name
+                  )}
+                </td>
                 <td>
                   {p.is_admin ? (
                     <span className="rounded bg-amber-100 px-2 py-1 text-amber-800">
