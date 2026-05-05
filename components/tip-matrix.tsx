@@ -219,7 +219,10 @@ export function TipMatrix({
             {visibleMatches.flatMap((m, idx) => {
               const home = teamMap.get(m.home_code);
               const away = teamMap.get(m.away_code);
-              const started = new Date(m.starts_at).getTime() <= Date.now();
+              const startMs = new Date(m.starts_at).getTime();
+              const lateMs = Date.now() - startMs;
+              const started = lateMs >= 0;
+              const inGrace = started && lateMs <= 10 * 60 * 1000;
               const result = m.finalized ? `${m.home_score}:${m.away_score}` : "-";
               const prev = idx > 0 ? visibleMatches[idx - 1] : null;
               const isNewDay =
@@ -274,7 +277,7 @@ export function TipMatrix({
                     const score = scoreMap.get(k(p.id, m.id));
                     const isMine = p.id === myUserId;
                     const visible = isMine || started || isAdmin;
-                    const ownClickable = isMine && !started;
+                    const ownClickable = isMine && (!started || inGrace);
                     const adminClickable = isAdmin && !m.finalized;
                     const clickable = ownClickable || adminClickable;
 
@@ -325,8 +328,8 @@ export function TipMatrix({
                           )}
                         </div>
                       );
-                    } else if (isMine && started && !isAdmin) {
-                      // hráč nestihl tip — promeškal čas startu
+                    } else if (isMine && started && !inGrace && !isAdmin) {
+                      // hráč nestihl tip - promeškal čas startu (i 10min grace)
                       content = (
                         <span title="Nestihl jsi tip" className="text-base">😞</span>
                       );
@@ -425,7 +428,7 @@ function TipModal({
 
   async function save() {
     if (hs === "" || as_ === "") {
-      setErr("Vyplň skóre po 60. minutě.");
+      setErr("Vyplň skóre po 60 minutách.");
       return;
     }
     if (p1Filled && (h1 === "" || a1 === "")) {
@@ -443,6 +446,23 @@ function TipModal({
       home_score_p1: p1Filled ? Number(h1) : null,
       away_score_p1: p1Filled ? Number(a1) : null,
     };
+
+    const startMs = new Date(match.starts_at).getTime();
+    const lateMs = Date.now() - startMs;
+    const isLate = !asAdmin && lateMs > 0 && lateMs <= 10 * 60 * 1000;
+
+    if (isLate) {
+      const { error } = await sb.from("pending_picks").insert(payload);
+      setSaving(false);
+      if (error) {
+        setErr(error.message);
+      } else {
+        alert("Zápas už začal. Tvůj tip jsme uložili a čeká na schválení Masterem.");
+        onSaved();
+      }
+      return;
+    }
+
     const { error } = await sb.from("picks").upsert(payload);
     setSaving(false);
     if (error) setErr(error.message);
@@ -478,9 +498,11 @@ function TipModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center">
-          <p className="text-sm font-semibold text-neutral-700">
-            {asAdmin ? targetUser.display_name : `Tip - zápas ${match.game_no}`}
-          </p>
+          {asAdmin && (
+            <p className="text-sm font-semibold text-neutral-700">
+              {targetUser.display_name}
+            </p>
+          )}
           <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
             {homeFlag && <img src={homeFlag} alt={match.home_code} width={20} height={15} className="rounded-sm shadow-sm" />}
             {home?.name_cs}
@@ -596,3 +618,4 @@ function TipModal({
     </div>
   );
 }
+               
