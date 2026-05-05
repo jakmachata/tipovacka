@@ -301,10 +301,11 @@ export function TipMatrix({
                         </div>
                       );
                     } else {
-                      content = (
-                        <span className="text-neutral-400">
-                          {isMine || (isAdmin && !m.finalized) ? "+ tip" : "-"}
-                        </span>
+                      // prázdná buňka — clickable cursor naznačí, že lze tipovat
+                      content = clickable ? (
+                        <span>&nbsp;</span>
+                      ) : (
+                        <span className="text-neutral-400">-</span>
                       );
                     }
 
@@ -447,10 +448,8 @@ function TipModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center">
-          <p className="text-xs uppercase tracking-wide text-neutral-500">
-            {asAdmin
-              ? `Tip hráče ${targetUser.display_name}`
-              : `Tip - zápas ${match.game_no}`}
+          <p className="text-sm font-semibold text-neutral-700">
+            {asAdmin ? targetUser.display_name : `Tip - zápas ${match.game_no}`}
           </p>
           <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
             {homeFlag && <img src={homeFlag} alt={match.home_code} width={20} height={15} className="rounded-sm shadow-sm" />}
@@ -489,7 +488,7 @@ function TipModal({
                 value={hs}
                 onChange={(e) => setHs(e.target.value)}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
-                placeholder="0"
+                placeholder=""
                 autoFocus
               />
               <span className="text-2xl">:</span>
@@ -499,7 +498,7 @@ function TipModal({
                 value={as_}
                 onChange={(e) => setAs(e.target.value)}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
-                placeholder="0"
+                placeholder=""
               />
             </div>
           </div>
@@ -515,7 +514,7 @@ function TipModal({
                 value={h1}
                 onChange={(e) => setH1(e.target.value)}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
-                placeholder="0"
+                placeholder=""
               />
               <span className="text-2xl">:</span>
               <input
@@ -524,7 +523,7 @@ function TipModal({
                 value={a1}
                 onChange={(e) => setA1(e.target.value)}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
-                placeholder="0"
+                placeholder=""
               />
             </div>
           </div>

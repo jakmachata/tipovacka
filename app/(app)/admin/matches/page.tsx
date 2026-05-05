@@ -73,6 +73,15 @@ export default async function AdminMatchesPage() {
     revalidatePath("/leaderboard");
   }
 
+  async function clearHandicap(formData: FormData) {
+    "use server";
+    const sb = await createClient();
+    const id = Number(formData.get("id"));
+    await sb.from("matches").update({ home_handicap: null }).eq("id", id);
+    revalidatePath("/admin/matches");
+    revalidatePath("/schedule");
+  }
+
   async function clearResult(formData: FormData) {
     "use server";
     const sb = await createClient();
@@ -125,6 +134,26 @@ export default async function AdminMatchesPage() {
                   <TeamFlag code={m.away_code} />
                   <span>{away?.name_cs}</span>
                 </span>
+                <span className="ml-2 inline-flex items-center gap-1 text-xs">
+                  <span className="text-neutral-500">Hcp domácích:</span>
+                  <input
+                    name="home_handicap"
+                    type="number"
+                    step={1}
+                    min={-9.5}
+                    max={9.5}
+                    defaultValue={m.home_handicap ?? ""}
+                    className="w-20 rounded border px-2 py-1 text-center"
+                    placeholder="±x.5"
+                  />
+                  <button
+                    formAction={clearHandicap}
+                    title="Vynulovat handicap"
+                    className="rounded border border-neutral-300 px-1.5 py-0.5 text-neutral-500 hover:bg-neutral-100"
+                  >
+                    ×
+                  </button>
+                </span>
                 {m.finalized && (
                   <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
                     finalizováno
@@ -148,20 +177,6 @@ export default async function AdminMatchesPage() {
                     />
                   </div>
                 </div>
-
-                <label className="text-xs">
-                  <span className="block text-neutral-500">Hcp domácích</span>
-                  <input
-                    name="home_handicap"
-                    type="number"
-                    step={1}
-                    min={-9.5}
-                    max={9.5}
-                    defaultValue={m.home_handicap ?? ""}
-                    className="w-20 rounded border px-2 py-1 text-center"
-                    placeholder="±x.5"
-                  />
-                </label>
 
                 <div className="flex flex-col items-center text-xs">
                   <span className="text-neutral-500">Skóre 60′</span>
@@ -227,3 +242,4 @@ export default async function AdminMatchesPage() {
     </main>
   );
 }
+            
