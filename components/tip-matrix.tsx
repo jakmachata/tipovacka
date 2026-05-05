@@ -8,6 +8,12 @@ interface PlayerWithTotal extends Profile {
   total?: number;
 }
 
+interface ActiveUser {
+  id: string;
+  display_name: string;
+  last_seen_at: string | null;
+}
+
 interface Props {
   myUserId: string;
   isAdmin?: boolean;
@@ -16,6 +22,7 @@ interface Props {
   players: PlayerWithTotal[];
   picks: Pick[];
   scores: Score[];
+  activeUsers?: ActiveUser[];
 }
 
 const HEADER_COLORS = [
@@ -123,6 +130,7 @@ export function TipMatrix({
   players,
   picks,
   scores,
+  activeUsers = [],
 }: Props) {
   const [editingTarget, setEditingTarget] = useState<
     { matchId: number; userId: string } | null
@@ -156,8 +164,25 @@ export function TipMatrix({
 
   return (
     <main>
-      <div className="mb-2 flex items-center justify-end">
-        <label className="flex items-center gap-2 text-xs text-neutral-600">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="text-xs text-neutral-500">
+          Aktivních za poslední 3 min:
+        </span>
+        {activeUsers.length === 0 ? (
+          <span className="text-xs text-neutral-400">nikdo</span>
+        ) : (
+          activeUsers.map((u) => (
+            <span
+              key={u.id}
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800"
+              title={u.last_seen_at ?? ""}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              {u.display_name}
+            </span>
+          ))
+        )}
+        <label className="ml-auto flex items-center gap-2 text-xs text-neutral-600">
           <input
             type="checkbox"
             checked={hidePast}
@@ -299,6 +324,11 @@ export function TipMatrix({
                             </div>
                           )}
                         </div>
+                      );
+                    } else if (isMine && started && !isAdmin) {
+                      // hráč nestihl tip — promeškal čas startu
+                      content = (
+                        <span title="Nestihl jsi tip" className="text-base">😞</span>
                       );
                     } else {
                       // chybějící tip = malá pomlčka (světle šedá pokud klikatelné)

@@ -27,15 +27,15 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
       <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
         🏒 Tipovačka
       </Link>
+      <Link href="/hraci" className={cls("/hraci")}>
+        Hráči
+      </Link>
       <Link href="/rules" className={cls("/rules")}>
         Pravidla
       </Link>
       {isAdmin && (
         <>
           <span className="mx-2 text-neutral-300">|</span>
-          <Link href="/admin/users" className={adminCls("/admin/users")}>
-            Hráči
-          </Link>
           <Link href="/admin/matches" className={adminCls("/admin/matches")}>
             Zápasy & výsledky
           </Link>

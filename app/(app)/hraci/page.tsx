@@ -32,8 +32,18 @@ function relativeFromNow(iso: string | null | undefined): string {
   return formatPraguePretty(iso);
 }
 
-export default async function AdminUsersPage() {
+export default async function HraciPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: meProfile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user!.id)
+    .single();
+  const isAdmin = !!meProfile?.is_admin;
+
   const { data: profiles } = await supabase
     .from("profiles")
     .select("*")
@@ -53,7 +63,7 @@ export default async function AdminUsersPage() {
           ? { is_approved: true, is_player: false }
           : { is_approved: true, is_player: true };
     await sb.from("profiles").update(fields).eq("id", id);
-    revalidatePath("/admin/users");
+    revalidatePath("/hraci");
     revalidatePath("/schedule");
   }
 
@@ -63,24 +73,26 @@ export default async function AdminUsersPage() {
     const id = String(formData.get("id"));
     const value = formData.get("value") === "true";
     await sb.from("profiles").update({ has_paid: value }).eq("id", id);
-    revalidatePath("/admin/users");
+    revalidatePath("/hraci");
   }
 
   return (
     <main>
       <h1 className="mb-4 text-xl font-semibold">Hráči</h1>
-      <p className="mb-3 text-sm text-neutral-600">
-        Klikni na status pro cyklický přepínač:{" "}
-        <span className="rounded bg-neutral-100 px-1.5 py-0.5">Ne</span> →{" "}
-        <span className="rounded bg-sky-100 px-1.5 py-0.5 text-sky-800">
-          Netipující
-        </span>{" "}
-        (vidí, ale nemá sloupec) →{" "}
-        <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-emerald-800">
-          Tipující
-        </span>{" "}
-        (má sloupec, tipuje) → Ne…
-      </p>
+      {isAdmin && (
+        <p className="mb-3 text-sm text-neutral-600">
+          Klikni na status pro cyklický přepínač:{" "}
+          <span className="rounded bg-neutral-100 px-1.5 py-0.5">Ne</span> →{" "}
+          <span className="rounded bg-sky-100 px-1.5 py-0.5 text-sky-800">
+            Netipující
+          </span>{" "}
+          (vidí, ale nemá sloupec) →{" "}
+          <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-emerald-800">
+            Tipující
+          </span>{" "}
+          (má sloupec, tipuje) → Ne…
+        </p>
+      )}
 
       <table className="w-full text-sm">
         <thead className="border-b text-left text-neutral-500">
@@ -103,7 +115,7 @@ export default async function AdminUsersPage() {
                     <span className="rounded bg-amber-100 px-2 py-1 text-amber-800">
                       Admin
                     </span>
-                  ) : (
+                  ) : isAdmin ? (
                     <form action={cycleStatus} className="inline">
                       <input type="hidden" name="id" value={p.id} />
                       <input type="hidden" name="current" value={s} />
@@ -111,18 +123,34 @@ export default async function AdminUsersPage() {
                         {s}
                       </button>
                     </form>
+                  ) : (
+                    <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
+                      {s}
+                    </span>
                   )}
                 </td>
                 <td className="text-neutral-500">{p.is_admin ? "✓" : ""}</td>
                 <td>
-                  <form action={togglePaid} className="inline">
-                    <input type="hidden" name="id" value={p.id} />
-                    <input
-                      type="hidden"
-                      name="value"
-                      value={(!p.has_paid).toString()}
-                    />
-                    <button
+                  {isAdmin ? (
+                    <form action={togglePaid} className="inline">
+                      <input type="hidden" name="id" value={p.id} />
+                      <input
+                        type="hidden"
+                        name="value"
+                        value={(!p.has_paid).toString()}
+                      />
+                      <button
+                        className={
+                          p.has_paid
+                            ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
+                            : "rounded bg-neutral-100 px-2 py-1 text-neutral-600"
+                        }
+                      >
+                        {p.has_paid ? "✓ ano" : "- ne"}
+                      </button>
+                    </form>
+                  ) : (
+                    <span
                       className={
                         p.has_paid
                           ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
@@ -130,8 +158,8 @@ export default async function AdminUsersPage() {
                       }
                     >
                       {p.has_paid ? "✓ ano" : "- ne"}
-                    </button>
-                  </form>
+                    </span>
+                  )}
                 </td>
                 <td
                   className="text-neutral-500"

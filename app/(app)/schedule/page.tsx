@@ -15,7 +15,8 @@ export default async function SchedulePage() {
     .single();
   const isAdmin = !!meProfile?.is_admin;
 
-  const [matchesRes, teamsRes, profilesRes, picksRes, scoresRes, leaderboardRes] =
+  const threeMinAgo = new Date(Date.now() - 3 * 60 * 1000).toISOString();
+  const [matchesRes, teamsRes, profilesRes, picksRes, scoresRes, leaderboardRes, activeRes] =
     await Promise.all([
       supabase.from("matches").select("*").order("starts_at"),
       supabase.from("teams").select("*"),
@@ -28,6 +29,12 @@ export default async function SchedulePage() {
       supabase.from("picks").select("*"),
       supabase.from("scores").select("*"),
       supabase.from("leaderboard").select("*"),
+      supabase
+        .from("profiles")
+        .select("id, display_name, last_seen_at")
+        .eq("is_approved", true)
+        .gte("last_seen_at", threeMinAgo)
+        .order("last_seen_at", { ascending: false }),
     ]);
 
   const totals = new Map(
@@ -50,6 +57,12 @@ export default async function SchedulePage() {
       return a.display_name.localeCompare(b.display_name, "cs");
     });
 
+  const activeUsers = (activeRes.data ?? []) as Array<{
+    id: string;
+    display_name: string;
+    last_seen_at: string | null;
+  }>;
+
   return (
     <TipMatrix
       myUserId={myId}
@@ -59,6 +72,7 @@ export default async function SchedulePage() {
       players={players}
       picks={picksRes.data ?? []}
       scores={scoresRes.data ?? []}
+      activeUsers={activeUsers}
     />
   );
 }
