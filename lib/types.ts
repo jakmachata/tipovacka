@@ -71,4 +71,7 @@ export interface LeaderboardRow {
   user_id: string;
   display_name: string;
   hcp_total: number;
-  exac
+  exact_total: number;
+  p1_total: number;
+  total: number;
+}
