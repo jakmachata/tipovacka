@@ -546,4 +546,31 @@ function TipModal({
                 type="button"
                 onClick={deletePick}
                 disabled={saving}
-                className="rounded border border-rose-300 px-3 py-2 text-sm text-rose-700 hover:bg-rose-50 disabled:op
+                className="rounded border border-rose-300 px-3 py-2 text-sm text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+              >
+                Smazat tip
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded border px-4 py-2 text-sm hover:bg-neutral-50"
+            >
+              Zrušit
+            </button>
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
+            >
+              {saving ? "Ukládám…" : "Uložit tip"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
