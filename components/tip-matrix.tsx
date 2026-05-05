@@ -203,6 +203,31 @@ export function TipMatrix({
     try { localStorage.setItem("tipovacka:emailPref", emailPref ? "1" : "0"); } catch {}
   }, [emailPref]);
 
+  // Heartbeat: každé 2 min poslat last_seen_at (jen když je tab v popředí).
+  useEffect(() => {
+    const sb = createClient();
+    let cancelled = false;
+    async function ping() {
+      if (cancelled) return;
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      await sb
+        .from("profiles")
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq("id", myUserId);
+    }
+    ping();
+    const interval = setInterval(ping, 2 * 60 * 1000);
+    const onVis = () => {
+      if (document.visibilityState === "visible") ping();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [myUserId]);
+
   const teamMap = new Map(teams.map((t) => [t.code, t]));
   const k = (uid: string, mid: number) => `${uid}|${mid}`;
   const pickMap = new Map(picks.map((p) => [k(p.user_id, p.match_id), p]));
@@ -260,10 +285,17 @@ export function TipMatrix({
         <span className="text-xs text-neutral-500">
           Aktivní uživatelé:
         </span>
-        {activeUsers.length === 0 ? (
-          <span className="text-xs text-neutral-400">nikdo</span>
-        ) : (
-          activeUsers.map((u) => (
+        {(() => {
+          // Self override: já vidím sám sebe vždy jako online (jsem na stránce).
+          const meEntry =
+            me && !activeUsers.some((u) => u.id === myUserId)
+              ? [{ id: me.id, display_name: me.display_name, last_seen_at: null }]
+              : [];
+          const list = [...meEntry, ...activeUsers];
+          if (list.length === 0) {
+            return <span className="text-xs text-neutral-400">nikdo</span>;
+          }
+          return list.map((u) => (
             <span
               key={u.id}
               className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800"
@@ -272,8 +304,8 @@ export function TipMatrix({
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
               {u.display_name}
             </span>
-          ))
-        )}
+          ));
+        })()}
         {isAdmin ? (
           <label className="ml-auto flex items-center gap-2 text-xs text-neutral-600">
             <input
@@ -303,8 +335,9 @@ export function TipMatrix({
                 checked={emailPref}
                 onChange={(e) => setEmailPref(e.target.checked)}
               />
-              Email upozornění (30 min před začátkem){" "}
-              <span className="text-neutral-400">- zatím nefunkční</span>
+              <span className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800">
+                Email upozornění (30 min před začátkem) - zatím nefunkční
+              </span>
             </label>
           </div>
         )}

@@ -180,8 +180,9 @@ export default async function HraciPage() {
                   className="text-neutral-500"
                   title={p.last_seen_at ? formatPraguePretty(p.last_seen_at) : ""}
                 >
-                  {p.last_seen_at &&
-                  Date.now() - new Date(p.last_seen_at).getTime() <= 3 * 60 * 1000 ? (
+                  {p.id === user!.id ||
+                  (p.last_seen_at &&
+                    Date.now() - new Date(p.last_seen_at).getTime() <= 3 * 60 * 1000) ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                       online
