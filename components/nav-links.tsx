@@ -7,8 +7,7 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
   const path = usePathname() ?? "";
   const active = (href: string) =>
     path === href || path.startsWith(href + "/");
-  const baseCls =
-    "px-2 py-1 rounded transition";
+  const baseCls = "px-2 py-1 rounded transition";
   const cls = (href: string, extra = "") =>
     baseCls +
     " " + extra + " " +
@@ -45,4 +44,8 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
           <Link href="/admin/history" className={adminCls("/admin/history")}>
             Historie tipů
           </Link>
-        <
+        </>
+      )}
+    </>
+  );
+}
