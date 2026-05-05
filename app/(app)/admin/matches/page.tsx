@@ -117,8 +117,8 @@ export default async function AdminMatchesPage() {
               key={m.id}
               action={saveMatch}
               className={
-                "w-[680px] max-w-full rounded border p-3 text-sm " +
-                (isCzech ? "bg-red-50 border-l-4 border-l-red-600" : "bg-white")
+                "w-[580px] max-w-full rounded border p-3 text-sm " +
+                (isCzech ? "bg-red-50" : "bg-white")
               }
             >
               <input type="hidden" name="id" value={m.id} />
@@ -240,4 +240,3 @@ export default async function AdminMatchesPage() {
     </main>
   );
 }
-             

@@ -223,7 +223,7 @@ export function TipMatrix({
                   key={m.id}
                   className={"border-b " + stripeBg}
                 >
-                  <td className={"px-2 py-2 whitespace-nowrap text-neutral-600 " + (m.is_czech ? "border-l-4 border-red-600" : "")}>
+                  <td className="px-2 py-2 whitespace-nowrap text-neutral-600">
                     {stageLabel && (
                       <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
                         {stageLabel}
