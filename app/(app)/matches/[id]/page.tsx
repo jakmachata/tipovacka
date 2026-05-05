@@ -62,10 +62,10 @@ export default async function MatchDetail({ params }: { params: Promise<{ id: st
                   {p.home_score}:{p.away_score}
                 </td>
                 <td>
-                  {p.home_score_p1 != null ? `${p.home_score_p1}:${p.away_score_p1}` : "—"}
+                  {p.home_score_p1 != null ? `${p.home_score_p1}:${p.away_score_p1}` : "-"}
                 </td>
                 <td className="text-right tabular-nums">
-                  {s ? `${s.total_points} (${s.hcp_points}+${s.exact_points}+${s.p1_points})` : "—"}
+                  {s ? `${s.total_points} (${s.hcp_points}+${s.exact_points}+${s.p1_points})` : "-"}
                 </td>
               </tr>
             );

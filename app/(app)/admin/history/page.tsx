@@ -92,15 +92,15 @@ export default async function AdminHistoryPage() {
               const stageLabel = m ? STAGE_LABEL[m.stage] : "";
               const tip60 =
                 r.home_score == null && r.away_score == null
-                  ? "—"
+                  ? "-"
                   : `${r.home_score}:${r.away_score}`;
               const tipP1 =
                 r.home_score_p1 == null && r.away_score_p1 == null
-                  ? "—"
+                  ? "-"
                   : `${r.home_score_p1}:${r.away_score_p1}`;
               const changedByName = r.changed_by
-                ? profileMap.get(r.changed_by) ?? "—"
-                : "—";
+                ? profileMap.get(r.changed_by) ?? "-"
+                : "-";
               const isAdminOverride =
                 r.changed_by != null && r.changed_by !== r.user_id;
               return (

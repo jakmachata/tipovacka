@@ -18,9 +18,9 @@ const STATUS_CLS: Record<Status, string> = {
 };
 
 function relativeFromNow(iso: string | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const ts = new Date(iso).getTime();
-  if (!Number.isFinite(ts)) return "—";
+  if (!Number.isFinite(ts)) return "-";
   const diffSec = Math.round((Date.now() - ts) / 1000);
   if (diffSec < 60) return `před ${diffSec}s`;
   const diffMin = Math.round(diffSec / 60);
@@ -129,7 +129,7 @@ export default async function AdminUsersPage() {
                           : "rounded bg-neutral-100 px-2 py-1 text-neutral-600"
                       }
                     >
-                      {p.has_paid ? "✓ ano" : "— ne"}
+                      {p.has_paid ? "✓ ano" : "- ne"}
                     </button>
                   </form>
                 </td>

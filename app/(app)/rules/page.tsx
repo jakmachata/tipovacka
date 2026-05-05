@@ -11,7 +11,7 @@ export default function RulesPage() {
         výhru o 4+). Tip 4:1 = jdeš s Rakouskem (musí vyhrát nebo prohrát max o 3).
       </p>
 
-      <h2 className="mt-6 mb-2 text-lg font-semibold">Bodování — handicap</h2>
+      <h2 className="mt-6 mb-2 text-lg font-semibold">Bodování - handicap</h2>
       <table className="mt-2 text-sm">
         <thead>
           <tr><th className="pr-6 text-left">Fáze</th><th className="text-left">Body</th></tr>

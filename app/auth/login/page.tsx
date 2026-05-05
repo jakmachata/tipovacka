@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-16">
-      <h1 className="mb-8 text-3xl font-bold">Tipovačka — přihlášení</h1>
+      <h1 className="mb-8 text-3xl font-bold">Tipovačka - přihlášení</h1>
       <form action={login} className="space-y-4">
         <input
           name="email"

@@ -195,7 +195,7 @@ export function TipMatrix({
               const home = teamMap.get(m.home_code);
               const away = teamMap.get(m.away_code);
               const started = new Date(m.starts_at).getTime() <= Date.now();
-              const result = m.finalized ? `${m.home_score}:${m.away_score}` : "—";
+              const result = m.finalized ? `${m.home_score}:${m.away_score}` : "-";
               const prev = idx > 0 ? visibleMatches[idx - 1] : null;
               const isNewDay =
                 !!prev &&
@@ -210,7 +210,7 @@ export function TipMatrix({
                   </tr>,
                 );
               }
-              // Striping ignoruje oddělení dní — natvrdo podle indexu zápasu (idx).
+              // Striping ignoruje oddělení dní - natvrdo podle indexu zápasu (idx).
               // CZE zápas má vlastní červené pozadí, jinak střídání bílá / velmi světlá žlutá.
               const stripeBg = m.is_czech
                 ? "bg-red-50 hover:bg-red-100"
@@ -295,7 +295,7 @@ export function TipMatrix({
                                   : "text-neutral-400")
                               }
                             >
-                              {score.total_points > 0 ? `+${score.total_points}` : "—"}
+                              {score.total_points > 0 ? `+${score.total_points}` : "-"}
                             </div>
                           )}
                         </div>
@@ -303,7 +303,7 @@ export function TipMatrix({
                     } else {
                       content = (
                         <span className="text-neutral-400">
-                          {isMine || (isAdmin && !m.finalized) ? "+ tip" : "—"}
+                          {isMine || (isAdmin && !m.finalized) ? "+ tip" : "-"}
                         </span>
                       );
                     }
@@ -456,8 +456,8 @@ function TipModal({
         <div className="text-center">
           <p className="text-xs uppercase tracking-wide text-neutral-500">
             {asAdmin
-              ? `Admin override — tip hráče ${targetUser.display_name}`
-              : `Tip — zápas ${match.game_no}`}
+              ? `Tip hráče ${targetUser.display_name}`
+              : `Tip - zápas ${match.game_no}`}
           </p>
           <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
             {homeFlag && <img src={homeFlag} alt={match.home_code} width={20} height={15} className="rounded-sm shadow-sm" />}
@@ -513,7 +513,7 @@ function TipModal({
 
           <div className="text-center">
             <label className="text-xs uppercase tracking-wide text-neutral-500">
-              Skóre po 1. třetině (volitelné, +1 bod za přesný tip)
+              Skóre po 1. třetině
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
               <input
@@ -522,7 +522,7 @@ function TipModal({
                 value={h1}
                 onChange={(e) => setH1(e.target.value)}
                 className="w-16 rounded border px-3 py-2 text-center"
-                placeholder="—"
+                placeholder="-"
               />
               <span>:</span>
               <input
@@ -531,7 +531,7 @@ function TipModal({
                 value={a1}
                 onChange={(e) => setA1(e.target.value)}
                 className="w-16 rounded border px-3 py-2 text-center"
-                placeholder="—"
+                placeholder="-"
               />
             </div>
           </div>
