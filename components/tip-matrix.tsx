@@ -848,5 +848,3 @@ function TipModal({
     </div>
   );
 }
-
-              cl
