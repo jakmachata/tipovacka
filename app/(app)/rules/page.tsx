@@ -40,7 +40,7 @@ export default function RulesPage() {
       <ul className="list-disc pl-6">
         <li>Vstup: 300 Kč zaplaceno předem.</li>
         <li>1. místo: 70 % banku · 2. místo: 30 %.</li>
-        <li>Při shodě 1. místa: výhra se dělí formou 50/50. Při shodně 2. místa je to 15/15.</li>
+        <li>Při shodě 1. místa: výhra se dělí formou 50/50. Při shodě 2. místa je to 15/15.</li>
       </ul>
     </main>
   );

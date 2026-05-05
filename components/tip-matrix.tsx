@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
+import { ColorPickerModal } from "@/components/color-picker-modal";
 
 interface PlayerWithTotal extends Profile {
   total?: number;
@@ -164,6 +165,8 @@ export function TipMatrix({
     { matchId: number; userId: string } | null
   >(null);
   const [hidePast, setHidePast] = useState(false);
+  const [pickingColor, setPickingColor] = useState(false);
+  const me = players.find((p) => p.id === myUserId) ?? null;
   // Pro non-Master: filter view + email pref. Pro Master: hidePast.
   const [filterMode, setFilterMode] = useState<"all" | "near" | "future">("all");
   const [emailPref, setEmailPref] = useState(false);
@@ -299,22 +302,37 @@ export function TipMatrix({
               <th className={headerBase + " bg-neutral-900 text-left min-w-[160px]"}>Hosté</th>
               <th className={headerBase + " bg-neutral-900 text-center min-w-[110px]"}>Výsledek</th>
               {players.map((p) => {
-                const color = colorForUser(p.id);
                 const isMineHeader = p.id === myUserId;
+                const hasCustom = !!p.bg_color;
+                const fallbackColor = colorForUser(p.id);
+                const fallbackBorder = borderForUser(p.id);
                 const ownBorder = isMineHeader
-                  ? " border-l-4 " + borderForUser(p.id)
+                  ? " border-l-2 border-r-2 " + (hasCustom ? "" : fallbackBorder)
                   : "";
+                const inlineStyle: React.CSSProperties = {};
+                if (hasCustom) {
+                  inlineStyle.backgroundColor = p.bg_color ?? undefined;
+                  inlineStyle.color = p.text_color ?? undefined;
+                }
+                if (isMineHeader && hasCustom) {
+                  inlineStyle.borderLeftColor = p.bg_color ?? undefined;
+                  inlineStyle.borderRightColor = p.bg_color ?? undefined;
+                }
                 return (
                   <th
                     key={p.id}
+                    onClick={isMineHeader ? () => setPickingColor(true) : undefined}
+                    title={isMineHeader ? "Kliknutím změň svou barvu" : undefined}
                     className={
                       headerBase +
                       " text-center min-w-[72px] " +
-                      color +
-                      ownBorder
+                      (hasCustom ? "" : fallbackColor + " ") +
+                      ownBorder +
+                      (isMineHeader ? " cursor-pointer" : "")
                     }
+                    style={inlineStyle}
                   >
-                    <div className="font-semibold">{p.display_name}</div>
+                    <div className="text-sm font-semibold">{p.display_name}</div>
                     <div className="text-[10px] font-normal opacity-80">
                       ({p.total ?? 0})
                     </div>
@@ -494,9 +512,14 @@ export function TipMatrix({
                         ? "cursor-pointer hover:bg-red-200 "
                         : "cursor-pointer hover:bg-amber-100 "
                       : "";
+                    const hasCustomCell = !!p.bg_color;
                     const ownBorder = isMine
-                      ? " border-l-4 " + borderForUser(p.id)
+                      ? " border-l-2 border-r-2 " + (hasCustomCell ? "" : borderForUser(p.id))
                       : "";
+                    const ownBorderStyle: React.CSSProperties =
+                      isMine && hasCustomCell
+                        ? { borderLeftColor: p.bg_color ?? undefined, borderRightColor: p.bg_color ?? undefined }
+                        : {};
 
                     return (
                       <td
@@ -510,6 +533,7 @@ export function TipMatrix({
                                 })
                             : undefined
                         }
+                        style={ownBorderStyle}
                         className={
                           "px-2 py-2 text-center min-w-[72px] " + cellBg + cellHover + ownBorder
                         }
@@ -536,6 +560,20 @@ export function TipMatrix({
           onClose={() => setEditingTarget(null)}
           onSaved={() => {
             setEditingTarget(null);
+            location.reload();
+          }}
+        />
+      )}
+
+      {pickingColor && me && (
+        <ColorPickerModal
+          userId={me.id}
+          displayName={me.display_name}
+          initialBg={me.bg_color}
+          initialText={me.text_color}
+          onClose={() => setPickingColor(false)}
+          onSaved={() => {
+            setPickingColor(false);
             location.reload();
           }}
         />

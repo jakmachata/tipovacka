@@ -86,7 +86,7 @@ export default async function HraciPage() {
             <th className="py-2">Přezdívka</th>
             <th>Status</th>
             <th>Zaplatil</th>
-            <th>Poslední login</th>
+            <th>Naposledy viděn</th>
           </tr>
         </thead>
         <tbody>
@@ -149,7 +149,15 @@ export default async function HraciPage() {
                   className="text-neutral-500"
                   title={p.last_seen_at ? formatPraguePretty(p.last_seen_at) : ""}
                 >
-                  {relativeFromNow(p.last_seen_at)}
+                  {p.last_seen_at &&
+                  Date.now() - new Date(p.last_seen_at).getTime() <= 3 * 60 * 1000 ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      online
+                    </span>
+                  ) : (
+                    relativeFromNow(p.last_seen_at)
+                  )}
                 </td>
               </tr>
             );

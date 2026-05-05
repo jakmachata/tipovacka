@@ -21,6 +21,8 @@ export interface Profile {
   has_paid: boolean;
   created_at: string;
   last_seen_at: string | null;
+  bg_color: string | null;
+  text_color: string | null;
 }
 
 export interface Team {
@@ -69,7 +71,4 @@ export interface LeaderboardRow {
   user_id: string;
   display_name: string;
   hcp_total: number;
-  exact_total: number;
-  p1_total: number;
-  total: number;
-}
+  exac
