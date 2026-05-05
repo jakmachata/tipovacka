@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 
@@ -53,10 +53,34 @@ const HEADER_COLORS = [
   "bg-pink-600",
 ];
 
-function colorForUser(userId: string) {
+const HEADER_BORDERS = [
+  "border-rose-600",
+  "border-orange-600",
+  "border-amber-600",
+  "border-yellow-600",
+  "border-lime-600",
+  "border-green-600",
+  "border-emerald-600",
+  "border-teal-600",
+  "border-cyan-600",
+  "border-sky-600",
+  "border-blue-600",
+  "border-indigo-600",
+  "border-violet-600",
+  "border-fuchsia-600",
+  "border-pink-600",
+];
+
+function userColorIdx(userId: string) {
   let h = 0;
   for (const c of userId) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return HEADER_COLORS[h % HEADER_COLORS.length];
+  return h % HEADER_COLORS.length;
+}
+function colorForUser(userId: string) {
+  return HEADER_COLORS[userColorIdx(userId)];
+}
+function borderForUser(userId: string) {
+  return HEADER_BORDERS[userColorIdx(userId)];
 }
 
 // Mapování IIHF 3-písmenných kódů na ISO 3166-1 alpha-2 kódy (pro flagcdn.com)
@@ -140,6 +164,25 @@ export function TipMatrix({
     { matchId: number; userId: string } | null
   >(null);
   const [hidePast, setHidePast] = useState(false);
+  // Pro non-Master: filter view + email pref. Pro Master: hidePast.
+  const [filterMode, setFilterMode] = useState<"all" | "near" | "future">("all");
+  const [emailPref, setEmailPref] = useState(false);
+
+  // Načíst persistované preference
+  useEffect(() => {
+    try {
+      const fm = localStorage.getItem("tipovacka:filterMode");
+      if (fm === "near" || fm === "future" || fm === "all") setFilterMode(fm);
+      const ep = localStorage.getItem("tipovacka:emailPref");
+      if (ep === "1") setEmailPref(true);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem("tipovacka:filterMode", filterMode); } catch {}
+  }, [filterMode]);
+  useEffect(() => {
+    try { localStorage.setItem("tipovacka:emailPref", emailPref ? "1" : "0"); } catch {}
+  }, [emailPref]);
 
   const teamMap = new Map(teams.map((t) => [t.code, t]));
   const k = (uid: string, mid: number) => `${uid}|${mid}`;
@@ -165,9 +208,32 @@ export function TipMatrix({
   const headerBase = "sticky top-12 z-10 px-2 py-2 whitespace-nowrap text-white";
 
   const now = Date.now();
-  const visibleMatches = hidePast
-    ? matches.filter((m) => new Date(m.starts_at).getTime() > now)
-    : matches;
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const todayStartMs = startOfDay.getTime();
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  let visibleMatches = matches;
+  if (isAdmin) {
+    if (hidePast) {
+      visibleMatches = matches.filter((m) => !m.finalized);
+    }
+  } else {
+    if (filterMode === "near") {
+      // dnešek + 1 den dozadu + 1 den dopředu
+      const minMs = todayStartMs - oneDay;
+      const maxMs = todayStartMs + 2 * oneDay; // exclusive
+      visibleMatches = matches.filter((m) => {
+        const ms = new Date(m.starts_at).getTime();
+        return ms >= minMs && ms < maxMs;
+      });
+    } else if (filterMode === "future") {
+      // od začátku dnešního dne dál
+      visibleMatches = matches.filter(
+        (m) => new Date(m.starts_at).getTime() >= todayStartMs,
+      );
+    }
+  }
 
   return (
     <main>
@@ -189,14 +255,39 @@ export function TipMatrix({
             </span>
           ))
         )}
-        <label className="ml-auto flex items-center gap-2 text-xs text-neutral-600">
-          <input
-            type="checkbox"
-            checked={hidePast}
-            onChange={(e) => setHidePast(e.target.checked)}
-          />
-          Skrýt odehrané zápasy
-        </label>
+        {isAdmin ? (
+          <label className="ml-auto flex items-center gap-2 text-xs text-neutral-600">
+            <input
+              type="checkbox"
+              checked={hidePast}
+              onChange={(e) => setHidePast(e.target.checked)}
+            />
+            Skrýt odehrané zápasy
+          </label>
+        ) : (
+          <div className="ml-auto flex flex-wrap items-center gap-3 text-xs text-neutral-600">
+            <label className="flex items-center gap-1">
+              Zobrazit:
+              <select
+                value={filterMode}
+                onChange={(e) => setFilterMode(e.target.value as "all" | "near" | "future")}
+                className="rounded border px-2 py-1"
+              >
+                <option value="all">Všechny zápasy</option>
+                <option value="near">Nejbližší dny</option>
+                <option value="future">Budoucí</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input
+                type="checkbox"
+                checked={emailPref}
+                onChange={(e) => setEmailPref(e.target.checked)}
+              />
+              Email upozornění (30 min před začátkem)
+            </label>
+          </div>
+        )}
       </div>
       <div className="-mx-4 px-4">
         <table className="min-w-full text-xs border-separate border-spacing-0">
@@ -208,10 +299,19 @@ export function TipMatrix({
               <th className={headerBase + " bg-neutral-900 text-center min-w-[110px]"}>Výsledek</th>
               {players.map((p) => {
                 const color = colorForUser(p.id);
+                const isMineHeader = p.id === myUserId;
+                const ownBorder = isMineHeader
+                  ? " border-l-4 " + borderForUser(p.id)
+                  : "";
                 return (
                   <th
                     key={p.id}
-                    className={headerBase + " text-center min-w-[72px] " + color}
+                    className={
+                      headerBase +
+                      " text-center min-w-[72px] " +
+                      color +
+                      ownBorder
+                    }
                   >
                     <div className="font-semibold">{p.display_name}</div>
                     <div className="text-[10px] font-normal opacity-80">
@@ -385,19 +485,16 @@ export function TipMatrix({
                       );
                     }
 
-                    const cellBg = m.is_czech
-                      ? isMine
-                        ? "bg-red-100 "
-                        : ""
-                      : isMine
-                        ? "bg-amber-50 "
-                        : adminClickable && !ownClickable
-                          ? "bg-amber-50/30 "
-                          : "";
+                    const cellBg = adminClickable && !ownClickable && !m.is_czech
+                      ? "bg-amber-50/30 "
+                      : "";
                     const cellHover = clickable
                       ? m.is_czech
                         ? "cursor-pointer hover:bg-red-200 "
                         : "cursor-pointer hover:bg-amber-100 "
+                      : "";
+                    const ownBorder = isMine
+                      ? " border-l-4 " + borderForUser(p.id)
                       : "";
 
                     return (
@@ -413,7 +510,7 @@ export function TipMatrix({
                             : undefined
                         }
                         className={
-                          "px-2 py-2 text-center min-w-[72px] " + cellBg + cellHover
+                          "px-2 py-2 text-center min-w-[72px] " + cellBg + cellHover + ownBorder
                         }
                       >
                         {content}
@@ -682,4 +779,3 @@ function TipModal({
     </div>
   );
 }
-     

@@ -15,12 +15,21 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!profile?.is_approved) redirect("/auth/pending");
 
+  // Pro admina: spočítat čekající pozdní tipy (badge v navu)
+  let pendingCount = 0;
+  if (profile.is_admin) {
+    const { count } = await supabase
+      .from("pending_picks")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending");
+    pendingCount = count ?? 0;
+  }
+
   // Throttled update last_seen_at (max jednou za 2 minuty)
   const lastSeen = profile?.last_seen_at
     ? new Date(profile.last_seen_at).getTime()
     : 0;
   if (Date.now() - lastSeen > 2 * 60 * 1000) {
-    // fire-and-forget — neblokujeme renderování při potížích
     await supabase
       .from("profiles")
       .update({ last_seen_at: new Date().toISOString() })
@@ -38,7 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <>
       <header className="sticky top-0 z-20 border-b bg-white">
         <nav className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 text-sm">
-          <NavLinks isAdmin={!!profile.is_admin} />
+          <NavLinks isAdmin={!!profile.is_admin} pendingCount={pendingCount} />
           <span className="ml-auto text-neutral-500">{profile.display_name}</span>
           <form action={logout}><button className="hover:underline">Odhlásit</button></form>
         </nav>

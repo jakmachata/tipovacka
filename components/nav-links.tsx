@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
+export function NavLinks({
+  isAdmin,
+  pendingCount = 0,
+}: {
+  isAdmin: boolean;
+  pendingCount?: number;
+}) {
   const path = usePathname() ?? "";
   const active = (href: string) =>
     path === href || path.startsWith(href + "/");
@@ -38,11 +44,27 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
           <Link href="/admin/matches" className={adminCls("/admin/matches")}>
             Zápasy & výsledky
           </Link>
-          <Link href="/admin/pending" className={adminCls("/admin/pending")}>
-            Pozdní tipy
-          </Link>
           <Link href="/admin/history" className={adminCls("/admin/history")}>
             Historie tipů
+          </Link>
+          <Link
+            href="/admin/pending"
+            className={
+              baseCls +
+              " " +
+              (active("/admin/pending")
+                ? "bg-rose-600 text-white"
+                : pendingCount > 0
+                  ? "bg-rose-100 text-rose-800 ring-1 ring-rose-300 animate-pulse"
+                  : "text-amber-700 hover:bg-amber-50")
+            }
+          >
+            Pozdní tipy
+            {pendingCount > 0 && (
+              <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
+                {pendingCount}
+              </span>
+            )}
           </Link>
         </>
       )}
