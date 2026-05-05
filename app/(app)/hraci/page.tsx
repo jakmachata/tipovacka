@@ -94,6 +94,7 @@ export default async function HraciPage() {
       <table className="w-full text-sm">
         <thead className="border-b text-left text-neutral-500">
           <tr>
+            {isAdmin && <th className="py-2">Email</th>}
             <th className="py-2">Přezdívka</th>
             <th>Status</th>
             <th>Zaplatil</th>
@@ -105,6 +106,9 @@ export default async function HraciPage() {
             const s = statusOf(p);
             return (
               <tr key={p.id} className="border-b">
+                {isAdmin && (
+                  <td className="py-2 text-neutral-600">{p.email ?? "-"}</td>
+                )}
                 <td className="py-2 font-medium">
                   {isAdmin && !p.is_admin ? (
                     <form action={updateDisplayName} className="inline-flex items-center gap-1">

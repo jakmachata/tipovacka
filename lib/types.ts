@@ -23,6 +23,7 @@ export interface Profile {
   last_seen_at: string | null;
   bg_color: string | null;
   text_color: string | null;
+  email: string | null;
 }
 
 export interface Team {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { PasswordInput } from "@/components/password-input";
 
 export default function LoginPage() {
   async function login(formData: FormData) {
@@ -16,7 +17,8 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-16">
-      <h1 className="mb-8 text-3xl font-bold">Natipovals? - přihlášení</h1>
+      <h1 className="text-4xl font-extrabold tracking-tight">NATIPOVALS</h1>
+      <p className="mb-8 text-sm text-neutral-500">Přihlášení</p>
       <form action={login} className="space-y-4">
         <input
           name="email"
@@ -25,13 +27,7 @@ export default function LoginPage() {
           required
           className="w-full rounded border px-3 py-2"
         />
-        <input
-          name="password"
-          type="password"
-          placeholder="heslo"
-          required
-          className="w-full rounded border px-3 py-2"
-        />
+        <PasswordInput name="password" placeholder="heslo" required />
         <button className="w-full rounded bg-black px-4 py-2 text-white">
           Přihlásit
         </button>

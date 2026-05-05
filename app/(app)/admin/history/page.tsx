@@ -62,8 +62,8 @@ export default async function AdminHistoryPage() {
             <th className="pr-3">Hráč</th>
             <th className="pr-3">Akce</th>
             <th className="pr-3">Zápas</th>
-            <th className="pr-3">Tip 60′</th>
-            <th className="pr-3">Tip 1. tř.</th>
+            <th className="pr-3">60'</th>
+            <th className="pr-3">1. třetina</th>
             <th className="pr-3">Změnil</th>
           </tr>
         </thead>
