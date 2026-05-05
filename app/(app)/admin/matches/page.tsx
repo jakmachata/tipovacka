@@ -22,10 +22,8 @@ function TeamFlag({ code }: { code: string }) {
   return (
     <img
       src={url}
-      width={20}
-      height={15}
       alt={code}
-      className="inline-block rounded-sm shadow-sm align-middle"
+      className="inline-block h-[15px] w-auto rounded-sm shadow-sm align-middle"
     />
   );
 }

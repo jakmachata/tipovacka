@@ -101,10 +101,8 @@ function TeamCell({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={url}
-          width={20}
-          height={15}
           alt={t.code}
-          className="inline-block rounded-sm shadow-sm"
+          className="inline-block h-[15px] w-auto rounded-sm shadow-sm"
         />
       )}
       <span>
@@ -254,7 +252,7 @@ export function TipMatrix({
               const stripeBg = m.is_czech
                 ? "bg-red-50 hover:bg-red-100"
                 : idx % 2 === 0
-                  ? "bg-white hover:bg-neutral-100"
+                  ? "bg-neutral-50 hover:bg-neutral-100"
                   : "bg-[#fffef2] hover:bg-yellow-100";
               const stageLabel = m.stage !== "group" ? STAGE_LABEL[m.stage] : null;
               rows.push(
@@ -330,9 +328,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                width={20}
-                                height={15}
-                                className="rounded-sm shadow-sm"
+                                className="h-[15px] w-auto rounded-sm shadow-sm"
                               />
                             </div>
                           )}
@@ -371,9 +367,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                width={20}
-                                height={15}
-                                className="rounded-sm shadow-sm"
+                                className="h-[15px] w-auto rounded-sm shadow-sm"
                               />
                             </div>
                           )}
@@ -493,6 +487,14 @@ function TipModal({
       setErr("Vyplň skóre po 1. třetině.");
       return;
     }
+    const hsN = Number(hs);
+    const asN = Number(as_);
+    const h1N = Number(h1);
+    const a1N = Number(a1);
+    if (h1N > hsN || a1N > asN) {
+      setErr("Skóre po 1. třetině nemůže být vyšší než finální skóre.");
+      return;
+    }
     setSaving(true);
     setErr("");
     const sb = createClient();
@@ -562,10 +564,10 @@ function TipModal({
             </p>
           )}
           <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
-            {homeFlag && <img src={homeFlag} alt={match.home_code} width={20} height={15} className="rounded-sm shadow-sm" />}
+            {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[15px] w-auto rounded-sm shadow-sm" />}
             {home?.name_cs}
             <span className="text-neutral-400">vs</span>
-            {awayFlag && <img src={awayFlag} alt={match.away_code} width={20} height={15} className="rounded-sm shadow-sm" />}
+            {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[15px] w-auto rounded-sm shadow-sm" />}
             {away?.name_cs}
           </h2>
           <p className="mt-1 text-sm text-neutral-600">
@@ -664,7 +666,6 @@ function TipModal({
             </button>
             <button
               type="button"
-              onClick={save}
               disabled={saving}
               className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
             >
@@ -676,4 +677,3 @@ function TipModal({
     </div>
   );
 }
-   
