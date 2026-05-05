@@ -61,6 +61,7 @@ function fmt(iso: string) {
     month: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Prague",
   });
 }
 
@@ -123,7 +124,9 @@ export function TipMatrix({
   picks,
   scores,
 }: Props) {
-  const [editingMatchId, setEditingMatchId] = useState<number | null>(null);
+  const [editingTarget, setEditingTarget] = useState<
+    { matchId: number; userId: string } | null
+  >(null);
   const [hidePast, setHidePast] = useState(false);
 
   const teamMap = new Map(teams.map((t) => [t.code, t]));
@@ -132,11 +135,17 @@ export function TipMatrix({
   const scoreMap = new Map(scores.map((s) => [k(s.user_id, s.match_id), s]));
 
   const editingMatch =
-    editingMatchId == null
+    editingTarget == null
       ? null
-      : matches.find((m) => m.id === editingMatchId) ?? null;
-  const myExisting =
-    editingMatchId == null ? null : pickMap.get(k(myUserId, editingMatchId)) ?? null;
+      : matches.find((m) => m.id === editingTarget.matchId) ?? null;
+  const editingPlayer =
+    editingTarget == null
+      ? null
+      : players.find((p) => p.id === editingTarget.userId) ?? null;
+  const editingExisting =
+    editingTarget == null
+      ? null
+      : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
   const headerBase = "sticky top-12 z-10 px-2 py-2 whitespace-nowrap text-white";
 
@@ -192,21 +201,22 @@ export function TipMatrix({
                 !!prev &&
                 new Date(prev.starts_at).toDateString() !==
                   new Date(m.starts_at).toDateString();
-              const rowSpan = 4 + players.length;
+              const colSpan = 4 + players.length;
               const rows: React.ReactNode[] = [];
               if (isNewDay) {
                 rows.push(
                   <tr key={`gap-${m.id}`} aria-hidden="true">
-                    <td colSpan={rowSpan} className="h-1.5 bg-neutral-100 p-0" />
+                    <td colSpan={colSpan} className="h-1.5 bg-neutral-100 p-0" />
                   </tr>,
                 );
               }
+              const czechBg = m.is_czech ? "bg-red-50 hover:bg-red-100" : "odd:bg-white even:bg-neutral-50 hover:bg-neutral-100";
               rows.push(
                 <tr
                   key={m.id}
-                  className="border-b odd:bg-white even:bg-neutral-50 hover:bg-neutral-100"
+                  className={"border-b " + czechBg}
                 >
-                  <td className="px-2 py-2 whitespace-nowrap text-neutral-600">
+                  <td className={"px-2 py-2 whitespace-nowrap text-neutral-600 " + (m.is_czech ? "border-l-4 border-red-600" : "")}>
                     {fmt(m.starts_at)}
                   </td>
                   <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[160px]">
@@ -227,7 +237,9 @@ export function TipMatrix({
                     const score = scoreMap.get(k(p.id, m.id));
                     const isMine = p.id === myUserId;
                     const visible = isMine || started || isAdmin;
-                    const clickable = isMine && !started;
+                    const ownClickable = isMine && !started;
+                    const adminClickable = isAdmin && !m.finalized;
+                    const clickable = ownClickable || adminClickable;
 
                     let content: React.ReactNode;
                     if (!visible) {
@@ -279,19 +291,34 @@ export function TipMatrix({
                     } else {
                       content = (
                         <span className="text-neutral-400">
-                          {isMine ? "+ tip" : "—"}
+                          {isMine || (isAdmin && !m.finalized) ? "+ tip" : "—"}
                         </span>
                       );
                     }
 
+                    const cellBg = isMine
+                      ? "bg-amber-50 "
+                      : adminClickable && !ownClickable
+                        ? "bg-amber-50/30 "
+                        : "";
+                    const cellHover = clickable
+                      ? "cursor-pointer hover:bg-amber-100 "
+                      : "";
+
                     return (
                       <td
                         key={p.id}
-                        onClick={clickable ? () => setEditingMatchId(m.id) : undefined}
+                        onClick={
+                          clickable
+                            ? () =>
+                                setEditingTarget({
+                                  matchId: m.id,
+                                  userId: p.id,
+                                })
+                            : undefined
+                        }
                         className={
-                          "px-2 py-2 text-center min-w-[72px] " +
-                          (isMine ? "bg-amber-50 " : "") +
-                          (clickable ? "cursor-pointer hover:bg-amber-100" : "")
+                          "px-2 py-2 text-center min-w-[72px] " + cellBg + cellHover
                         }
                       >
                         {content}
@@ -306,14 +333,16 @@ export function TipMatrix({
         </table>
       </div>
 
-      {editingMatch && (
+      {editingMatch && editingPlayer && (
         <TipModal
           match={editingMatch}
-          existing={myExisting}
+          targetUser={editingPlayer}
+          asAdmin={isAdmin && editingPlayer.id !== myUserId}
+          existing={editingExisting}
           teamMap={teamMap}
-          onClose={() => setEditingMatchId(null)}
+          onClose={() => setEditingTarget(null)}
           onSaved={() => {
-            setEditingMatchId(null);
+            setEditingTarget(null);
             location.reload();
           }}
         />
@@ -324,12 +353,16 @@ export function TipMatrix({
 
 function TipModal({
   match,
+  targetUser,
+  asAdmin,
   existing,
   teamMap,
   onClose,
   onSaved,
 }: {
   match: Match;
+  targetUser: Profile;
+  asAdmin: boolean;
   existing: Pick | null;
   teamMap: Map<string, Team>;
   onClose: () => void;
@@ -366,14 +399,8 @@ function TipModal({
     setSaving(true);
     setErr("");
     const sb = createClient();
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) {
-      setErr("Nepřihlášen");
-      setSaving(false);
-      return;
-    }
     const payload = {
-      user_id: user.id,
+      user_id: targetUser.id,
       match_id: match.id,
       home_score: Number(hs),
       away_score: Number(as_),
@@ -381,6 +408,22 @@ function TipModal({
       away_score_p1: p1Filled ? Number(a1) : null,
     };
     const { error } = await sb.from("picks").upsert(payload);
+    setSaving(false);
+    if (error) setErr(error.message);
+    else onSaved();
+  }
+
+  async function deletePick() {
+    if (!existing) return;
+    if (!confirm(`Smazat tip hráče ${targetUser.display_name}?`)) return;
+    setSaving(true);
+    setErr("");
+    const sb = createClient();
+    const { error } = await sb
+      .from("picks")
+      .delete()
+      .eq("user_id", targetUser.id)
+      .eq("match_id", match.id);
     setSaving(false);
     if (error) setErr(error.message);
     else onSaved();
@@ -400,7 +443,9 @@ function TipModal({
       >
         <div className="text-center">
           <p className="text-xs uppercase tracking-wide text-neutral-500">
-            Tip — zápas {match.game_no}
+            {asAdmin
+              ? `Admin override — tip hráče ${targetUser.display_name}`
+              : `Tip — zápas ${match.game_no}`}
           </p>
           <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
             {homeFlag && <img src={homeFlag} alt={match.home_code} width={20} height={15} className="rounded-sm shadow-sm" />}
@@ -416,6 +461,7 @@ function TipModal({
               month: "numeric",
               hour: "2-digit",
               minute: "2-digit",
+              timeZone: "Europe/Prague",
             })}
             {match.home_handicap != null && (
               <span className="ml-2">
@@ -481,22 +527,36 @@ function TipModal({
 
         {err && <p className="mt-3 text-sm text-rose-600 text-center">{err}</p>}
 
-        <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded border px-4 py-2 text-sm hover:bg-neutral-50"
-          >
-            Zrušit
-          </button>
-          <button
-            type="button"
-            onClick={save}
-            disabled={saving}
-            className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-          >
-            {saving ? "Ukládám…" : "Uložit tip"}
-          </button>
+        <div className="mt-6 flex justify-between gap-2">
+          <div>
+            {asAdmin && existing && (
+              <button
+                type="button"
+                onClick={deletePick}
+                disabled={saving}
+                className="rounded border border-rose-300 px-3 py-2 text-sm text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+              >
+                Smazat tip
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded border px-4 py-2 text-sm hover:bg-neutral-50"
+            >
+              Zrušit
+            </button>
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
+            >
+              {saving ? "Ukládám…" : "Uložit tip"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

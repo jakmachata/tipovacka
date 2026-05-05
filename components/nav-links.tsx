@@ -39,6 +39,9 @@ export function NavLinks({ isAdmin }: { isAdmin: boolean }) {
           <Link href="/admin/matches" className={adminCls("/admin/matches")}>
             Zápasy & výsledky
           </Link>
+          <Link href="/admin/history" className={adminCls("/admin/history")}>
+            Historie tipů
+          </Link>
         </>
       )}
     </>

@@ -9,11 +9,23 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, is_admin, is_approved")
+    .select("display_name, is_admin, is_approved, last_seen_at")
     .eq("id", user.id)
     .single();
 
   if (!profile?.is_approved) redirect("/auth/pending");
+
+  // Throttled update last_seen_at (max jednou za 2 minuty)
+  const lastSeen = profile?.last_seen_at
+    ? new Date(profile.last_seen_at).getTime()
+    : 0;
+  if (Date.now() - lastSeen > 2 * 60 * 1000) {
+    // fire-and-forget — neblokujeme renderování při potížích
+    await supabase
+      .from("profiles")
+      .update({ last_seen_at: new Date().toISOString() })
+      .eq("id", user.id);
+  }
 
   async function logout() {
     "use server";

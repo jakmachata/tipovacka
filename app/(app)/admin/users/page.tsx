@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { formatPraguePretty } from "@/lib/tz";
 
 type Status = "Ne" | "Netipující" | "Tipující";
 
@@ -15,6 +16,21 @@ const STATUS_CLS: Record<Status, string> = {
   Netipující: "bg-sky-100 text-sky-800",
   Tipující: "bg-emerald-100 text-emerald-800",
 };
+
+function relativeFromNow(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const ts = new Date(iso).getTime();
+  if (!Number.isFinite(ts)) return "—";
+  const diffSec = Math.round((Date.now() - ts) / 1000);
+  if (diffSec < 60) return `před ${diffSec}s`;
+  const diffMin = Math.round(diffSec / 60);
+  if (diffMin < 60) return `před ${diffMin} min`;
+  const diffHr = Math.round(diffMin / 60);
+  if (diffHr < 24) return `před ${diffHr} h`;
+  const diffDay = Math.round(diffHr / 24);
+  if (diffDay < 30) return `před ${diffDay} dny`;
+  return formatPraguePretty(iso);
+}
 
 export default async function AdminUsersPage() {
   const supabase = await createClient();
@@ -72,6 +88,7 @@ export default async function AdminUsersPage() {
             <th className="py-2">Přezdívka</th>
             <th>Status</th>
             <th>Zaplatil</th>
+            <th>Naposledy viděn</th>
             <th>Admin</th>
           </tr>
         </thead>
@@ -114,6 +131,12 @@ export default async function AdminUsersPage() {
                       {p.has_paid ? "✓ ano" : "— ne"}
                     </button>
                   </form>
+                </td>
+                <td
+                  className="text-neutral-500"
+                  title={p.last_seen_at ? formatPraguePretty(p.last_seen_at) : ""}
+                >
+                  {relativeFromNow(p.last_seen_at)}
                 </td>
                 <td className="text-neutral-500">{p.is_admin ? "✓" : ""}</td>
               </tr>

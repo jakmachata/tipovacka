@@ -2,8 +2,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { STAGE_LABEL, type Match, type Team } from "@/lib/types";
 import { TimePicker } from "@/components/time-picker";
-
-const pad = (n: number) => String(n).padStart(2, "0");
+import { pragueLocalToUTC, pragueParts, snap5 } from "@/lib/tz";
 
 const TEAM_ISO2: Record<string, string> = {
   CAN: "ca", USA: "us", FIN: "fi", SWE: "se", CZE: "cz",
@@ -14,16 +13,6 @@ const TEAM_ISO2: Record<string, string> = {
 function flagUrl(code: string): string | null {
   const iso = TEAM_ISO2[code];
   return iso ? `https://flagcdn.com/w20/${iso}.png` : null;
-}
-
-function toDateStr(iso: string) {
-  const d = new Date(iso);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-function toTimeStr(iso: string) {
-  const d = new Date(iso);
-  const m = Math.round(d.getMinutes() / 5) * 5 % 60;
-  return `${pad(d.getHours())}:${pad(m)}`;
 }
 
 function TeamFlag({ code }: { code: string }) {
@@ -73,12 +62,31 @@ export default async function AdminMatchesPage() {
     };
     if (dateStr && timeStr) {
       const [yr, mo, da] = dateStr.split("-").map(Number);
-      const [hh, mm] = timeStr.split(":").map(Number);
-      const d = new Date(yr, mo - 1, da, hh, Math.round(mm / 5) * 5 % 60, 0, 0);
-      update.starts_at = d.toISOString();
+      const [hh, mmRaw] = timeStr.split(":").map(Number);
+      // Datum/čas přicházejí v Europe/Prague (CET/CEST). Přepočítáme na UTC ISO.
+      update.starts_at = pragueLocalToUTC(yr, mo, da, hh, snap5(mmRaw)).toISOString();
     }
 
     await sb.from("matches").update(update).eq("id", id);
+    revalidatePath("/admin/matches");
+    revalidatePath("/schedule");
+    revalidatePath("/leaderboard");
+  }
+
+  async function clearResult(formData: FormData) {
+    "use server";
+    const sb = await createClient();
+    const id = Number(formData.get("id"));
+    await sb
+      .from("matches")
+      .update({
+        home_score: null,
+        away_score: null,
+        home_score_p1: null,
+        away_score_p1: null,
+        finalized: false,
+      })
+      .eq("id", id);
     revalidatePath("/admin/matches");
     revalidatePath("/schedule");
     revalidatePath("/leaderboard");
@@ -89,6 +97,7 @@ export default async function AdminMatchesPage() {
       <h1 className="mb-1 text-xl font-semibold">Zápasy & výsledky</h1>
       <p className="mb-4 text-sm text-neutral-600">
         Uprav datum/čas, handicap a výsledky. Po uložení se body přepočítají.
+        Časy jsou v Europe/Prague (CET/CEST).
       </p>
 
       <div className="space-y-2">
@@ -96,11 +105,16 @@ export default async function AdminMatchesPage() {
           const m = mx as Match;
           const home = teamMap.get(m.home_code);
           const away = teamMap.get(m.away_code);
+          const { date: dateStr, time: timeStr } = pragueParts(m.starts_at);
+          const isCzech = m.is_czech;
           return (
             <form
               key={m.id}
               action={saveMatch}
-              className="w-fit rounded border bg-white p-3 text-sm"
+              className={
+                "w-fit rounded border p-3 text-sm " +
+                (isCzech ? "bg-red-50 border-l-4 border-l-red-600" : "bg-white")
+              }
             >
               <input type="hidden" name="id" value={m.id} />
 
@@ -115,21 +129,26 @@ export default async function AdminMatchesPage() {
                   <TeamFlag code={m.away_code} />
                   <span>{away?.name_cs}</span>
                 </span>
+                {m.finalized && (
+                  <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                    finalizováno
+                  </span>
+                )}
               </header>
 
               <div className="flex flex-wrap items-end gap-3">
                 <div className="flex flex-col items-start text-xs">
-                  <span className="text-neutral-500">Datum & čas</span>
+                  <span className="text-neutral-500">Datum & čas (CET/CEST)</span>
                   <div className="mt-1 flex items-center gap-1">
                     <input
                       name="starts_date"
                       type="date"
-                      defaultValue={toDateStr(m.starts_at)}
+                      defaultValue={dateStr}
                       className="rounded border px-2 py-1"
                     />
                     <TimePicker
                       name="starts_time"
-                      defaultValue={toTimeStr(m.starts_at)}
+                      defaultValue={timeStr}
                     />
                   </div>
                 </div>
@@ -194,6 +213,17 @@ export default async function AdminMatchesPage() {
                   Uložit
                 </button>
               </div>
+
+              {m.finalized && (
+                <div className="mt-2">
+                  <button
+                    formAction={clearResult}
+                    className="rounded border border-rose-300 bg-white px-2 py-1 text-xs text-rose-700 hover:bg-rose-50"
+                  >
+                    Smazat výsledek
+                  </button>
+                </div>
+              )}
             </form>
           );
         })}

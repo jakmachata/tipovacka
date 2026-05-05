@@ -20,6 +20,7 @@ export interface Profile {
   is_player: boolean;
   has_paid: boolean;
   created_at: string;
+  last_seen_at: string | null;
 }
 
 export interface Team {
