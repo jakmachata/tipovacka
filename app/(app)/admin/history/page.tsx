@@ -34,8 +34,7 @@ export default async function AdminHistoryPage() {
       supabase
         .from("picks_audit")
         .select("*")
-        .order("changed_at", { ascending: false })
-        .limit(500),
+        .order("changed_at", { ascending: false }),
       supabase.from("profiles").select("id, display_name"),
       supabase.from("matches").select("*"),
       supabase.from("teams").select("*"),
@@ -54,10 +53,7 @@ export default async function AdminHistoryPage() {
 
   return (
     <main>
-      <h1 className="mb-1 text-xl font-semibold">Historie tipů</h1>
-      <p className="mb-4 text-sm text-neutral-600">
-        Posledních 500 záznamů.
-      </p>
+      <h1 className="mb-4 text-xl font-semibold">Historie tipů</h1>
 
       <table className="w-full text-sm">
         <thead className="border-b text-left text-neutral-500">
@@ -121,6 +117,11 @@ export default async function AdminHistoryPage() {
                     </span>
                   </td>
                   <td className="pr-3 whitespace-nowrap">
+                    {m && (
+                      <span className="mr-2 text-neutral-500">
+                        {formatPraguePretty(m.starts_at)}
+                      </span>
+                    )}
                     {stageLabel && (
                       <span className="mr-2 rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">
                         {stageLabel}

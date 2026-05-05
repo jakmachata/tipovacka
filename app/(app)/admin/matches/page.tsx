@@ -94,10 +94,7 @@ export default async function AdminMatchesPage() {
 
   return (
     <main>
-      <h1 className="mb-1 text-xl font-semibold">Zápasy & výsledky</h1>
-      <p className="mb-4 text-sm text-neutral-600">
-        Uprav datum/čas, handicap a výsledky. Po uložení se body přepočítají.
-      </p>
+      <h1 className="mb-4 text-xl font-semibold">Zápasy & výsledky</h1>
 
       <div className="space-y-2">
         {(matches ?? []).map((mx) => {

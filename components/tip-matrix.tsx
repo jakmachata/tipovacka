@@ -380,18 +380,11 @@ function TipModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [hs, setHs] = useState<string>(
-    existing?.home_score != null ? String(existing.home_score) : "",
-  );
-  const [as_, setAs] = useState<string>(
-    existing?.away_score != null ? String(existing.away_score) : "",
-  );
-  const [h1, setH1] = useState<string>(
-    existing?.home_score_p1 != null ? String(existing.home_score_p1) : "",
-  );
-  const [a1, setA1] = useState<string>(
-    existing?.away_score_p1 != null ? String(existing.away_score_p1) : "",
-  );
+  // Inputs default to empty (mobile UX) — existing pick je vidět v matici, modal je čistá tabulka.
+  const [hs, setHs] = useState<string>("");
+  const [as_, setAs] = useState<string>("");
+  const [h1, setH1] = useState<string>("");
+  const [a1, setA1] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
@@ -487,7 +480,7 @@ function TipModal({
         <div className="mt-6 space-y-5">
           <div className="text-center">
             <label className="text-xs uppercase tracking-wide text-neutral-500">
-              Skóre po 60. minutě
+              Skóre po 60 minutách
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
               <input
@@ -521,17 +514,17 @@ function TipModal({
                 min={0}
                 value={h1}
                 onChange={(e) => setH1(e.target.value)}
-                className="w-16 rounded border px-3 py-2 text-center"
-                placeholder="-"
+                className="w-20 rounded border px-3 py-2 text-center text-2xl"
+                placeholder="0"
               />
-              <span>:</span>
+              <span className="text-2xl">:</span>
               <input
                 type="number"
                 min={0}
                 value={a1}
                 onChange={(e) => setA1(e.target.value)}
-                className="w-16 rounded border px-3 py-2 text-center"
-                placeholder="-"
+                className="w-20 rounded border px-3 py-2 text-center text-2xl"
+                placeholder="0"
               />
             </div>
           </div>
