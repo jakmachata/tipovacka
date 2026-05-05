@@ -97,7 +97,6 @@ export default async function AdminMatchesPage() {
       <h1 className="mb-1 text-xl font-semibold">Zápasy & výsledky</h1>
       <p className="mb-4 text-sm text-neutral-600">
         Uprav datum/čas, handicap a výsledky. Po uložení se body přepočítají.
-        Časy jsou v Europe/Prague (CET/CEST).
       </p>
 
       <div className="space-y-2">
@@ -138,7 +137,7 @@ export default async function AdminMatchesPage() {
 
               <div className="flex flex-wrap items-end gap-3">
                 <div className="flex flex-col items-start text-xs">
-                  <span className="text-neutral-500">Datum & čas (CET/CEST)</span>
+                  <span className="text-neutral-500">Datum & čas</span>
                   <div className="mt-1 flex items-center gap-1">
                     <input
                       name="starts_date"

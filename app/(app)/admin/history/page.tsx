@@ -56,7 +56,7 @@ export default async function AdminHistoryPage() {
     <main>
       <h1 className="mb-1 text-xl font-semibold">Historie tipů</h1>
       <p className="mb-4 text-sm text-neutral-600">
-        Posledních 500 záznamů. Časy v Europe/Prague.
+        Posledních 500 záznamů.
       </p>
 
       <table className="w-full text-sm">

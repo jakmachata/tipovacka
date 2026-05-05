@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Match, Pick, Profile, Team, Score } from "@/lib/types";
+import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 
 interface PlayerWithTotal extends Profile {
   total?: number;
@@ -210,14 +210,26 @@ export function TipMatrix({
                   </tr>,
                 );
               }
-              const czechBg = m.is_czech ? "bg-red-50 hover:bg-red-100" : "odd:bg-white even:bg-yellow-50 hover:bg-yellow-100";
+              // Striping ignoruje oddělení dní — natvrdo podle indexu zápasu (idx).
+              // CZE zápas má vlastní červené pozadí, jinak střídání bílá / velmi světlá žlutá.
+              const stripeBg = m.is_czech
+                ? "bg-red-50 hover:bg-red-100"
+                : idx % 2 === 0
+                  ? "bg-white hover:bg-neutral-100"
+                  : "bg-[#fffef2] hover:bg-yellow-100";
+              const stageLabel = m.stage !== "group" ? STAGE_LABEL[m.stage] : null;
               rows.push(
                 <tr
                   key={m.id}
-                  className={"border-b " + czechBg}
+                  className={"border-b " + stripeBg}
                 >
                   <td className={"px-2 py-2 whitespace-nowrap text-neutral-600 " + (m.is_czech ? "border-l-4 border-red-600" : "")}>
-                    {fmt(m.starts_at)}
+                    {stageLabel && (
+                      <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
+                        {stageLabel}
+                      </div>
+                    )}
+                    <div>{fmt(m.starts_at)}</div>
                   </td>
                   <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[160px]">
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
@@ -534,31 +546,4 @@ function TipModal({
                 type="button"
                 onClick={deletePick}
                 disabled={saving}
-                className="rounded border border-rose-300 px-3 py-2 text-sm text-rose-700 hover:bg-rose-50 disabled:opacity-50"
-              >
-                Smazat tip
-              </button>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded border px-4 py-2 text-sm hover:bg-neutral-50"
-            >
-              Zrušit
-            </button>
-            <button
-              type="button"
-              onClick={save}
-              disabled={saving}
-              className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-            >
-              {saving ? "Ukládám…" : "Uložit tip"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+                className="rounded border border-rose-300 px-3 py-2 text-sm text-rose-700 hover:bg-rose-50 disabled:op
