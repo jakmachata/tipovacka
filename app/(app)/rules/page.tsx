@@ -7,8 +7,9 @@ export default function RulesPage() {
         se odvodí ze tvého rozdílu skóre a handicapu domácích.
       </p>
       <p className="mt-2 text-sm text-neutral-600">
-        Příklad: Finsko -3.5 vs Rakousko +3.5. Tip 6:1 = jdeš s Finskem (potřebuješ
-        výhru o 4+). Tip 4:1 = jdeš s Rakouskem (musí vyhrát nebo prohrát max o 3).
+        Příklad: Finsko -3.5 vs Rakousko +3.5.
+        <br />
+        Tip 6:1 = jdeš s Finskem (potřebuješ výhru o 4+). Tip 4:1 = jdeš s Rakouskem (musí vyhrát nebo prohrát max o 3).
       </p>
 
       <h2 className="mt-6 mb-2 text-lg font-semibold">Bodování - handicap</h2>
@@ -28,7 +29,7 @@ export default function RulesPage() {
       <h2 className="mt-6 mb-2 text-lg font-semibold">Bonusy</h2>
       <ul className="list-disc pl-6">
         <li><strong>+4 body</strong> za přesný výsledek po 60. minutě.</li>
-        <li><strong>+1 bod</strong> za přesný výsledek po 1. třetině (nepovinný tip).</li>
+        <li><strong>+1 bod</strong> za přesný výsledek po 1. třetině.</li>
       </ul>
       <p className="mt-2 text-sm text-neutral-600">
         Maximum z jednoho zápasu = 4 (handicap medailového zápasu) + 4 (přesný 60′) + 1
@@ -39,8 +40,5 @@ export default function RulesPage() {
       <ul className="list-disc pl-6">
         <li>Vstup: 300 Kč zaplaceno předem.</li>
         <li>1. místo: 70 % banku · 2. místo: 30 %.</li>
-        <li>Při shodě 1. místa: výhra 50/50. Při shodě 2. místa: 15/15.</li>
-      </ul>
-    </main>
-  );
-}
+        <li>Při shodě 1. místa: výhra se dělí formou 50/50. Při shodně 2. místa je to 15/15.</li>
+      </ul

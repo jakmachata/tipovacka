@@ -275,7 +275,7 @@ export function TipMatrix({
               >
                 <option value="all">Všechny zápasy</option>
                 <option value="near">Nejbližší dny</option>
-                <option value="future">Budoucí</option>
+                <option value="future">Pohled vpřed</option>
               </select>
             </label>
             <label className="flex items-center gap-1.5">
@@ -284,7 +284,8 @@ export function TipMatrix({
                 checked={emailPref}
                 onChange={(e) => setEmailPref(e.target.checked)}
               />
-              Email upozornění (30 min před začátkem)
+              Email upozornění (30 min před začátkem){" "}
+              <span className="text-neutral-400">- zatím nefunkční</span>
             </label>
           </div>
         )}
@@ -771,11 +772,4 @@ function TipModal({
               disabled={saving}
               className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
             >
-              {saving ? "Ukládám…" : "Uložit tip"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+              {saving ? "Ukládám…" : "Uložit tip"
