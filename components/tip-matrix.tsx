@@ -121,20 +121,25 @@ function TeamCell({
   const sign = v === null ? "" : v > 0 ? `+${v}` : `${v}`;
   const url = flagUrl(t.code);
   return (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-      {url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={url}
-          alt={t.code}
-          className="inline-block h-[15px] w-auto rounded-sm shadow-sm"
-        />
-      )}
-      <span>
-        <span className="md:hidden">{t.code}</span>
-        <span className="hidden md:inline">{t.name_cs}</span>
-        {v === null ? "" : ` (${sign})`}
+    <span className="inline-flex flex-col items-start whitespace-nowrap md:flex-row md:items-center md:gap-1.5">
+      <span className="inline-flex items-center gap-1.5">
+        {url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={url}
+            alt={t.code}
+            className="inline-block h-[15px] w-auto rounded-sm shadow-sm"
+          />
+        )}
+        <span>
+          <span className="md:hidden">{t.code}</span>
+          <span className="hidden md:inline">{t.name_cs}</span>
+          <span className="hidden md:inline">{v === null ? "" : ` (${sign})`}</span>
+        </span>
       </span>
+      {v !== null && (
+        <span className="text-[11px] leading-tight text-neutral-500 md:hidden">{`(${sign})`}</span>
+      )}
     </span>
   );
 }
@@ -250,7 +255,7 @@ export function TipMatrix({
       ? null
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
-  const headerBase = "sticky top-12 z-10 px-2 py-2 whitespace-nowrap text-white";
+  const headerBase = "md:sticky md:top-12 z-10 px-2 py-2 whitespace-nowrap text-white";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -343,14 +348,14 @@ export function TipMatrix({
           </div>
         )}
       </div>
-      <div className="-mx-4 px-4">
+      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
         <table className="min-w-full text-xs border-separate border-spacing-0">
           <thead>
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center sticky left-0 md:left-auto md:static z-20 md:z-10"}>Datum</th>
               <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[80px] md:left-auto md:static z-20 md:z-10"}>Domácí</th>
               <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[160px] md:left-auto md:static z-20 md:z-10"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center min-w-[110px] sticky left-[240px] md:left-auto md:static z-20 md:z-10"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center min-w-[95px] sticky left-[240px] md:left-auto md:static z-20 md:z-10"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -451,7 +456,7 @@ export function TipMatrix({
                   <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[160px] md:static z-10 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[110px] sticky left-[240px] md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[95px] sticky left-[240px] md:static z-10 md:z-auto " + stripeBg}>
                     <span className="font-semibold">{result}</span>
                     {m.finalized && m.home_score_p1 != null && (
                       <span className="ml-1 text-neutral-400">({m.home_score_p1}:{m.away_score_p1})</span>
@@ -560,9 +565,9 @@ export function TipMatrix({
                         <span title="Nestihl jsi tip" className="text-base">😞</span>
                       );
                     } else {
-                      // chybějící tip: klikatelná buňka = "+" (vyzývá k tipu), nekl. = pomlčka
+                      // chybějící tip: klikatelná buňka = tučné "+" (vyzývá k tipu), nekl. = pomlčka
                       content = (
-                        <span className={clickable ? "text-neutral-400 text-base" : "text-neutral-400"}>
+                        <span className={clickable ? "text-neutral-500 text-lg font-bold leading-none" : "text-neutral-400"}>
                           {clickable ? "+" : "-"}
                         </span>
                       );
