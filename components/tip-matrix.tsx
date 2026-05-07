@@ -379,13 +379,13 @@ export function TipMatrix({
         )}
       </div>
       <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
-        <table className="min-w-full text-xs border-separate border-spacing-0">
+        <table className="min-w-full text-xs border-separate border-spacing-0 table-fixed">
           <thead>
             <tr>
-              <th className={headerBase + " bg-neutral-900 text-center min-w-[50px]"}>Buly</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-0 md:left-auto md:static z-40 md:z-10"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[80px] md:left-auto md:static z-40 md:z-10"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center min-w-[60px]"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[50px]"}>Buly</th>
+              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-0 md:left-auto md:static z-40 md:z-10"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[80px] md:left-auto md:static z-40 md:z-10"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[60px]"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -429,13 +429,16 @@ export function TipMatrix({
                   >
                     <div
                       className={
-                        "font-semibold leading-tight " +
-                        ((p.display_name?.length ?? 0) > 11
-                          ? "text-[9px]"
-                          : (p.display_name?.length ?? 0) > 8
-                            ? "text-[10px]"
-                            : "text-xs")
+                        "font-semibold leading-tight overflow-hidden text-ellipsis " +
+                        ((p.display_name?.length ?? 0) > 13
+                          ? "text-[8px]"
+                          : (p.display_name?.length ?? 0) > 11
+                            ? "text-[9px]"
+                            : (p.display_name?.length ?? 0) > 8
+                              ? "text-[10px]"
+                              : "text-xs")
                       }
+                      title={p.display_name}
                     >
                       {p.display_name}
                     </div>
@@ -483,7 +486,7 @@ export function TipMatrix({
                   key={m.id}
                   className={"border-b " + stripeBg}
                 >
-                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 min-w-[50px] " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[50px] " + stripeBg}>
                     {stageLabel && (
                       <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
                         {stageLabel}
@@ -492,13 +495,13 @@ export function TipMatrix({
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
                     <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[80px] md:static z-30 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[80px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[60px] " + stripeBg}>
+                  <td className={"px-2 py-2 text-center whitespace-nowrap w-[60px] " + stripeBg}>
                     <div className="font-semibold leading-tight">{result}</div>
                     {m.finalized && m.home_score_p1 != null && (
                       <div className="text-[11px] text-neutral-400 leading-tight">({m.home_score_p1}:{m.away_score_p1})</div>
