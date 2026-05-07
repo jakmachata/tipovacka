@@ -151,7 +151,7 @@ function TeamCell({
         <span className="inline-flex flex-col leading-tight">
           <span>{t.code}</span>
           {v !== null && (
-            <span className="text-[11px] text-neutral-500">{`(${sign})`}</span>
+            <span className="text-[11px] text-neutral-500">{sign}</span>
           )}
         </span>
       </span>
@@ -382,10 +382,10 @@ export function TipMatrix({
         <table className="min-w-full text-xs border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className={headerBase + " bg-neutral-900 text-center sticky left-0 md:left-auto md:static z-20 md:z-10 min-w-[60px]"}>Datum</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[60px] md:left-auto md:static z-20 md:z-10"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[140px] md:left-auto md:static z-20 md:z-10"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center min-w-[60px] sticky left-[220px] md:left-auto md:static z-20 md:z-10"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center min-w-[50px]"}>Buly</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-0 md:left-auto md:static z-20 md:z-10"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[80px] md:left-auto md:static z-20 md:z-10"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-center min-w-[60px]"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -472,7 +472,7 @@ export function TipMatrix({
                   key={m.id}
                   className={"border-b " + stripeBg}
                 >
-                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 sticky left-0 md:static z-10 md:z-auto min-w-[60px] " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 min-w-[50px] " + stripeBg}>
                     {stageLabel && (
                       <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
                         {stageLabel}
@@ -481,13 +481,13 @@ export function TipMatrix({
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
                     <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[60px] md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-0 md:static z-10 md:z-auto " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[140px] md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[80px] md:static z-10 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[60px] sticky left-[220px] md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[60px] " + stripeBg}>
                     <div className="font-semibold leading-tight">{result}</div>
                     {m.finalized && m.home_score_p1 != null && (
                       <div className="text-[11px] text-neutral-400 leading-tight">({m.home_score_p1}:{m.away_score_p1})</div>
@@ -513,40 +513,49 @@ export function TipMatrix({
                       const sideHcp = hcpSideValue(pick, m);
                       content = (
                         <div className="leading-tight">
-                          <div className="font-medium">
-                            <span
-                              className={
-                                score && score.exact_points > 0
-                                  ? "text-fuchsia-600 font-bold"
-                                  : ""
-                              }
-                            >
-                              {pick.home_score}:{pick.away_score}
-                            </span>
-                            {pick.home_score_p1 != null && (
+                          <div className="grid grid-cols-2 gap-x-1 items-center">
+                            {/* A: fulltime score (left half, centered) */}
+                            <div className="text-center font-medium">
                               <span
                                 className={
-                                  "ml-1 " +
-                                  (score && score.p1_points > 0
-                                    ? "text-fuchsia-400"
-                                    : "text-neutral-500")
+                                  score && score.exact_points > 0
+                                    ? "text-fuchsia-600 font-bold"
+                                    : ""
                                 }
                               >
-                                ({pick.home_score_p1}:{pick.away_score_p1})
+                                {pick.home_score}:{pick.away_score}
                               </span>
-                            )}
-                          </div>
-                          {sideFlag && (
-                            <div className="mt-0.5 flex items-center justify-center gap-0 text-xs text-neutral-500">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={sideFlag}
-                                alt={sideCode ?? ""}
-                                className="h-[10px] w-auto rounded-sm shadow-sm"
-                              />
-                              {sideHcp && <span>{sideHcp}</span>}
                             </div>
-                          )}
+                            {/* B: flag (right half, centered) */}
+                            <div className="flex justify-center items-center min-h-[10px]">
+                              {sideFlag && (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                  src={sideFlag}
+                                  alt={sideCode ?? ""}
+                                  className="h-[10px] w-auto rounded-sm shadow-sm"
+                                />
+                              )}
+                            </div>
+                            {/* C: 1st period (left half, centered) */}
+                            <div className="text-center text-[11px]">
+                              {pick.home_score_p1 != null ? (
+                                <span
+                                  className={
+                                    score && score.p1_points > 0
+                                      ? "text-fuchsia-400"
+                                      : "text-neutral-500"
+                                  }
+                                >
+                                  ({pick.home_score_p1}:{pick.away_score_p1})
+                                </span>
+                              ) : null}
+                            </div>
+                            {/* D: handicap value (right half, centered) */}
+                            <div className="text-center text-[11px] text-neutral-500">
+                              {sideHcp ?? ""}
+                            </div>
+                          </div>
                           {score && (
                             <div
                               className={
@@ -568,26 +577,30 @@ export function TipMatrix({
                       const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
                         <div title="Tip čeká na schválení Masterem" className="leading-tight text-rose-600">
-                          <div className="font-medium">
-                            <span className="mr-0.5">?</span>
-                            {pendingPick.home_score}:{pendingPick.away_score}
-                            {pendingPick.home_score_p1 != null && (
-                              <span className="ml-1 text-rose-400">
-                                ({pendingPick.home_score_p1}:{pendingPick.away_score_p1})
-                              </span>
-                            )}
-                          </div>
-                          {sideFlag && (
-                            <div className="mt-0.5 flex items-center justify-center gap-0 text-xs opacity-70">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={sideFlag}
-                                alt={sideCode ?? ""}
-                                className="h-[10px] w-auto rounded-sm shadow-sm"
-                              />
-                              {sideHcp && <span>{sideHcp}</span>}
+                          <div className="grid grid-cols-2 gap-x-1 items-center">
+                            <div className="text-center font-medium">
+                              <span className="mr-0.5">?</span>
+                              {pendingPick.home_score}:{pendingPick.away_score}
                             </div>
-                          )}
+                            <div className="flex justify-center items-center min-h-[10px] opacity-70">
+                              {sideFlag && (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                  src={sideFlag}
+                                  alt={sideCode ?? ""}
+                                  className="h-[10px] w-auto rounded-sm shadow-sm"
+                                />
+                              )}
+                            </div>
+                            <div className="text-center text-[11px] text-rose-400">
+                              {pendingPick.home_score_p1 != null
+                                ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
+                                : ""}
+                            </div>
+                            <div className="text-center text-[11px] opacity-70">
+                              {sideHcp ?? ""}
+                            </div>
+                          </div>
                         </div>
                       );
                     } else if (isMine && started && !inGrace && !isAdmin) {
