@@ -52,12 +52,11 @@ export default async function HraciPage() {
     .order("is_admin", { ascending: false })
     .order("created_at", { ascending: false });
 
-  async function cycleStatus(formData: FormData) {
+  async function setStatus(formData: FormData) {
     "use server";
     const sb = await createClient();
     const id = String(formData.get("id"));
-    const current = String(formData.get("current")) as Status;
-    const next = ORDER[(ORDER.indexOf(current) + 1) % ORDER.length];
+    const next = String(formData.get("next")) as Status;
     const fields =
       next === "Neschválen"
         ? { is_approved: false, is_player: false }
@@ -173,13 +172,33 @@ export default async function HraciPage() {
                       Admin
                     </span>
                   ) : isAdmin ? (
-                    <form action={cycleStatus} className="inline">
-                      <input type="hidden" name="id" value={p.id} />
-                      <input type="hidden" name="current" value={s} />
-                      <button className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
+                    <details className="relative inline-block">
+                      <summary
+                        className={
+                          "cursor-pointer rounded px-2 py-1 list-none [&::-webkit-details-marker]:hidden " +
+                          STATUS_CLS[s]
+                        }
+                      >
                         {s}
-                      </button>
-                    </form>
+                      </summary>
+                      <div className="absolute left-0 top-full z-10 mt-1 rounded border bg-white shadow-lg">
+                        {ORDER.map((opt) => (
+                          <form action={setStatus} key={opt} className="block">
+                            <input type="hidden" name="id" value={p.id} />
+                            <input type="hidden" name="next" value={opt} />
+                            <button
+                              className={
+                                "block w-full whitespace-nowrap px-3 py-1.5 text-left text-sm hover:opacity-80 " +
+                                STATUS_CLS[opt] +
+                                (opt === s ? " font-semibold" : "")
+                              }
+                            >
+                              {opt}
+                            </button>
+                          </form>
+                        ))}
+                      </div>
+                    </details>
                   ) : (
                     <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
                       {s}
@@ -241,6 +260,7 @@ export default async function HraciPage() {
                           <input type="hidden" name="id" value={p.id} />
                           <input type="hidden" name="email" value={p.email} />
                           <button
+                            title="Smazat dummy účet"
                             className="rounded bg-rose-100 px-1.5 py-0.5 text-xs text-rose-700 hover:bg-rose-200"
                           >
                             🗑️
@@ -257,4 +277,3 @@ export default async function HraciPage() {
     </main>
   );
 }
-
