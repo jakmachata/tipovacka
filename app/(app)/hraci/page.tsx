@@ -65,7 +65,7 @@ export default async function HraciPage() {
     "use server";
     const sb = await createClient();
     const id = String(formData.get("id"));
-    const name = String(formData.get("display_name") ?? "").trim();
+    const name = String(formData.get("display_name") ?? "").trim().slice(0, 12);
     if (!name) return;
     await sb.from("profiles").update({ display_name: name }).eq("id", id);
     revalidatePath("/hraci");
@@ -112,7 +112,7 @@ export default async function HraciPage() {
                 Email
               </th>
             )}
-            <th className="py-2 pr-4" style={{ width: "180px" }}>Přezdívka</th>
+            <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
             <th className="pr-4" style={{ width: "130px" }}>Status</th>
             <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>
             <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
@@ -140,7 +140,8 @@ export default async function HraciPage() {
                       <input
                         name="display_name"
                         defaultValue={p.display_name ?? ""}
-                        className="w-20 rounded border px-2 py-0.5 text-sm"
+                        maxLength={12}
+                        className="w-32 rounded border px-2 py-0.5 text-sm"
                       />
                       <button className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs hover:bg-neutral-200">
                         ✓
