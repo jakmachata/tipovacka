@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 import { ColorPickerModal } from "@/components/color-picker-modal";
@@ -131,7 +131,8 @@ function TeamCell({
         />
       )}
       <span>
-        {t.name_cs}
+        <span className="md:hidden">{t.code}</span>
+        <span className="hidden md:inline">{t.name_cs}</span>
         {v === null ? "" : ` (${sign})`}
       </span>
     </span>
@@ -678,6 +679,25 @@ function TipModal({
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
+  // Refs pro sekvenční zadávání skóre na mobilu (auto-advance po každé číslici)
+  const hsRef = useRef<HTMLInputElement>(null);
+  const asRef = useRef<HTMLInputElement>(null);
+  const h1Ref = useRef<HTMLInputElement>(null);
+  const a1Ref = useRef<HTMLInputElement>(null);
+  const saveBtnRef = useRef<HTMLButtonElement>(null);
+
+  function handleDigit(
+    val: string,
+    setter: (v: string) => void,
+    nextRef: React.RefObject<HTMLElement | null>,
+  ) {
+    const d = val.replace(/\D/g, "").slice(0, 1);
+    setter(d);
+    if (d.length === 1 && nextRef.current) {
+      nextRef.current.focus();
+    }
+  }
+
   const home = teamMap.get(match.home_code);
   const away = teamMap.get(match.away_code);
 
@@ -768,10 +788,12 @@ function TipModal({
           )}
           <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
             {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[15px] w-auto rounded-sm shadow-sm" />}
-            {home?.name_cs}
+            <span className="md:hidden">{match.home_code}</span>
+            <span className="hidden md:inline">{home?.name_cs}</span>
             <span className="text-neutral-400">vs</span>
             {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[15px] w-auto rounded-sm shadow-sm" />}
-            {away?.name_cs}
+            <span className="md:hidden">{match.away_code}</span>
+            <span className="hidden md:inline">{away?.name_cs}</span>
           </h2>
           <p className="mt-1 text-sm text-neutral-600">
             {new Date(match.starts_at).toLocaleString("cs-CZ", {
@@ -798,20 +820,28 @@ function TipModal({
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
               <input
-                type="number"
-                min={0}
+                ref={hsRef}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={1}
                 value={hs}
-                onChange={(e) => setHs(e.target.value)}
+                onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
+                onFocus={(e) => e.currentTarget.select()}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
                 placeholder=""
                 autoFocus
               />
               <span className="text-2xl">:</span>
               <input
-                type="number"
-                min={0}
+                ref={asRef}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={1}
                 value={as_}
-                onChange={(e) => setAs(e.target.value)}
+                onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
+                onFocus={(e) => e.currentTarget.select()}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
                 placeholder=""
               />
@@ -824,19 +854,27 @@ function TipModal({
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
               <input
-                type="number"
-                min={0}
+                ref={h1Ref}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={1}
                 value={h1}
-                onChange={(e) => setH1(e.target.value)}
+                onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
+                onFocus={(e) => e.currentTarget.select()}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
                 placeholder=""
               />
               <span className="text-2xl">:</span>
               <input
-                type="number"
-                min={0}
+                ref={a1Ref}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={1}
                 value={a1}
-                onChange={(e) => setA1(e.target.value)}
+                onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
+                onFocus={(e) => e.currentTarget.select()}
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
                 placeholder=""
               />
@@ -868,6 +906,7 @@ function TipModal({
               Zrušit
             </button>
             <button
+              ref={saveBtnRef}
               type="button"
               onClick={save}
               disabled={saving}
