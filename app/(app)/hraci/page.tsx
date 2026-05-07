@@ -4,17 +4,17 @@ import { formatPraguePretty } from "@/lib/tz";
 
 const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
-type Status = "Ne" | "Netipující" | "Tipující";
+type Status = "Neschválen" | "Netipující" | "Tipující";
 
 function statusOf(p: { is_approved: boolean; is_player: boolean }): Status {
-  if (!p.is_approved) return "Ne";
+  if (!p.is_approved) return "Neschválen";
   return p.is_player ? "Tipující" : "Netipující";
 }
 
-const ORDER: Status[] = ["Ne", "Netipující", "Tipující"];
+const ORDER: Status[] = ["Neschválen", "Netipující", "Tipující"];
 
 const STATUS_CLS: Record<Status, string> = {
-  Ne: "bg-neutral-100 text-neutral-600",
+  Neschválen: "bg-neutral-100 text-neutral-600",
   Netipující: "bg-sky-100 text-sky-800",
   Tipující: "bg-emerald-100 text-emerald-800",
 };
@@ -59,7 +59,7 @@ export default async function HraciPage() {
     const current = String(formData.get("current")) as Status;
     const next = ORDER[(ORDER.indexOf(current) + 1) % ORDER.length];
     const fields =
-      next === "Ne"
+      next === "Neschválen"
         ? { is_approved: false, is_player: false }
         : next === "Netipující"
           ? { is_approved: true, is_player: false }
@@ -124,11 +124,16 @@ export default async function HraciPage() {
       <table className="w-full text-sm">
         <thead className="border-b text-left text-neutral-500">
           <tr>
-            {isAdmin && <th className="py-2">Email</th>}
+            {isAdmin && (
+              <th className="py-2 text-xs font-medium" style={{ width: "180px" }}>
+                Email
+              </th>
+            )}
             <th className="py-2">Přezdívka</th>
             <th>Status</th>
             <th>Zaplatil</th>
             <th>Naposledy viděn</th>
+            {isAdmin && <th className="py-2 text-right pr-2">Smazat</th>}
           </tr>
         </thead>
         <tbody>
@@ -137,24 +142,12 @@ export default async function HraciPage() {
             return (
               <tr key={p.id} className="border-b">
                 {isAdmin && (
-                  <td className="py-2 text-neutral-600">
-                    <span className="inline-flex items-center gap-2">
-                      <span>{p.email ?? "-"}</span>
-                      {typeof p.email === "string" &&
-                        p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX) &&
-                        p.id !== user!.id && (
-                          <form action={deleteDummy} className="inline">
-                            <input type="hidden" name="id" value={p.id} />
-                            <input type="hidden" name="email" value={p.email} />
-                            <button
-                              title="Smazat dummy účet"
-                              className="rounded bg-rose-100 px-1.5 py-0.5 text-xs text-rose-700 hover:bg-rose-200"
-                            >
-                              🗑️
-                            </button>
-                          </form>
-                        )}
-                    </span>
+                  <td
+                    className="py-2 text-xs text-neutral-600 truncate"
+                    style={{ width: "180px", maxWidth: "180px" }}
+                    title={p.email ?? ""}
+                  >
+                    {p.email ?? "-"}
                   </td>
                 )}
                 <td className="py-2 font-medium">
@@ -239,6 +232,23 @@ export default async function HraciPage() {
                     relativeFromNow(p.last_seen_at)
                   )}
                 </td>
+                {isAdmin && (
+                  <td className="py-2 text-right pr-2">
+                    {typeof p.email === "string" &&
+                      p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX) &&
+                      p.id !== user!.id && (
+                        <form action={deleteDummy} className="inline">
+                          <input type="hidden" name="id" value={p.id} />
+                          <input type="hidden" name="email" value={p.email} />
+                          <button
+                            className="rounded bg-rose-100 px-1.5 py-0.5 text-xs text-rose-700 hover:bg-rose-200"
+                          >
+                            🗑️
+                          </button>
+                        </form>
+                      )}
+                  </td>
+                )}
               </tr>
             );
           })}
