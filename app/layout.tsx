@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { ChunkReloadHandler } from "@/components/chunk-reload-handler";
 
 export const metadata: Metadata = {
   title: "Natipovals?",
@@ -9,7 +10,4 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="cs">
-      <body className="min-h-screen font-sans">{children}</body>
-    </html>
-  );
-}
+      <body 
