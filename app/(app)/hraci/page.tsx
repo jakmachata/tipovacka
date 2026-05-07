@@ -125,14 +125,14 @@ export default async function HraciPage() {
         <thead className="border-b text-left text-neutral-500">
           <tr>
             {isAdmin && (
-              <th className="py-2 text-xs font-medium" style={{ width: "180px" }}>
+              <th className="py-2 text-xs font-medium" style={{ width: "210px" }}>
                 Email
               </th>
             )}
-            <th className="py-2">Přezdívka</th>
+            <th className="py-2" style={{ width: "110px" }}>Přezdívka</th>
             <th>Status</th>
             <th>Zaplatil</th>
-            <th>Naposledy viděn</th>
+            <th style={{ width: "100px" }}>Naposledy viděn</th>
             {isAdmin && <th className="py-2 text-right pr-2">Smazat</th>}
           </tr>
         </thead>
@@ -144,7 +144,7 @@ export default async function HraciPage() {
                 {isAdmin && (
                   <td
                     className="py-2 text-xs text-neutral-600 truncate"
-                    style={{ width: "180px", maxWidth: "180px" }}
+                    style={{ width: "210px", maxWidth: "210px" }}
                     title={p.email ?? ""}
                   >
                     {p.email ?? "-"}
@@ -157,7 +157,7 @@ export default async function HraciPage() {
                       <input
                         name="display_name"
                         defaultValue={p.display_name ?? ""}
-                        className="w-32 rounded border px-2 py-0.5 text-sm"
+                        className="w-20 rounded border px-2 py-0.5 text-sm"
                       />
                       <button className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs hover:bg-neutral-200">
                         ✓
