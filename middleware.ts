@@ -50,4 +50,13 @@ export async function middleware(request: NextRequest) {
     if (profile && !profile.is_approved) {
       const url = request.nextUrl.clone();
       url.pathname = "/pending";
-    
+      return NextResponse.redirect(url);
+    }
+  }
+
+  return response;
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};
