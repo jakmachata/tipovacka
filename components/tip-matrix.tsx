@@ -25,7 +25,8 @@ interface PendingPick {
 }
 
 interface Props {
-  myUserId: string;
+  // null = host (nepřihlášený)
+  myUserId: string | null;
   isAdmin?: boolean;
   matches: Match[];
   teams: Team[];
@@ -240,7 +241,9 @@ export function TipMatrix({
   }, [emailPref]);
 
   // Heartbeat: každé 2 min poslat last_seen_at (jen když je tab v popředí).
+  // Skip pro hosta (myUserId == null).
   useEffect(() => {
+    if (!myUserId) return;
     const sb = createClient();
     let cancelled = false;
     async function ping() {
@@ -379,7 +382,16 @@ export function TipMatrix({
         )}
       </div>
       <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
-        <table className="min-w-full text-xs border-separate border-spacing-0 table-fixed">
+        <table className="text-xs border-separate border-spacing-0 table-fixed">
+          <colgroup>
+            <col className="w-[50px]" />
+            <col className="w-[80px] md:w-[160px]" />
+            <col className="w-[80px] md:w-[160px]" />
+            <col className="w-[60px]" />
+            {players.map((p) => (
+              <col key={p.id} className="w-[77px]" />
+            ))}
+          </colgroup>
           <thead>
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center w-[50px]"}>Buly</th>

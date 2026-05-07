@@ -32,25 +32,42 @@ export async function middleware(request: NextRequest) {
     path.startsWith("/login/") ||
     path.startsWith("/register/") ||
     path.startsWith("/pending/");
-  const isPublic = path === "/" || path.startsWith("/_next") || path.startsWith("/favicon");
+  // Veřejně přístupné cesty bez přihlášení (kromě auth tras a Next.js internals).
+  const isGuestAllowed =
+    path === "/" ||
+    path === "/schedule" ||
+    path.startsWith("/schedule/") ||
+    path === "/trophies" ||
+    path.startsWith("/trophies/") ||
+    path.startsWith("/_next") ||
+    path.startsWith("/favicon");
 
-  if (!user && !isAuthRoute && !isPublic) {
+  if (!user && !isAuthRoute && !isGuestAllowed) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
   if (user && !isAuthRoute && path !== "/pending") {
-    // ověř schválení
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_approved")
-      .eq("id", user.id)
-      .single();
-    if (profile && !profile.is_approved) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/pending";
-      return NextResponse.redirect(url);
+    // Schválení vyžadujeme pouze pro chráněné stránky (admin, hraci atd.).
+    // Public stránky (schedule, trophies) přihlášený neschválený smí vidět.
+    const isPublicForApproved =
+      path === "/" ||
+      path === "/schedule" ||
+      path.startsWith("/schedule/") ||
+      path === "/trophies" ||
+      path.startsWith("/trophies/");
+    if (!isPublicForApproved) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_approved")
+        .eq("id", user.id)
+        .single();
+      if (profile && !profile.is_approved) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/pending";
+        return NextResponse.redirect(url);
+      }
     }
   }
 

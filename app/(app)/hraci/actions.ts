@@ -3,18 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export type Status = "Neschválen" | "Netipující" | "Tipující";
+// Binární status: schválen → tipuje, neschválen → nemůže tipovat (ale vidí schedule).
+export type Status = "Neschválen" | "Tipující";
 
 export async function setStatus(formData: FormData) {
   const sb = await createClient();
   const id = String(formData.get("id"));
   const next = String(formData.get("next")) as Status;
+  // is_approved + is_player sjednoceny — buď oboje true, nebo oboje false.
   const fields =
-    next === "Neschválen"
-      ? { is_approved: false, is_player: false }
-      : next === "Netipující"
-        ? { is_approved: true, is_player: false }
-        : { is_approved: true, is_player: true };
+    next === "Tipující"
+      ? { is_approved: true, is_player: true }
+      : { is_approved: false, is_player: false };
   await sb.from("profiles").update(fields).eq("id", id);
   revalidatePath("/hraci");
   revalidatePath("/schedule");

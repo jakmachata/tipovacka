@@ -1,11 +1,28 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NavLinks } from "@/components/nav-links";
+import { GuestHeader } from "@/components/guest-header";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+
+  // Host (nepřihlášený): zobraz veřejnou hlavičku s formulářem login/register a renderuj children.
+  if (!user) {
+    return (
+      <>
+        <header className="sticky top-0 z-20 bg-white">
+          <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 text-sm">
+            <NavLinks isAdmin={false} pendingCount={0} unapprovedCount={0} guest />
+            <div className="ml-auto">
+              <GuestHeader />
+            </div>
+          </nav>
+        </header>
+        <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
+      </>
+    );
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -13,12 +30,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .eq("id", user.id)
     .single();
 
-  if (!profile?.is_approved) redirect("/pending");
+  // Schválení už řeší middleware: unapproved user smí vidět veřejné stránky
+  // (/schedule, /trophies). Pro chráněné stránky (/hraci, /admin/*, /rules)
+  // je middleware přesměruje na /pending.
 
   // Pro admina: spočítat čekající pozdní tipy + neschválené hráče (badge v navu)
   let pendingCount = 0;
   let unapprovedCount = 0;
-  if (profile.is_admin) {
+  if (profile?.is_admin) {
     const [pendingRes, unapprovedRes] = await Promise.all([
       supabase
         .from("pending_picks")
@@ -48,7 +67,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     "use server";
     const sb = await createClient();
     await sb.auth.signOut();
-    redirect("/login");
+    redirect("/schedule");
   }
 
   return (
@@ -56,11 +75,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 z-20 bg-white">
         <nav className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 text-sm">
           <NavLinks
-            isAdmin={!!profile.is_admin}
+            isAdmin={!!profile?.is_admin}
             pendingCount={pendingCount}
             unapprovedCount={unapprovedCount}
           />
-          <span className="ml-auto text-neutral-500">{profile.display_name}</span>
+          <span className="ml-auto text-neutral-500">{profile?.display_name}</span>
           <form action={logout}><button className="hover:underline">Odhlásit</button></form>
         </nav>
       </header>

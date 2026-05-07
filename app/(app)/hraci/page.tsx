@@ -6,16 +6,14 @@ import { setStatus } from "./actions";
 
 const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
-type Status = "Neschválen" | "Netipující" | "Tipující";
+type Status = "Neschválen" | "Tipující";
 
-function statusOf(p: { is_approved: boolean; is_player: boolean }): Status {
-  if (!p.is_approved) return "Neschválen";
-  return p.is_player ? "Tipující" : "Netipující";
+function statusOf(p: { is_approved: boolean }): Status {
+  return p.is_approved ? "Tipující" : "Neschválen";
 }
 
 const STATUS_CLS: Record<Status, string> = {
   Neschválen: "bg-neutral-100 text-neutral-600",
-  Netipující: "bg-sky-100 text-sky-800",
   Tipující: "bg-emerald-100 text-emerald-800",
 };
 

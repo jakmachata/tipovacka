@@ -7,10 +7,12 @@ export function NavLinks({
   isAdmin,
   pendingCount = 0,
   unapprovedCount = 0,
+  guest = false,
 }: {
   isAdmin: boolean;
   pendingCount?: number;
   unapprovedCount?: number;
+  guest?: boolean;
 }) {
   const path = usePathname() ?? "";
   const active = (href: string) =>
@@ -40,6 +42,23 @@ export function NavLinks({
     return cls("/hraci");
   })();
 
+  // Host: zobrazujeme jen veřejné odkazy (Tipovačka, Pravidla, Trophy room).
+  if (guest) {
+    return (
+      <>
+        <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
+          🏒 Natipovals?
+        </Link>
+        <Link href="/rules" className={cls("/rules")}>
+          Pravidla
+        </Link>
+        <Link href="/trophies" className={cls("/trophies")}>
+          🏆 Trophy room
+        </Link>
+      </>
+    );
+  }
+
   return (
     <>
       <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
@@ -47,6 +66,9 @@ export function NavLinks({
       </Link>
       <Link href="/rules" className={cls("/rules")}>
         Pravidla
+      </Link>
+      <Link href="/trophies" className={cls("/trophies")}>
+        🏆 Trophy room
       </Link>
       <Link href="/hraci" className={hraciCls}>
         Hráči
@@ -64,6 +86,9 @@ export function NavLinks({
           </Link>
           <Link href="/admin/history" className={adminCls("/admin/history")}>
             Historie tipů
+          </Link>
+          <Link href="/admin/trophies" className={adminCls("/admin/trophies")}>
+            Trophy edit
           </Link>
           <Link
             href="/admin/pending"

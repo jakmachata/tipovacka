@@ -8,12 +8,16 @@ export default async function SchedulePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: meProfile } = await supabase
-    .from("profiles")
-    .select("is_admin")
-    .eq("id", user!.id)
-    .single();
-  const isAdmin = !!meProfile?.is_admin;
+  // Pro hosta isAdmin=false, myUserId=null. Pro přihlášeného načteme profil.
+  let isAdmin = false;
+  if (user) {
+    const { data: meProfile } = await supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .single();
+    isAdmin = !!meProfile?.is_admin;
+  }
 
   const threeMinAgo = new Date(Date.now() - 3 * 60 * 1000).toISOString();
   const [
@@ -53,14 +57,16 @@ export default async function SchedulePage() {
     ]),
   );
 
-  // Pořadí sloupců: přihlášený první, ostatní podle aktuálních bodů (sestupně),
-  // pak abecedně podle jména pro stabilitu.
-  const myId = user!.id;
+  // Pořadí sloupců: přihlášený první (pokud je hráč), ostatní podle bodů (sestupně),
+  // pak abecedně. Host (no user) = jen seřazení podle bodů.
+  const myId = user?.id ?? null;
   const players = ((profilesRes.data ?? []) as Profile[])
     .map((p) => ({ ...p, total: totals.get(p.id) ?? 0 }))
     .sort((a, b) => {
-      if (a.id === myId) return -1;
-      if (b.id === myId) return 1;
+      if (myId) {
+        if (a.id === myId) return -1;
+        if (b.id === myId) return 1;
+      }
       const t = (b.total ?? 0) - (a.total ?? 0);
       if (t !== 0) return t;
       return a.display_name.localeCompare(b.display_name, "cs");
