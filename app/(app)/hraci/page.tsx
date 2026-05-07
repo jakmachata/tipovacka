@@ -121,18 +121,18 @@ export default async function HraciPage() {
     <main>
       <h1 className="mb-4 text-xl font-semibold">Hráči</h1>
 
-      <table className="w-full text-sm">
+      <table className="text-sm">
         <thead className="border-b text-left text-neutral-500">
           <tr>
             {isAdmin && (
-              <th className="py-2 text-xs font-medium" style={{ width: "210px" }}>
+              <th className="py-2 pr-4 text-xs font-medium" style={{ width: "210px" }}>
                 Email
               </th>
             )}
-            <th className="py-2" style={{ width: "110px" }}>Přezdívka</th>
-            <th>Status</th>
-            <th>Zaplatil</th>
-            <th style={{ width: "100px" }}>Naposledy viděn</th>
+            <th className="py-2 pr-4" style={{ width: "130px" }}>Přezdívka</th>
+            <th className="pr-4">Status</th>
+            <th className="pr-4">Zaplatil</th>
+            <th className="pr-4" style={{ width: "100px" }}>Naposledy viděn</th>
             {isAdmin && <th className="py-2 text-right pr-2">Smazat</th>}
           </tr>
         </thead>
