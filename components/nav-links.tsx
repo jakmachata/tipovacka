@@ -6,9 +6,11 @@ import { usePathname } from "next/navigation";
 export function NavLinks({
   isAdmin,
   pendingCount = 0,
+  unapprovedCount = 0,
 }: {
   isAdmin: boolean;
   pendingCount?: number;
+  unapprovedCount?: number;
 }) {
   const path = usePathname() ?? "";
   const active = (href: string) =>
@@ -27,6 +29,17 @@ export function NavLinks({
       ? "bg-amber-600 text-white"
       : "text-amber-700 hover:bg-amber-50");
 
+  // Hráči link: pokud je admin a má neschválené účty, svítí růžovou + pulse + badge.
+  const hraciCls = (() => {
+    if (isAdmin && unapprovedCount > 0) {
+      return baseCls + " " +
+        (active("/hraci")
+          ? "bg-rose-600 text-white"
+          : "bg-rose-100 text-rose-800 ring-1 ring-rose-300 animate-pulse");
+    }
+    return cls("/hraci");
+  })();
+
   return (
     <>
       <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
@@ -35,8 +48,13 @@ export function NavLinks({
       <Link href="/rules" className={cls("/rules")}>
         Pravidla
       </Link>
-      <Link href="/hraci" className={cls("/hraci")}>
+      <Link href="/hraci" className={hraciCls}>
         Hráči
+        {isAdmin && unapprovedCount > 0 && (
+          <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
+            {unapprovedCount}
+          </span>
+        )}
       </Link>
       {isAdmin && (
         <>
