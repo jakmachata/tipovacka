@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { formatPraguePretty } from "@/lib/tz";
+import { StatusMenu } from "@/components/status-menu";
+import { setStatus } from "./actions";
 
 const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
@@ -10,8 +12,6 @@ function statusOf(p: { is_approved: boolean; is_player: boolean }): Status {
   if (!p.is_approved) return "Neschválen";
   return p.is_player ? "Tipující" : "Netipující";
 }
-
-const ORDER: Status[] = ["Neschválen", "Netipující", "Tipující"];
 
 const STATUS_CLS: Record<Status, string> = {
   Neschválen: "bg-neutral-100 text-neutral-600",
@@ -51,22 +51,6 @@ export default async function HraciPage() {
     .select("*")
     .order("is_admin", { ascending: false })
     .order("created_at", { ascending: false });
-
-  async function setStatus(formData: FormData) {
-    "use server";
-    const sb = await createClient();
-    const id = String(formData.get("id"));
-    const next = String(formData.get("next")) as Status;
-    const fields =
-      next === "Neschválen"
-        ? { is_approved: false, is_player: false }
-        : next === "Netipující"
-          ? { is_approved: true, is_player: false }
-          : { is_approved: true, is_player: true };
-    await sb.from("profiles").update(fields).eq("id", id);
-    revalidatePath("/hraci");
-    revalidatePath("/schedule");
-  }
 
   async function togglePaid(formData: FormData) {
     "use server";
@@ -172,33 +156,7 @@ export default async function HraciPage() {
                       Admin
                     </span>
                   ) : isAdmin ? (
-                    <details className="relative inline-block">
-                      <summary
-                        className={
-                          "cursor-pointer rounded px-2 py-1 list-none [&::-webkit-details-marker]:hidden " +
-                          STATUS_CLS[s]
-                        }
-                      >
-                        {s}
-                      </summary>
-                      <div className="absolute left-0 top-full z-10 mt-1 rounded border bg-white shadow-lg">
-                        {ORDER.map((opt) => (
-                          <form action={setStatus} key={opt} className="block">
-                            <input type="hidden" name="id" value={p.id} />
-                            <input type="hidden" name="next" value={opt} />
-                            <button
-                              className={
-                                "block w-full whitespace-nowrap px-3 py-1.5 text-left text-sm hover:opacity-80 " +
-                                STATUS_CLS[opt] +
-                                (opt === s ? " font-semibold" : "")
-                              }
-                            >
-                              {opt}
-                            </button>
-                          </form>
-                        ))}
-                      </div>
-                    </details>
+                    <StatusMenu id={p.id} current={s} action={setStatus} />
                   ) : (
                     <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
                       {s}
