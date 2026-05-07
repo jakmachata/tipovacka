@@ -347,10 +347,10 @@ export function TipMatrix({
         <table className="min-w-full text-xs border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className={headerBase + " bg-neutral-900 text-left"}>Datum</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[160px]"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[160px]"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center min-w-[110px]"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center sticky left-0 md:left-auto md:static z-20 md:z-10"}>Datum</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[80px] md:left-auto md:static z-20 md:z-10"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[160px] md:left-auto md:static z-20 md:z-10"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-center min-w-[110px] sticky left-[240px] md:left-auto md:static z-20 md:z-10"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -437,7 +437,7 @@ export function TipMatrix({
                   key={m.id}
                   className={"border-b " + stripeBg}
                 >
-                  <td className="px-2 py-2 whitespace-nowrap text-neutral-600">
+                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 sticky left-0 md:static z-10 md:z-auto " + stripeBg}>
                     {stageLabel && (
                       <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
                         {stageLabel}
@@ -445,13 +445,13 @@ export function TipMatrix({
                     )}
                     <div>{fmt(m.starts_at)}</div>
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[160px]">
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[80px] md:static z-10 md:z-auto " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap font-medium min-w-[160px]">
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[160px] md:static z-10 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className="px-2 py-2 text-center whitespace-nowrap min-w-[110px]">
+                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[110px] sticky left-[240px] md:static z-10 md:z-auto " + stripeBg}>
                     <span className="font-semibold">{result}</span>
                     {m.finalized && m.home_score_p1 != null && (
                       <span className="ml-1 text-neutral-400">({m.home_score_p1}:{m.away_score_p1})</span>
@@ -560,10 +560,10 @@ export function TipMatrix({
                         <span title="Nestihl jsi tip" className="text-base">😞</span>
                       );
                     } else {
-                      // chybějící tip = malá pomlčka (světle šedá pokud klikatelné)
+                      // chybějící tip: klikatelná buňka = "+" (vyzývá k tipu), nekl. = pomlčka
                       content = (
-                        <span className={clickable ? "text-neutral-300" : "text-neutral-400"}>
-                          -
+                        <span className={clickable ? "text-neutral-400 text-base" : "text-neutral-400"}>
+                          {clickable ? "+" : "-"}
                         </span>
                       );
                     }

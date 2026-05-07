@@ -53,7 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b bg-white">
+      <header className="sticky top-0 z-20 bg-white">
         <nav className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 text-sm">
           <NavLinks
             isAdmin={!!profile.is_admin}
