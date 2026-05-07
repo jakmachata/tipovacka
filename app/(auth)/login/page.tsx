@@ -11,7 +11,7 @@ export default function LoginPage() {
       email: String(formData.get("email")),
       password: String(formData.get("password")),
     });
-    if (error) return redirect(`/auth/login?error=${encodeURIComponent(error.message)}`);
+    if (error) return redirect(`/login?error=${encodeURIComponent(error.message)}`);
     redirect("/schedule");
   }
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
       </form>
       <p className="mt-6 text-sm text-neutral-600">
         Účet ještě nemáš?{" "}
-        <Link href="/auth/register" className="underline">
+        <Link href="/register" className="underline">
           Zaregistrovat se
         </Link>
       </p>

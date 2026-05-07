@@ -5,7 +5,7 @@ import { NavLinks } from "@/components/nav-links";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/login");
+  if (!user) redirect("/login");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .eq("id", user.id)
     .single();
 
-  if (!profile?.is_approved) redirect("/auth/pending");
+  if (!profile?.is_approved) redirect("/pending");
 
   // Pro admina: spočítat čekající pozdní tipy + neschválené hráče (badge v navu)
   let pendingCount = 0;
@@ -48,7 +48,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     "use server";
     const sb = await createClient();
     await sb.auth.signOut();
-    redirect("/auth/login");
+    redirect("/login");
   }
 
   return (

@@ -25,16 +25,22 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  const isAuthRoute = path.startsWith("/auth");
+  const isAuthRoute =
+    path === "/login" ||
+    path === "/register" ||
+    path === "/pending" ||
+    path.startsWith("/login/") ||
+    path.startsWith("/register/") ||
+    path.startsWith("/pending/");
   const isPublic = path === "/" || path.startsWith("/_next") || path.startsWith("/favicon");
 
   if (!user && !isAuthRoute && !isPublic) {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && !isAuthRoute && path !== "/auth/pending") {
+  if (user && !isAuthRoute && path !== "/pending") {
     // ověř schválení
     const { data: profile } = await supabase
       .from("profiles")
@@ -43,14 +49,5 @@ export async function middleware(request: NextRequest) {
       .single();
     if (profile && !profile.is_approved) {
       const url = request.nextUrl.clone();
-      url.pathname = "/auth/pending";
-      return NextResponse.redirect(url);
-    }
-  }
-
-  return response;
-}
-
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
-};
+      url.pathname = "/pending";
+    

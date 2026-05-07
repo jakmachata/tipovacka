@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export default async function PendingPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return redirect("/auth/login");
+  if (!user) return redirect("/login");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -18,7 +18,7 @@ export default async function PendingPage() {
     "use server";
     const sb = await createClient();
     await sb.auth.signOut();
-    redirect("/auth/login");
+    redirect("/login");
   }
 
   return (

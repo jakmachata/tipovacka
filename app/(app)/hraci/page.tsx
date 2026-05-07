@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { formatPraguePretty } from "@/lib/tz";
+
+const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
 type Status = "Ne" | "Netipující" | "Tipující";
 
@@ -87,6 +89,34 @@ export default async function HraciPage() {
     revalidatePath("/schedule");
   }
 
+  async function deleteDummy(formData: FormData) {
+    "use server";
+    // Re-ověř, že volající je admin
+    const sb = await createClient();
+    const { data: { user: caller } } = await sb.auth.getUser();
+    if (!caller) return;
+    const { data: callerProfile } = await sb
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", caller.id)
+      .single();
+    if (!callerProfile?.is_admin) return;
+
+    const id = String(formData.get("id"));
+    const email = String(formData.get("email") ?? "").toLowerCase();
+
+    // POJISTKA: smazat lze jen dummy účty
+    if (!email.endsWith(DUMMY_EMAIL_SUFFIX)) return;
+    if (id === caller.id) return; // sám sebe ne
+
+    // Service-role client → maže auth.users; FK kaskáda smaže profile + picks + ...
+    const admin = createServiceClient();
+    await admin.auth.admin.deleteUser(id);
+
+    revalidatePath("/hraci");
+    revalidatePath("/schedule");
+  }
+
   return (
     <main>
       <h1 className="mb-4 text-xl font-semibold">Hráči</h1>
@@ -107,7 +137,25 @@ export default async function HraciPage() {
             return (
               <tr key={p.id} className="border-b">
                 {isAdmin && (
-                  <td className="py-2 text-neutral-600">{p.email ?? "-"}</td>
+                  <td className="py-2 text-neutral-600">
+                    <span className="inline-flex items-center gap-2">
+                      <span>{p.email ?? "-"}</span>
+                      {typeof p.email === "string" &&
+                        p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX) &&
+                        p.id !== user!.id && (
+                          <form action={deleteDummy} className="inline">
+                            <input type="hidden" name="id" value={p.id} />
+                            <input type="hidden" name="email" value={p.email} />
+                            <button
+                              title="Smazat dummy účet"
+                              className="rounded bg-rose-100 px-1.5 py-0.5 text-xs text-rose-700 hover:bg-rose-200"
+                            >
+                              🗑️
+                            </button>
+                          </form>
+                        )}
+                    </span>
+                  </td>
                 )}
                 <td className="py-2 font-medium">
                   {isAdmin && !p.is_admin ? (
@@ -199,3 +247,4 @@ export default async function HraciPage() {
     </main>
   );
 }
+                                                    

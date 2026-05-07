@@ -10,11 +10,11 @@ export default function RegisterPage() {
     const password = String(formData.get("password"));
 
     const { error } = await supabase.auth.signUp({ email, password });
-    if (error) return redirect(`/auth/register?error=${encodeURIComponent(error.message)}`);
+    if (error) return redirect(`/register?error=${encodeURIComponent(error.message)}`);
 
     // V Supabase projektech bez "Confirm email" rovnou login;
     // jinak Supabase pošle confirmation mail a uživatel potvrdí.
-    redirect("/auth/pending");
+    redirect("/pending");
   }
 
   return (
@@ -45,7 +45,7 @@ export default function RegisterPage() {
       </form>
       <p className="mt-6 text-sm text-neutral-600">
         Už máš účet?{" "}
-        <Link href="/auth/login" className="underline">
+        <Link href="/login" className="underline">
           Přihlásit se
         </Link>
       </p>
