@@ -129,10 +129,10 @@ export default async function HraciPage() {
                 Email
               </th>
             )}
-            <th className="py-2 pr-4" style={{ width: "130px" }}>Přezdívka</th>
-            <th className="pr-4">Status</th>
-            <th className="pr-4">Zaplatil</th>
-            <th className="pr-4" style={{ width: "100px" }}>Naposledy viděn</th>
+            <th className="py-2 pr-4" style={{ width: "180px" }}>Přezdívka</th>
+            <th className="pr-4" style={{ width: "130px" }}>Status</th>
+            <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>
+            <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
             {isAdmin && <th className="py-2 text-right pr-2">Smazat</th>}
           </tr>
         </thead>
@@ -257,3 +257,4 @@ export default async function HraciPage() {
     </main>
   );
 }
+
