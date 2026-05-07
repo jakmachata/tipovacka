@@ -247,4 +247,3 @@ export default async function HraciPage() {
     </main>
   );
 }
-                                                    
