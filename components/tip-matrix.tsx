@@ -383,8 +383,8 @@ export function TipMatrix({
           <thead>
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center min-w-[50px]"}>Buly</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-0 md:left-auto md:static z-20 md:z-10"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[80px] md:left-auto md:static z-20 md:z-10"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-0 md:left-auto md:static z-40 md:z-10"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[80px] md:left-auto md:static z-40 md:z-10"}>Hosté</th>
               <th className={headerBase + " bg-neutral-900 text-center min-w-[60px]"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
@@ -420,14 +420,25 @@ export function TipMatrix({
                     }
                     className={
                       headerBase +
-                      " text-center min-w-[72px] " +
+                      " text-center w-[77px] " +
                       (hasCustom ? "" : fallbackColor + " ") +
                       ownBorder +
                       (isMineHeader || isAdmin ? " cursor-pointer" : "")
                     }
                     style={inlineStyle}
                   >
-                    <div className="text-xs font-semibold">{p.display_name}</div>
+                    <div
+                      className={
+                        "font-semibold leading-tight " +
+                        ((p.display_name?.length ?? 0) > 11
+                          ? "text-[9px]"
+                          : (p.display_name?.length ?? 0) > 8
+                            ? "text-[10px]"
+                            : "text-xs")
+                      }
+                    >
+                      {p.display_name}
+                    </div>
                     <div className="text-lg font-normal opacity-90 leading-none">
                       {p.total ?? 0}
                     </div>
@@ -481,10 +492,10 @@ export function TipMatrix({
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
                     <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-0 md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[80px] md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[80px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[60px] " + stripeBg}>
@@ -527,7 +538,7 @@ export function TipMatrix({
                               </span>
                             </div>
                             {/* B: flag (right half, centered) */}
-                            <div className="flex justify-center items-center min-h-[10px]">
+                            <div className="flex justify-center items-center h-[14px]">
                               {sideFlag && (
                                 /* eslint-disable-next-line @next/next/no-img-element */
                                 <img
@@ -552,7 +563,7 @@ export function TipMatrix({
                               ) : null}
                             </div>
                             {/* D: handicap value (right half, centered) */}
-                            <div className="text-center text-[11px] text-neutral-500">
+                            <div className="flex justify-center items-center h-[14px] text-[11px] text-neutral-500">
                               {sideHcp ?? ""}
                             </div>
                           </div>
@@ -582,7 +593,7 @@ export function TipMatrix({
                               <span className="mr-0.5">?</span>
                               {pendingPick.home_score}:{pendingPick.away_score}
                             </div>
-                            <div className="flex justify-center items-center min-h-[10px] opacity-70">
+                            <div className="flex justify-center items-center h-[14px] opacity-70">
                               {sideFlag && (
                                 /* eslint-disable-next-line @next/next/no-img-element */
                                 <img
@@ -597,7 +608,7 @@ export function TipMatrix({
                                 ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
                                 : ""}
                             </div>
-                            <div className="text-center text-[11px] opacity-70">
+                            <div className="flex justify-center items-center h-[14px] text-[11px] opacity-70">
                               {sideHcp ?? ""}
                             </div>
                           </div>
@@ -648,7 +659,7 @@ export function TipMatrix({
                         }
                         style={ownBorderStyle}
                         className={
-                          "px-2 py-2 text-center min-w-[72px] " + cellBg + cellHover + ownBorder
+                          "px-1 py-2 text-center w-[77px] overflow-hidden " + cellBg + cellHover + ownBorder
                         }
                       >
                         {content}
