@@ -107,6 +107,22 @@ function fmt(iso: string) {
   });
 }
 
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleString("cs-CZ", {
+    day: "numeric",
+    month: "numeric",
+    timeZone: "Europe/Prague",
+  });
+}
+
+function fmtTime(iso: string) {
+  return new Date(iso).toLocaleString("cs-CZ", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Prague",
+  });
+}
+
 function TeamCell({
   t,
   hcp,
@@ -121,8 +137,26 @@ function TeamCell({
   const sign = v === null ? "" : v > 0 ? `+${v}` : `${v}`;
   const url = flagUrl(t.code);
   return (
-    <span className="inline-flex flex-col items-start whitespace-nowrap md:flex-row md:items-center md:gap-1.5">
-      <span className="inline-flex items-center gap-1.5">
+    <>
+      {/* MOBILE: flag (vertically centered) + stacked code/hcp on right */}
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap md:hidden">
+        {url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={url}
+            alt={t.code}
+            className="inline-block h-[15px] w-auto rounded-sm shadow-sm"
+          />
+        )}
+        <span className="inline-flex flex-col leading-tight">
+          <span>{t.code}</span>
+          {v !== null && (
+            <span className="text-[11px] text-neutral-500">{`(${sign})`}</span>
+          )}
+        </span>
+      </span>
+      {/* DESKTOP: flag + full name + (hcp) inline */}
+      <span className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex">
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -132,15 +166,11 @@ function TeamCell({
           />
         )}
         <span>
-          <span className="md:hidden">{t.code}</span>
-          <span className="hidden md:inline">{t.name_cs}</span>
-          <span className="hidden md:inline">{v === null ? "" : ` (${sign})`}</span>
+          {t.name_cs}
+          {v === null ? "" : ` (${sign})`}
         </span>
       </span>
-      {v !== null && (
-        <span className="text-[11px] leading-tight text-neutral-500 md:hidden">{`(${sign})`}</span>
-      )}
-    </span>
+    </>
   );
 }
 
@@ -352,10 +382,10 @@ export function TipMatrix({
         <table className="min-w-full text-xs border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className={headerBase + " bg-neutral-900 text-center sticky left-0 md:left-auto md:static z-20 md:z-10"}>Datum</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[80px] md:left-auto md:static z-20 md:z-10"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[160px] md:left-auto md:static z-20 md:z-10"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center min-w-[95px] sticky left-[240px] md:left-auto md:static z-20 md:z-10"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center sticky left-0 md:left-auto md:static z-20 md:z-10 min-w-[60px]"}>Datum</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[60px] md:left-auto md:static z-20 md:z-10"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left min-w-[80px] md:min-w-[160px] sticky left-[140px] md:left-auto md:static z-20 md:z-10"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-center min-w-[60px] sticky left-[220px] md:left-auto md:static z-20 md:z-10"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -442,24 +472,25 @@ export function TipMatrix({
                   key={m.id}
                   className={"border-b " + stripeBg}
                 >
-                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 sticky left-0 md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 sticky left-0 md:static z-10 md:z-auto min-w-[60px] " + stripeBg}>
                     {stageLabel && (
                       <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
                         {stageLabel}
                       </div>
                     )}
-                    <div>{fmt(m.starts_at)}</div>
+                    <div className="leading-tight">{fmtDate(m.starts_at)}</div>
+                    <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[80px] md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[60px] md:static z-10 md:z-auto " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[160px] md:static z-10 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium min-w-[80px] md:min-w-[160px] sticky left-[140px] md:static z-10 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[95px] sticky left-[240px] md:static z-10 md:z-auto " + stripeBg}>
-                    <span className="font-semibold">{result}</span>
+                  <td className={"px-2 py-2 text-center whitespace-nowrap min-w-[60px] sticky left-[220px] md:static z-10 md:z-auto " + stripeBg}>
+                    <div className="font-semibold leading-tight">{result}</div>
                     {m.finalized && m.home_score_p1 != null && (
-                      <span className="ml-1 text-neutral-400">({m.home_score_p1}:{m.away_score_p1})</span>
+                      <div className="text-[11px] text-neutral-400 leading-tight">({m.home_score_p1}:{m.away_score_p1})</div>
                     )}
                   </td>
 
@@ -699,7 +730,7 @@ function TipModal({
     const d = val.replace(/\D/g, "").slice(0, 1);
     setter(d);
     if (d.length === 1 && nextRef.current) {
-      nextRef.current.focus();
+      nextRef.current.focus({ preventScroll: true });
     }
   }
 
