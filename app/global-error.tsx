@@ -19,7 +19,7 @@ export default function GlobalError({
       <body style={{ fontFamily: "system-ui, sans-serif", padding: 24, maxWidth: 700, margin: "0 auto" }}>
         <h1 style={{ color: "#be123c", marginBottom: 8 }}>Něco se pokazilo (global)</h1>
         <p style={{ color: "#525252", marginBottom: 16 }}>
-          Pošli prosím tenhle text Masterovi:
+          Pošli prosím tenhle text Kubovi:
         </p>
         <pre
           style={{

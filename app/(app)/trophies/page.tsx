@@ -47,7 +47,7 @@ export default async function TrophiesPage() {
 
       {list.length === 0 ? (
         <p className="text-sm text-neutral-500">
-          Zatím tu nic není. Master to brzy doplní.
+          Zatím tu nic není. Kuba to brzy doplní.
         </p>
       ) : (
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

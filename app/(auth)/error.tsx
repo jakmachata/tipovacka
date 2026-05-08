@@ -18,7 +18,7 @@ export default function AuthError({
     <main className="mx-auto max-w-md px-4 py-16">
       <h1 className="mb-2 text-2xl font-semibold text-rose-700">Něco se pokazilo</h1>
       <p className="mb-4 text-sm text-neutral-600">
-        Stalo se to při načítání přihlašovací stránky. Pošli prosím tenhle text Masterovi:
+        Stalo se to při načítání přihlašovací stránky. Pošli prosím tenhle text Kubovi:
       </p>
       <pre className="mb-4 max-h-64 overflow-auto rounded bg-neutral-100 p-3 text-xs">
         {error?.message || "(no message)"}

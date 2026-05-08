@@ -21,7 +21,7 @@ export default function RegisterPage() {
     <main className="mx-auto max-w-md px-4 py-16">
       <h1 className="mb-2 text-3xl font-bold">Registrace</h1>
       <p className="mb-8 text-sm text-neutral-600">
-        Po registraci tě musí Master schválit a přidělit ti přezdívku, než začneš tipovat.
+        Po registraci tě musí Kuba schválit a přidělit ti přezdívku, než začneš tipovat.
       </p>
       <form action={register} className="space-y-4">
         <input

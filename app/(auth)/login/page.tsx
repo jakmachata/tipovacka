@@ -40,7 +40,7 @@ export default function LoginPage() {
       </p>
       <p className="mt-2 text-sm">
         <span className="rounded bg-rose-100 px-2 py-0.5 text-rose-800">
-          Zapomenuté heslo (zatím nefunkční - kontaktuj Mastera)
+          Zapomenuté heslo (zatím nefunkční - kontaktuj Kubu)
         </span>
       </p>
     </main>

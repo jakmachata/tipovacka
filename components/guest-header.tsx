@@ -93,7 +93,7 @@ export function GuestHeader() {
       // takže to detekujeme a uživatele upozorníme.
       if (data?.user && (!data.user.identities || data.user.identities.length === 0)) {
         setErr(
-          "Tento e-mail je už registrovaný. Zkus se přihlásit, nebo požádej Mastera o reset hesla.",
+          "Tento e-mail je už registrovaný.",
         );
         setBusy(false);
         return;
@@ -119,7 +119,7 @@ export function GuestHeader() {
               <h3 className="font-semibold">Skoro hotovo! ✅</h3>
               <p className="text-neutral-600">
                 Poslali jsme ti potvrzovací e-mail na <strong>{email}</strong>.
-                Klikni na odkaz v e-mailu pro ověření a pak počkej, až tě Master
+                Klikni na odkaz v e-mailu pro ověření a pak počkej, až tě Kuba
                 schválí.
               </p>
               <p className="text-xs text-neutral-500">
@@ -234,7 +234,7 @@ export function GuestHeader() {
               {mode === "login" && (
                 <p className="mt-2 text-[11px]">
                   <span className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800">
-                    Zapomenuté heslo (zatím nefunkční - kontaktuj Mastera)
+                    Zapomenuté heslo (zatím nefunkční - kontaktuj Kubu)
                   </span>
                 </p>
               )}

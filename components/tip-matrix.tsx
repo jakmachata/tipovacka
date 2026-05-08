@@ -391,7 +391,7 @@ export function TipMatrix({
           </div>
         )}
       </div>
-      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
+      <div className="-mx-4 px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -618,7 +618,7 @@ export function TipMatrix({
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
-                        <div title="Tip čeká na schválení Masterem" className="leading-tight text-rose-600">
+                        <div title="Tip čeká na schválení Kubou" className="leading-tight text-rose-600">
                           <div className="grid grid-cols-2 gap-x-1 items-center">
                             <div className="text-center font-medium">
                               <span className="mr-0.5">?</span>
@@ -832,7 +832,7 @@ function TipModal({
       if (error) {
         setErr(error.message);
       } else {
-        alert("Zápas už začal. Tvůj tip jsme uložili a čeká na schválení Masterem.");
+        alert("Zápas už začal. Tvůj tip jsme uložili a čeká na schválení Kubou.");
         onSaved();
       }
       return;
