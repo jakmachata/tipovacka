@@ -51,7 +51,7 @@ export default async function TrophiesPage() {
           Zatím tu nic není. Master to brzy doplní.
         </p>
       ) : (
-        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {list.map((t) => {
             const rows: Array<{
               medal: string;
@@ -66,7 +66,7 @@ export default async function TrophiesPage() {
             return (
               <li
                 key={t.id}
-                className="w-full max-w-[420px] rounded-lg border p-4"
+                className="w-full max-w-[440px] rounded-lg border p-4"
               >
                 {rows.length === 0 ? (
                   <>
