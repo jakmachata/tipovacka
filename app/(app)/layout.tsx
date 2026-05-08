@@ -11,10 +11,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) {
     return (
       <>
-        <header className="sticky top-0 z-20 bg-white">
+        {/* Mobile-only top bar (sticky): login/register vlevo nahoře. */}
+        <div className="sticky top-0 z-30 border-b bg-white md:hidden">
+          <div className="mx-auto flex max-w-7xl items-center px-4 py-2 text-sm">
+            <GuestHeader />
+          </div>
+        </div>
+        {/* Menu — sticky pouze na desktopu (na mobilu odsune scroll pryč). */}
+        <header className="bg-white md:sticky md:top-0 md:z-20">
           <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 text-sm">
             <NavLinks isAdmin={false} pendingCount={0} unapprovedCount={0} guest />
-            <div className="ml-auto">
+            <div className="ml-auto hidden md:block">
               <GuestHeader />
             </div>
           </nav>
@@ -72,15 +79,27 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      <header className="sticky top-0 z-20 bg-white">
-        <nav className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 text-sm">
+      {/* Mobile-only top bar (sticky): jméno + Odhlásit vlevo nahoře. */}
+      <div className="sticky top-0 z-30 border-b bg-white md:hidden">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 text-sm">
+          <span className="text-neutral-500">{profile?.display_name}</span>
+          <form action={logout}>
+            <button className="hover:underline">Odhlásit</button>
+          </form>
+        </div>
+      </div>
+      {/* Menu — sticky pouze na desktopu (na mobilu odsune scroll pryč). */}
+      <header className="bg-white md:sticky md:top-0 md:z-20">
+        <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 text-sm">
           <NavLinks
             isAdmin={!!profile?.is_admin}
             pendingCount={pendingCount}
             unapprovedCount={unapprovedCount}
           />
-          <span className="ml-auto text-neutral-500">{profile?.display_name}</span>
-          <form action={logout}><button className="hover:underline">Odhlásit</button></form>
+          <span className="ml-auto hidden text-neutral-500 md:inline">{profile?.display_name}</span>
+          <form action={logout} className="hidden md:block">
+            <button className="hover:underline">Odhlásit</button>
+          </form>
         </nav>
       </header>
       <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>

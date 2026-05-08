@@ -19,8 +19,9 @@ export function NavLinks({
     path === href || path.startsWith(href + "/");
   // py-2 + border-y-2 transparent → menu vyšší, layout se nemění při aktivaci.
   // Aktivní stav přebarví obě 2px linky (přes font-bold + border-current).
+  // Mobile o stupeň menší (15 px), desktop 17 px.
   const baseCls =
-    "px-2 py-2 rounded transition text-[17px] border-y-2 border-transparent";
+    "px-2 py-2 rounded transition text-[15px] md:text-[17px] border-y-2 border-transparent";
   // !border-current forsuje barvu nad baseCls .border-transparent (Tailwind class source order).
   const activeMark = "font-bold !border-current";
   const cls = (href: string, extra = "") =>
