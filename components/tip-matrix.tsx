@@ -297,8 +297,8 @@ export function TipMatrix({
       ? null
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
-  // md:top-[68px] = výška headeru (sticky nav s text-[17px], py-2 + border-y-2 + nav.py-3 ≈ 67 px).
-  const headerBase = "md:sticky md:top-[68px] z-10 px-2 py-2 whitespace-nowrap text-white";
+  // Sticky table thead pod fixed mobile top bar (37 px) i pod desktop sticky header (68 px).
+  const headerBase = "sticky top-[37px] md:top-[68px] z-10 px-2 py-2 whitespace-nowrap text-white";
 
   const now = Date.now();
   const startOfDay = new Date();
