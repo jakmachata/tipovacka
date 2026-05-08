@@ -1,10 +1,15 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ChunkReloadHandler } from "@/components/chunk-reload-handler";
 
 export const metadata: Metadata = {
   title: "Natipovals?",
   description: "Tipování MS v hokeji 2026",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 0.85,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

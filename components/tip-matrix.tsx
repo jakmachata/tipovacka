@@ -298,7 +298,7 @@ export function TipMatrix({
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
-  const headerBase = "sticky top-[60px] z-10 px-2 py-2 whitespace-nowrap text-white";
+  const headerBase = "sticky top-[64px] md:top-[67px] z-10 px-2 py-2 whitespace-nowrap text-white";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -412,10 +412,10 @@ export function TipMatrix({
           </colgroup>
           <thead>
             <tr>
-              <th className={headerBase + " bg-neutral-900 text-center w-[50px]"}>Buly</th>
-              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-0 md:left-auto z-40 md:z-10"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[80px] md:left-auto z-40 md:z-10"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center w-[75px]"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
+              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[50px] md:left-auto z-40 md:z-10"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[130px] md:left-auto z-40 md:z-10"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[210px] md:left-auto z-40 md:z-10"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -514,7 +514,7 @@ export function TipMatrix({
                   key={m.id}
                   className={"border-b " + stripeBg}
                 >
-                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[50px] " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[50px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
                     {stageLabel && (
                       <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
                         {stageLabel}
@@ -523,13 +523,13 @@ export function TipMatrix({
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
                     <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[50px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[80px] md:static z-30 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[130px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] " + stripeBg}>
+                  <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
                     <div className="font-semibold leading-tight">{result}</div>
                     {m.finalized && m.home_score_p1 != null && (
                       <div className="text-[11px] text-neutral-400 leading-tight">({m.home_score_p1}:{m.away_score_p1})</div>
