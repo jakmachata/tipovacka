@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { formatPraguePretty } from "@/lib/tz";
 import { StatusMenu } from "@/components/status-menu";
 import { setStatus } from "./actions";
+import { DeleteAccountButton } from "@/components/delete-account-button";
 
 const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
@@ -70,7 +71,7 @@ export default async function HraciPage() {
     revalidatePath("/schedule");
   }
 
-  async function deleteDummy(formData: FormData) {
+  async function deleteAccount(formData: FormData) {
     "use server";
     // Re-ověř, že volající je admin
     const sb = await createClient();
@@ -84,15 +85,13 @@ export default async function HraciPage() {
     if (!callerProfile?.is_admin) return;
 
     const id = String(formData.get("id"));
-    const email = String(formData.get("email") ?? "").toLowerCase();
+    if (id === caller.id) return; // sám sebe ne (admin nechce smazat sebe omylem)
 
-    // POJISTKA: smazat lze jen dummy účty
-    if (!email.endsWith(DUMMY_EMAIL_SUFFIX)) return;
-    if (id === caller.id) return; // sám sebe ne
-
-    // Service-role client → maže auth.users; FK kaskáda smaže profile + picks + ...
+    // Smazat lze jakýkoli účet (dummy i reálný); klient-side confirm dialog
+    // už proběhl pro non-dummy. Server jen ověří admin práva.
     const admin = createServiceClient();
     await admin.auth.admin.deleteUser(id);
+    // FK kaskáda smaže profile, picks, scores, picks_audit, pending_picks.
 
     revalidatePath("/hraci");
     revalidatePath("/schedule");
@@ -120,6 +119,9 @@ export default async function HraciPage() {
         <tbody>
           {(profiles ?? []).map((p: any) => {
             const s = statusOf(p);
+            const isDummyEmail =
+              typeof p.email === "string" &&
+              p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX);
             return (
               <tr key={p.id} className="border-b">
                 {isAdmin && (
@@ -210,20 +212,15 @@ export default async function HraciPage() {
                 </td>
                 {isAdmin && (
                   <td className="py-2 text-right pr-2">
-                    {typeof p.email === "string" &&
-                      p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX) &&
-                      p.id !== user!.id && (
-                        <form action={deleteDummy} className="inline">
-                          <input type="hidden" name="id" value={p.id} />
-                          <input type="hidden" name="email" value={p.email} />
-                          <button
-                            title="Smazat dummy účet"
-                            className="rounded bg-rose-100 px-1.5 py-0.5 text-xs text-rose-700 hover:bg-rose-200"
-                          >
-                            🗑️
-                          </button>
-                        </form>
-                      )}
+                    {!p.is_admin && p.id !== user!.id && (
+                      <DeleteAccountButton
+                        id={p.id}
+                        email={p.email ?? ""}
+                        displayName={p.display_name}
+                        isDummy={isDummyEmail}
+                        action={deleteAccount}
+                      />
+                    )}
                   </td>
                 )}
               </tr>

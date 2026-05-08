@@ -215,6 +215,15 @@ export function TipMatrix({
   >(null);
   const [hidePast, setHidePast] = useState(false);
   const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
+  // Team column width: mobile 80px, desktop 160px. Aktualizujeme přes resize listener.
+  const [teamColWidth, setTeamColWidth] = useState(80);
+  useEffect(() => {
+    const update = () =>
+      setTeamColWidth(typeof window !== "undefined" && window.innerWidth >= 768 ? 160 : 80);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   const me = players.find((p) => p.id === myUserId) ?? null;
   const colorTarget =
     pickingColorFor == null
@@ -382,11 +391,19 @@ export function TipMatrix({
         )}
       </div>
       <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
-        <table className="text-xs border-separate border-spacing-0 table-fixed">
+        {/*
+          FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
+          aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
+          Team col je 80px mobile / 160px desktop (přes JS state, viz teamColWidth).
+        */}
+        <table
+          className="text-xs border-separate border-spacing-0 table-fixed"
+          style={{ width: 50 + teamColWidth * 2 + 60 + players.length * 77 }}
+        >
           <colgroup>
             <col style={{ width: 50 }} />
-            <col className="md:[width:160px]" style={{ width: 80 }} />
-            <col className="md:[width:160px]" style={{ width: 80 }} />
+            <col style={{ width: teamColWidth }} />
+            <col style={{ width: teamColWidth }} />
             <col style={{ width: 60 }} />
             {players.map((p) => (
               <col key={p.id} style={{ width: 77 }} />
