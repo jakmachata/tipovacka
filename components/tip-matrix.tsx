@@ -529,11 +529,13 @@ export function TipMatrix({
                   <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[130px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
-                    <div className="font-semibold leading-tight">{result}</div>
-                    {m.finalized && m.home_score_p1 != null && (
-                      <div className="text-[11px] text-neutral-400 leading-tight">({m.home_score_p1}:{m.away_score_p1})</div>
-                    )}
+                  <td className={"text-center whitespace-nowrap w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
+                    <div className="flex h-full flex-col">
+                      <div className="flex flex-1 items-center justify-center px-2 pt-2 text-base font-semibold leading-tight">{result}</div>
+                      <div className="flex flex-1 items-center justify-center px-2 pb-2 text-[11px] text-neutral-400 leading-tight">
+                        {m.finalized && m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
+                      </div>
+                    </div>
                   </td>
 
                   {players.map((p) => {
@@ -555,7 +557,7 @@ export function TipMatrix({
                       const sideHcp = hcpSideValue(pick, m);
                       content = (
                         <div className="leading-tight">
-                          {/* Row 1: fulltime (60m) — centered, zarovnaný s row 1 ve sloupci Výsledek */}
+                          {/* Row 1: fulltime (60m) */}
                           <div className="text-center font-medium">
                             <span
                               className={
@@ -567,7 +569,7 @@ export function TipMatrix({
                               {pick.home_score}:{pick.away_score}
                             </span>
                           </div>
-                          {/* Row 2: 1. třetina — centered, zarovnaný s row 2 ve sloupci Výsledek */}
+                          {/* Row 2: 1. třetina */}
                           <div className="text-center text-[11px]">
                             {pick.home_score_p1 != null ? (
                               <span
@@ -581,7 +583,7 @@ export function TipMatrix({
                               </span>
                             ) : null}
                           </div>
-                          {/* Row 3: vlajka, HCP, body — zleva */}
+                          {/* Row 3: vlajka + HCP zleva */}
                           <div className="flex items-center gap-1 text-[11px]">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
@@ -594,7 +596,10 @@ export function TipMatrix({
                             {sideHcp != null && (
                               <span className="text-neutral-500">{sideHcp}</span>
                             )}
-                            {score && (
+                          </div>
+                          {/* Row 4: body */}
+                          <div className="text-[11px]">
+                            {score ? (
                               <span
                                 className={
                                   "font-semibold " +
@@ -605,6 +610,8 @@ export function TipMatrix({
                               >
                                 {score.total_points > 0 ? `+${score.total_points}` : "-"}
                               </span>
+                            ) : (
+                              <span>&nbsp;</span>
                             )}
                           </div>
                         </div>
@@ -636,6 +643,7 @@ export function TipMatrix({
                             )}
                             {sideHcp != null && <span>{sideHcp}</span>}
                           </div>
+                          <div className="text-[11px]">&nbsp;</div>
                         </div>
                       );
                     } else if (isMine && started && !inGrace && !isAdmin) {
