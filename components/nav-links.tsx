@@ -21,7 +21,8 @@ export function NavLinks({
   // Aktivní stav přebarví obě 2px linky (přes font-bold + border-current).
   const baseCls =
     "px-2 py-2 rounded transition text-[17px] border-y-2 border-transparent";
-  const activeMark = "font-bold border-current";
+  // !border-current forsuje barvu nad baseCls .border-transparent (Tailwind class source order).
+  const activeMark = "font-bold !border-current";
   const cls = (href: string, extra = "") =>
     baseCls +
     " " + extra + " " +
