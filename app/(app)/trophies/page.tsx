@@ -51,7 +51,7 @@ export default async function TrophiesPage() {
           Zatím tu nic není. Master to brzy doplní.
         </p>
       ) : (
-        <ul className="space-y-6">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {list.map((t) => {
             const rows: Array<{
               medal: string;
