@@ -17,18 +17,20 @@ export function NavLinks({
   const path = usePathname() ?? "";
   const active = (href: string) =>
     path === href || path.startsWith(href + "/");
-  const baseCls = "px-2 py-1 rounded transition";
+  const baseCls = "px-2 py-1 rounded transition text-lg";
+  // Aktivní položka: bez pozadí, místo toho tučně + nadtrženo i podtrženo (2 px).
+  const activeMark = "font-bold underline overline decoration-2 underline-offset-4";
   const cls = (href: string, extra = "") =>
     baseCls +
     " " + extra + " " +
     (active(href)
-      ? "bg-neutral-900 text-white"
+      ? "text-neutral-900 " + activeMark
       : "text-neutral-700 hover:bg-neutral-100");
   const adminCls = (href: string) =>
     baseCls +
     " " +
     (active(href)
-      ? "bg-amber-600 text-white"
+      ? "text-amber-700 " + activeMark
       : "text-amber-700 hover:bg-amber-50");
 
   // Hráči link: pokud je admin a má neschválené účty, svítí růžovou + pulse + badge.
@@ -36,7 +38,7 @@ export function NavLinks({
     if (isAdmin && unapprovedCount > 0) {
       return baseCls + " " +
         (active("/hraci")
-          ? "bg-rose-600 text-white"
+          ? "bg-rose-100 text-rose-800 ring-1 ring-rose-300 " + activeMark
           : "bg-rose-100 text-rose-800 ring-1 ring-rose-300 animate-pulse");
     }
     return cls("/hraci");
@@ -96,7 +98,7 @@ export function NavLinks({
               baseCls +
               " " +
               (active("/admin/pending")
-                ? "bg-rose-600 text-white"
+                ? "text-rose-700 " + activeMark
                 : pendingCount > 0
                   ? "bg-rose-100 text-rose-800 ring-1 ring-rose-300 animate-pulse"
                   : "text-amber-700 hover:bg-amber-50")

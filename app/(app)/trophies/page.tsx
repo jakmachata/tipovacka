@@ -83,8 +83,8 @@ export default async function TrophiesPage() {
                         <col style={{ width: 40 }} />
                         <col style={{ width: 170 }} />
                         <col style={{ width: 40 }} />
-                        <col style={{ width: 50 }} />
-                        <col style={{ width: 50 }} />
+                        <col style={{ width: 60 }} />
+                        <col style={{ width: 60 }} />
                       </colgroup>
                       <thead>
                         <tr className="text-left">
