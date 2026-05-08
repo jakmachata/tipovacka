@@ -39,11 +39,11 @@ export default async function TrophiesPage() {
         ...aneb historie naší letité tipovačky...
       </p>
       <p className="mb-6 text-xs text-neutral-500">
-        DIR (Daily&apos;s Ideal Rate) ukazuje, jak blízko byl hráč optimálnímu
-        zisku za turnaj. <strong>DIR1</strong> = počet bodů ÷ součet nejvyšších
-        tipů na zápas. <strong>DIR2</strong> = počet bodů ÷ součet druhých
-        nejvyšších tipů na zápas. Pokud Daily&apos;s ideal pro turnaj nebyl
-        dopočítán, zůstává buňka prázdná.
+        DIR (Daily&apos;s Ideal Rate) tu je od toho, aby ukázal nějakou
+        stabilní metriku mezi turnaji, které měly různá pravidla bodování.
+        Ukazuje, jak blízko byl hráč optimálnímu zisku za turnaj:{" "}
+        <strong>DIR1</strong> je součet nejvyšších zisků z každého zápasu;{" "}
+        <strong>DIR2</strong> je druhý nejvyšší.
       </p>
 
       {list.length === 0 ? (
@@ -64,7 +64,10 @@ export default async function TrophiesPage() {
             ].filter((r) => r.name);
 
             return (
-              <li key={t.id} className="rounded-lg border p-4">
+              <li
+                key={t.id}
+                className="w-full max-w-[420px] rounded-lg border p-4"
+              >
                 {rows.length === 0 ? (
                   <>
                     <div className="mb-2 text-lg font-semibold">
@@ -79,10 +82,10 @@ export default async function TrophiesPage() {
                     <table className="text-sm">
                       <colgroup>
                         <col style={{ width: 40 }} />
-                        <col style={{ width: 160 }} />
-                        <col style={{ width: 60 }} />
-                        <col style={{ width: 70 }} />
-                        <col style={{ width: 70 }} />
+                        <col style={{ width: 170 }} />
+                        <col style={{ width: 40 }} />
+                        <col style={{ width: 50 }} />
+                        <col style={{ width: 50 }} />
                       </colgroup>
                       <thead>
                         <tr className="text-left">
