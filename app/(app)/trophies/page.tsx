@@ -17,9 +17,8 @@ interface Trophy {
 
 function dir(points: number | null, ideal: number | null): string {
   if (points == null || ideal == null || ideal === 0) return "";
-  const r = points / ideal;
-  // Procentem s jedním desetinným místem.
-  return (r * 100).toFixed(1) + " %";
+  // Procentem (bez jednotky), 1 desetinné místo. Symbol % je v hlavičce sloupce.
+  return ((points / ideal) * 100).toFixed(1);
 }
 
 export default async function TrophiesPage() {
@@ -40,8 +39,8 @@ export default async function TrophiesPage() {
       </p>
       <p className="mb-6 text-xs text-neutral-500">
         DIR (Daily&apos;s Ideal Rate) tu je od toho, aby ukázal nějakou
-        stabilní metriku mezi turnaji, které měly různá pravidla bodování.
-        Ukazuje, jak blízko byl hráč optimálnímu zisku za turnaj:{" "}
+        stabilní metriku mezi turnaji s různými pravidly bodování. Ukazuje,
+        jak blízko byl hráč optimálnímu bodovému zisku:{" "}
         <strong>DIR1</strong> je součet nejvyšších zisků z každého zápasu;{" "}
         <strong>DIR2</strong> je druhý nejvyšší.
       </p>
@@ -97,10 +96,10 @@ export default async function TrophiesPage() {
                             Body
                           </th>
                           <th className="px-2 py-1 text-right text-xs uppercase text-neutral-500">
-                            DIR1
+                            DIR1 %
                           </th>
                           <th className="px-2 py-1 text-right text-xs uppercase text-neutral-500">
-                            DIR2
+                            DIR2 %
                           </th>
                         </tr>
                       </thead>
