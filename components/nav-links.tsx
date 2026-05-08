@@ -56,20 +56,22 @@ export function NavLinks({
     );
   }
 
-  // Pořadí pro přihlášené: Natipovals → Hráči → Pravidla → Trophy room.
+  // Pořadí pro přihlášené: Natipovals → Pravidla → Trophy room. Hráči jen admin.
   return (
     <>
       <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
         🏒 Natipovals?
       </Link>
-      <Link href="/hraci" className={hraciCls}>
-        Hráči
-        {isAdmin && unapprovedCount > 0 && (
-          <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
-            {unapprovedCount}
-          </span>
-        )}
-      </Link>
+      {isAdmin && (
+        <Link href="/hraci" className={hraciCls}>
+          Hráči
+          {unapprovedCount > 0 && (
+            <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
+              {unapprovedCount}
+            </span>
+          )}
+        </Link>
+      )}
       <Link href="/rules" className={cls("/rules")}>
         Pravidla
       </Link>

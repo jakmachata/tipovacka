@@ -65,22 +65,40 @@ export default async function TrophiesPage() {
 
             return (
               <li key={t.id} className="rounded-lg border p-4">
-                <div className="mb-3 text-lg font-semibold">{t.event_name}</div>
-
                 {rows.length === 0 ? (
-                  <p className="text-sm text-neutral-500">
-                    Zatím bez výsledků.
-                  </p>
+                  <>
+                    <div className="mb-2 text-lg font-semibold">
+                      {t.event_name}
+                    </div>
+                    <p className="text-sm text-neutral-500">
+                      Zatím bez výsledků.
+                    </p>
+                  </>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="text-sm">
+                      <colgroup>
+                        <col style={{ width: 40 }} />
+                        <col style={{ width: 160 }} />
+                        <col style={{ width: 60 }} />
+                        <col style={{ width: 70 }} />
+                        <col style={{ width: 70 }} />
+                      </colgroup>
                       <thead>
-                        <tr className="text-left text-xs uppercase text-neutral-500">
-                          <th className="w-10 px-2 py-1"></th>
-                          <th className="px-2 py-1">Jméno</th>
-                          <th className="px-2 py-1 text-right">Body</th>
-                          <th className="px-2 py-1 text-right">DIR1</th>
-                          <th className="px-2 py-1 text-right">DIR2</th>
+                        <tr className="text-left">
+                          <th className="px-2 py-1"></th>
+                          <th className="px-2 py-1 text-base font-semibold text-neutral-900">
+                            {t.event_name}
+                          </th>
+                          <th className="px-2 py-1 text-right text-xs uppercase text-neutral-500">
+                            Body
+                          </th>
+                          <th className="px-2 py-1 text-right text-xs uppercase text-neutral-500">
+                            DIR1
+                          </th>
+                          <th className="px-2 py-1 text-right text-xs uppercase text-neutral-500">
+                            DIR2
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -102,19 +120,6 @@ export default async function TrophiesPage() {
                       </tbody>
                     </table>
                   </div>
-                )}
-
-                {(t.daily_ideal_1 != null || t.daily_ideal_2 != null) && (
-                  <p className="mt-2 text-[11px] text-neutral-500">
-                    Daily&apos;s ideal:{" "}
-                    {t.daily_ideal_1 != null
-                      ? `#1 = ${t.daily_ideal_1}`
-                      : "#1 —"}
-                    {", "}
-                    {t.daily_ideal_2 != null
-                      ? `#2 = ${t.daily_ideal_2}`
-                      : "#2 —"}
-                  </p>
                 )}
 
                 {t.notes && (
