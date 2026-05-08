@@ -384,12 +384,12 @@ export function TipMatrix({
       <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
         <table className="text-xs border-separate border-spacing-0 table-fixed">
           <colgroup>
-            <col className="w-[50px]" />
-            <col className="w-[80px] md:w-[160px]" />
-            <col className="w-[80px] md:w-[160px]" />
-            <col className="w-[60px]" />
+            <col style={{ width: 50 }} />
+            <col className="md:[width:160px]" style={{ width: 80 }} />
+            <col className="md:[width:160px]" style={{ width: 80 }} />
+            <col style={{ width: 60 }} />
             {players.map((p) => (
-              <col key={p.id} className="w-[77px]" />
+              <col key={p.id} style={{ width: 77 }} />
             ))}
           </colgroup>
           <thead>
@@ -402,18 +402,17 @@ export function TipMatrix({
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
                 const fallbackColor = colorForUser(p.id);
-                const fallbackBorder = borderForUser(p.id);
-                const ownBorder = isMineHeader
-                  ? " border-l-2 border-r-2 " + (hasCustom ? "" : fallbackBorder)
-                  : "";
-                const inlineStyle: React.CSSProperties = {};
+                // Pro isMine zvýrazníme sloupec přes inset box-shadow — neovlivňuje šířku.
+                const myAccentColor = hasCustom
+                  ? p.bg_color ?? "#000"
+                  : "#16a34a"; // emerald-600 jako fallback pro vlastníka
+                const inlineStyle: React.CSSProperties = { width: 77 };
                 if (hasCustom) {
                   inlineStyle.backgroundColor = p.bg_color ?? undefined;
                   inlineStyle.color = p.text_color ?? undefined;
                 }
-                if (isMineHeader && hasCustom) {
-                  inlineStyle.borderLeftColor = p.bg_color ?? undefined;
-                  inlineStyle.borderRightColor = p.bg_color ?? undefined;
+                if (isMineHeader) {
+                  inlineStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}`;
                 }
                 return (
                   <th
@@ -425,16 +424,15 @@ export function TipMatrix({
                     }
                     title={
                       isMineHeader
-                        ? "Kliknutím změň svou barvu"
+                        ? "Kliknutím uprav profil (jméno + barvu)"
                         : isAdmin
-                          ? `Změnit barvu hráče ${p.display_name}`
+                          ? `Uprav profil hráče ${p.display_name}`
                           : undefined
                     }
                     className={
                       headerBase +
-                      " text-center w-[77px] " +
+                      " text-center " +
                       (hasCustom ? "" : fallbackColor + " ") +
-                      ownBorder +
                       (isMineHeader || isAdmin ? " cursor-pointer" : "")
                     }
                     style={inlineStyle}
@@ -652,13 +650,13 @@ export function TipMatrix({
                         : "cursor-pointer hover:bg-amber-100 "
                       : "";
                     const hasCustomCell = !!p.bg_color;
-                    const ownBorder = isMine
-                      ? " border-l-2 border-r-2 " + (hasCustomCell ? "" : borderForUser(p.id))
-                      : "";
-                    const ownBorderStyle: React.CSSProperties =
-                      isMine && hasCustomCell
-                        ? { borderLeftColor: p.bg_color ?? undefined, borderRightColor: p.bg_color ?? undefined }
-                        : {};
+                    const myAccentColor = hasCustomCell
+                      ? p.bg_color ?? "#000"
+                      : "#16a34a";
+                    const cellStyle: React.CSSProperties = { width: 77 };
+                    if (isMine) {
+                      cellStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}`;
+                    }
 
                     return (
                       <td
@@ -672,9 +670,9 @@ export function TipMatrix({
                                 })
                             : undefined
                         }
-                        style={ownBorderStyle}
+                        style={cellStyle}
                         className={
-                          "px-1 py-2 text-center w-[77px] overflow-hidden " + cellBg + cellHover + ownBorder
+                          "px-1 py-2 text-center overflow-hidden " + cellBg + cellHover
                         }
                       >
                         {content}
@@ -710,6 +708,7 @@ export function TipMatrix({
           displayName={colorTarget.display_name}
           initialBg={colorTarget.bg_color}
           initialText={colorTarget.text_color}
+          canEditName={isAdmin || colorTarget.id === myUserId}
           onClose={() => setPickingColorFor(null)}
           onSaved={() => {
             setPickingColorFor(null);

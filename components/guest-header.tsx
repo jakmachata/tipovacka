@@ -15,6 +15,7 @@ export function GuestHeader() {
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [registerSuccess, setRegisterSuccess] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,14 +49,22 @@ export function GuestHeader() {
       // Po loginu refresh aby server-rendered layout přepnul z guest na member.
       window.location.reload();
     } else {
-      const { error } = await sb.auth.signUp({ email, password });
+      // Email confirmation: po signUp Supabase pošle ověřovací mail.
+      // Po kliknutí na link se uživatel potvrdí; pak ho master ještě schválí.
+      const { error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin + "/pending",
+        },
+      });
       if (error) {
         setErr(error.message);
         setBusy(false);
         return;
       }
-      // Po registraci profil čeká na schválení.
-      window.location.href = "/pending";
+      setRegisterSuccess(true);
+      setBusy(false);
     }
   }
 
@@ -70,85 +79,120 @@ export function GuestHeader() {
       </button>
       {open && (
         <div className="absolute right-0 top-full z-30 mt-1 w-72 rounded-lg border bg-white p-4 shadow-xl">
-          <div className="mb-3 flex gap-1 text-xs">
-            <button
-              type="button"
-              onClick={() => setMode("login")}
-              className={
-                "flex-1 rounded px-2 py-1 " +
-                (mode === "login"
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200")
-              }
-            >
-              Přihlášení
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("register")}
-              className={
-                "flex-1 rounded px-2 py-1 " +
-                (mode === "register"
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200")
-              }
-            >
-              Registrace
-            </button>
-          </div>
-          <form onSubmit={submit} className="space-y-2">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="email"
-              className="w-full rounded border px-2 py-1.5 text-sm"
-            />
-            <div className="relative">
-              <input
-                type={showPw ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={mode === "register" ? 6 : undefined}
-                placeholder={mode === "register" ? "heslo (min. 6 znaků)" : "heslo"}
-                className="w-full rounded border px-2 py-1.5 pr-9 text-sm"
-              />
+          {registerSuccess ? (
+            <div className="space-y-3 text-sm">
+              <h3 className="font-semibold">Skoro hotovo! ✅</h3>
+              <p className="text-neutral-600">
+                Poslali jsme ti potvrzovací e-mail na <strong>{email}</strong>.
+                Klikni na odkaz v e-mailu pro ověření a pak počkej, až tě Master
+                schválí.
+              </p>
+              <p className="text-xs text-neutral-500">
+                Pokud e-mail nedorazil do pár minut, zkontroluj spam.
+              </p>
               <button
                 type="button"
-                onClick={() => setShowPw((v) => !v)}
-                title={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
-                aria-label={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
-                className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-neutral-500 hover:text-neutral-800"
+                onClick={() => {
+                  setRegisterSuccess(false);
+                  setMode("login");
+                  setEmail("");
+                  setPassword("");
+                }}
+                className="w-full rounded bg-black px-3 py-1.5 text-sm text-white"
               >
-                {showPw ? "🙈" : "👁️"}
+                Zavřít
               </button>
             </div>
-            {err && <p className="text-xs text-rose-600">{err}</p>}
-            <button
-              type="submit"
-              disabled={busy}
-              className="w-full rounded bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50"
-            >
-              {busy
-                ? "Zpracovávám…"
-                : mode === "login"
-                  ? "Přihlásit"
-                  : "Vytvořit účet"}
-            </button>
-          </form>
-          {mode === "register" && (
-            <p className="mt-2 text-[11px] text-neutral-500">
-              Po registraci tě musí Master schválit a přidělit ti přezdívku.
-            </p>
-          )}
-          {mode === "login" && (
-            <p className="mt-2 text-[11px]">
-              <span className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800">
-                Zapomenuté heslo (zatím nefunkční - kontaktuj Mastera)
-              </span>
-            </p>
+          ) : (
+            <>
+              <div className="mb-3 flex gap-1 text-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("login");
+                    setErr("");
+                  }}
+                  className={
+                    "flex-1 rounded px-2 py-1 " +
+                    (mode === "login"
+                      ? "bg-neutral-900 text-white"
+                      : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200")
+                  }
+                >
+                  Přihlášení
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("register");
+                    setErr("");
+                  }}
+                  className={
+                    "flex-1 rounded px-2 py-1 " +
+                    (mode === "register"
+                      ? "bg-neutral-900 text-white"
+                      : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200")
+                  }
+                >
+                  Registrace
+                </button>
+              </div>
+              <form onSubmit={submit} className="space-y-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="email"
+                  className="w-full rounded border px-2 py-1.5 text-sm"
+                />
+                <div className="relative">
+                  <input
+                    type={showPw ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={mode === "register" ? 6 : undefined}
+                    placeholder={mode === "register" ? "heslo (min. 6 znaků)" : "heslo"}
+                    className="w-full rounded border px-2 py-1.5 pr-9 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((v) => !v)}
+                    title={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
+                    aria-label={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
+                    className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-neutral-500 hover:text-neutral-800"
+                  >
+                    {showPw ? "🙈" : "👁️"}
+                  </button>
+                </div>
+                {err && <p className="text-xs text-rose-600">{err}</p>}
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full rounded bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50"
+                >
+                  {busy
+                    ? "Zpracovávám…"
+                    : mode === "login"
+                      ? "Přihlásit"
+                      : "Vytvořit účet"}
+                </button>
+              </form>
+              {mode === "register" && (
+                <p className="mt-2 text-[11px] text-neutral-500">
+                  Po registraci ti přijde potvrzovací e-mail. Po jeho ověření tě
+                  ještě musí Master schválit.
+                </p>
+              )}
+              {mode === "login" && (
+                <p className="mt-2 text-[11px]">
+                  <span className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800">
+                    Zapomenuté heslo (zatím nefunkční - kontaktuj Mastera)
+                  </span>
+                </p>
+              )}
+            </>
           )}
         </div>
       )}

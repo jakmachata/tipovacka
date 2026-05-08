@@ -8,6 +8,8 @@ interface Props {
   displayName: string;
   initialBg: string | null;
   initialText: string | null;
+  // canEditName: může upravit přezdívku (vlastník nebo admin).
+  canEditName?: boolean;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -38,9 +40,11 @@ export function ColorPickerModal({
   displayName,
   initialBg,
   initialText,
+  canEditName = false,
   onClose,
   onSaved,
 }: Props) {
+  const [name, setName] = useState(displayName);
   const [bg, setBg] = useState(initialBg ?? "#dc2626");
   const [text, setText] = useState(initialText ?? "#ffffff");
   const [saving, setSaving] = useState(false);
@@ -50,10 +54,17 @@ export function ColorPickerModal({
     setSaving(true);
     setErr("");
     const sb = createClient();
-    const { error } = await sb
-      .from("profiles")
-      .update({ bg_color: bg, text_color: text })
-      .eq("id", userId);
+    const update: Record<string, unknown> = { bg_color: bg, text_color: text };
+    if (canEditName) {
+      const trimmed = name.trim().slice(0, 12);
+      if (!trimmed) {
+        setErr("Přezdívka nemůže být prázdná.");
+        setSaving(false);
+        return;
+      }
+      update.display_name = trimmed;
+    }
+    const { error } = await sb.from("profiles").update(update).eq("id", userId);
     setSaving(false);
     if (error) setErr(error.message);
     else onSaved();
@@ -81,18 +92,33 @@ export function ColorPickerModal({
         className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-lg font-semibold">Vlastní barva</h2>
+        <h2 className="mb-4 text-lg font-semibold">Profil</h2>
+
+        {canEditName && (
+          <div className="mb-4">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-neutral-500">
+              Přezdívka (max. 12 znaků)
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={12}
+              className="w-full rounded border px-3 py-2 text-sm"
+            />
+          </div>
+        )}
 
         <div
           className="mb-4 rounded px-4 py-3 text-center text-sm font-semibold"
           style={{ backgroundColor: bg, color: text }}
         >
-          {displayName} (náhled)
+          {(name || displayName) + " (náhled)"}
         </div>
 
         <div className="mb-4">
           <label className="mb-1 block text-xs uppercase tracking-wide text-neutral-500">
-            Předvolby
+            Předvolby barev
           </label>
           <div className="flex flex-wrap gap-1.5">
             {PRESETS.map((p, i) => (
@@ -161,7 +187,7 @@ export function ColorPickerModal({
             disabled={saving}
             className="rounded border border-neutral-300 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
           >
-            Vrátit na výchozí
+            Vrátit barvy na výchozí
           </button>
           <div className="flex gap-2">
             <button

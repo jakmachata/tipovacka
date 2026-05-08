@@ -53,7 +53,7 @@ export function NavLinks({
           Pravidla
         </Link>
         <Link href="/trophies" className={cls("/trophies")}>
-          🏆 Trophy room
+          Trophy room
         </Link>
       </>
     );
@@ -68,7 +68,7 @@ export function NavLinks({
         Pravidla
       </Link>
       <Link href="/trophies" className={cls("/trophies")}>
-        🏆 Trophy room
+        Trophy room
       </Link>
       <Link href="/hraci" className={hraciCls}>
         Hráči
