@@ -218,8 +218,7 @@ export function GuestHeader() {
               </form>
               {mode === "register" && (
                 <p className="mt-2 text-[11px] text-neutral-500">
-                  Po registraci ti přijde potvrzovací e-mail. Po jeho ověření tě
-                  ještě musí Master schválit.
+                  Po registraci ti přijde potvrzovací e-mail.
                 </p>
               )}
               {mode === "login" && (

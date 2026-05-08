@@ -42,15 +42,12 @@ export function NavLinks({
     return cls("/hraci");
   })();
 
-  // Host: zobrazujeme jen veřejné odkazy. Pořadí: Natipovals → Pravidla → Trophy room.
+  // Host: jen Natipovals + Trophy room (Pravidla a Hráči jen pro přihlášené).
   if (guest) {
     return (
       <>
         <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
           🏒 Natipovals?
-        </Link>
-        <Link href="/rules" className={cls("/rules")}>
-          Pravidla
         </Link>
         <Link href="/trophies" className={cls("/trophies")}>
           Trophy room
