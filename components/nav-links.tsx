@@ -17,9 +17,11 @@ export function NavLinks({
   const path = usePathname() ?? "";
   const active = (href: string) =>
     path === href || path.startsWith(href + "/");
-  const baseCls = "px-2 py-1 rounded transition text-lg";
-  // Aktivní položka: bez pozadí, místo toho tučně + nadtrženo i podtrženo (2 px).
-  const activeMark = "font-bold underline overline decoration-2 underline-offset-4";
+  // py-2 + border-y-2 transparent → menu vyšší, layout se nemění při aktivaci.
+  // Aktivní stav přebarví obě 2px linky (přes font-bold + border-current).
+  const baseCls =
+    "px-2 py-2 rounded transition text-[17px] border-y-2 border-transparent";
+  const activeMark = "font-bold border-current";
   const cls = (href: string, extra = "") =>
     baseCls +
     " " + extra + " " +
