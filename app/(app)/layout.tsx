@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     return (
       <>
         {/* Mobile-only top bar (fixed pro 100% spolehlivé ukotvení). */}
-        <div className="fixed inset-x-0 top-0 z-50 border-b bg-white md:hidden">
+        <div className="fixed inset-x-0 top-0 z-50 border-b bg-white transform-gpu md:hidden">
           <div className="mx-auto flex max-w-7xl items-center px-4 py-2 text-sm">
             <GuestHeader />
           </div>
@@ -82,7 +82,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <>
       {/* Mobile-only top bar (fixed pro 100% spolehlivé ukotvení). */}
-      <div className="fixed inset-x-0 top-0 z-50 border-b bg-white md:hidden">
+      <div className="fixed inset-x-0 top-0 z-50 border-b bg-white transform-gpu md:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 text-sm">
           <span className="text-neutral-500">{profile?.display_name}</span>
           <form action={logout}>

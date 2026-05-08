@@ -76,7 +76,7 @@ export function GuestHeader() {
         setBusy(false);
         return;
       }
-      const { error } = await sb.auth.signUp({
+      const { data, error } = await sb.auth.signUp({
         email,
         password,
         options: {
@@ -85,6 +85,16 @@ export function GuestHeader() {
       });
       if (error) {
         setErr(error.message);
+        setBusy(false);
+        return;
+      }
+      // Supabase v2 vrací data.user.identities = [] když e-mail už existuje
+      // (anti-enumeration default). Pro nás je to tichá smrt registrace,
+      // takže to detekujeme a uživatele upozorníme.
+      if (data?.user && (!data.user.identities || data.user.identities.length === 0)) {
+        setErr(
+          "Tento e-mail je už registrovaný. Zkus se přihlásit, nebo požádej Mastera o reset hesla.",
+        );
         setBusy(false);
         return;
       }

@@ -413,8 +413,8 @@ export function TipMatrix({
           <thead>
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center w-[50px]"}>Buly</th>
-              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-0 md:left-auto md:static z-40 md:z-10"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[80px] md:left-auto md:static z-40 md:z-10"}>Hosté</th>
+              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-0 md:left-auto z-40 md:z-10"}>Domácí</th>
+              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[80px] md:left-auto z-40 md:z-10"}>Hosté</th>
               <th className={headerBase + " bg-neutral-900 text-center w-[75px]"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
