@@ -297,8 +297,8 @@ export function TipMatrix({
       ? null
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
-  // Sticky table thead pod fixed mobile top bar (37 px) i pod desktop sticky header (68 px).
-  const headerBase = "sticky top-[37px] md:top-[68px] z-10 px-2 py-2 whitespace-nowrap text-white";
+  // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
+  const headerBase = "sticky top-[60px] z-10 px-2 py-2 whitespace-nowrap text-white";
 
   const now = Date.now();
   const startOfDay = new Date();
