@@ -11,12 +11,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) {
     return (
       <>
-        {/* Mobile-only top bar (sticky): login/register vlevo nahoře. */}
-        <div className="sticky top-0 z-30 border-b bg-white md:hidden">
+        {/* Mobile-only top bar (fixed pro 100% spolehlivé ukotvení). */}
+        <div className="fixed inset-x-0 top-0 z-30 border-b bg-white md:hidden">
           <div className="mx-auto flex max-w-7xl items-center px-4 py-2 text-sm">
             <GuestHeader />
           </div>
         </div>
+        {/* Spacer rezervuje místo pod fixed barem (jen mobile). */}
+        <div className="h-[37px] md:hidden" />
         {/* Menu — sticky pouze na desktopu (na mobilu odsune scroll pryč). */}
         <header className="bg-white md:sticky md:top-0 md:z-20">
           <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 text-sm">
@@ -79,8 +81,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      {/* Mobile-only top bar (sticky): jméno + Odhlásit vlevo nahoře. */}
-      <div className="sticky top-0 z-30 border-b bg-white md:hidden">
+      {/* Mobile-only top bar (fixed pro 100% spolehlivé ukotvení). */}
+      <div className="fixed inset-x-0 top-0 z-30 border-b bg-white md:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 text-sm">
           <span className="text-neutral-500">{profile?.display_name}</span>
           <form action={logout}>
@@ -88,6 +90,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </form>
         </div>
       </div>
+      {/* Spacer rezervuje místo pod fixed barem (jen mobile). */}
+      <div className="h-[37px] md:hidden" />
       {/* Menu — sticky pouze na desktopu (na mobilu odsune scroll pryč). */}
       <header className="bg-white md:sticky md:top-0 md:z-20">
         <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 text-sm">
