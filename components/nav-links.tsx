@@ -42,7 +42,7 @@ export function NavLinks({
     return cls("/hraci");
   })();
 
-  // Host: zobrazujeme jen veřejné odkazy (Tipovačka, Pravidla, Trophy room).
+  // Host: zobrazujeme jen veřejné odkazy. Pořadí: Natipovals → Pravidla → Trophy room.
   if (guest) {
     return (
       <>
@@ -59,16 +59,11 @@ export function NavLinks({
     );
   }
 
+  // Pořadí pro přihlášené: Natipovals → Hráči → Pravidla → Trophy room.
   return (
     <>
       <Link href="/schedule" className={cls("/schedule", "font-semibold")}>
         🏒 Natipovals?
-      </Link>
-      <Link href="/rules" className={cls("/rules")}>
-        Pravidla
-      </Link>
-      <Link href="/trophies" className={cls("/trophies")}>
-        Trophy room
       </Link>
       <Link href="/hraci" className={hraciCls}>
         Hráči
@@ -77,6 +72,12 @@ export function NavLinks({
             {unapprovedCount}
           </span>
         )}
+      </Link>
+      <Link href="/rules" className={cls("/rules")}>
+        Pravidla
+      </Link>
+      <Link href="/trophies" className={cls("/trophies")}>
+        Trophy room
       </Link>
       {isAdmin && (
         <>

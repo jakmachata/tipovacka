@@ -2,11 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 
 interface Trophy {
   id: number;
-  year: number;
   event_name: string;
   gold: string | null;
   silver: string | null;
   bronze: string | null;
+  gold_points: number | null;
+  silver_points: number | null;
+  bronze_points: number | null;
   notes: string | null;
 }
 
@@ -15,7 +17,6 @@ export default async function TrophiesPage() {
   const { data: trophies } = await supabase
     .from("trophies")
     .select("*")
-    .order("year", { ascending: false })
     .order("id", { ascending: false });
 
   const list = (trophies ?? []) as Trophy[];
@@ -35,27 +36,39 @@ export default async function TrophiesPage() {
         <ul className="space-y-4">
           {list.map((t) => (
             <li key={t.id} className="rounded-lg border p-4">
-              <div className="mb-2 flex items-baseline gap-2">
-                <span className="text-lg font-semibold">{t.event_name}</span>
-                <span className="text-sm text-neutral-500">{t.year}</span>
-              </div>
+              <div className="mb-2 text-lg font-semibold">{t.event_name}</div>
               <div className="space-y-1 text-sm">
                 {t.gold && (
-                  <div>
-                    <span className="mr-2">🥇</span>
+                  <div className="flex items-baseline gap-2">
+                    <span>🥇</span>
                     <span className="font-semibold">{t.gold}</span>
+                    {t.gold_points != null && (
+                      <span className="text-xs text-neutral-500">
+                        ({t.gold_points} bodů)
+                      </span>
+                    )}
                   </div>
                 )}
                 {t.silver && (
-                  <div>
-                    <span className="mr-2">🥈</span>
+                  <div className="flex items-baseline gap-2">
+                    <span>🥈</span>
                     <span>{t.silver}</span>
+                    {t.silver_points != null && (
+                      <span className="text-xs text-neutral-500">
+                        ({t.silver_points} bodů)
+                      </span>
+                    )}
                   </div>
                 )}
                 {t.bronze && (
-                  <div>
-                    <span className="mr-2">🥉</span>
+                  <div className="flex items-baseline gap-2">
+                    <span>🥉</span>
                     <span>{t.bronze}</span>
+                    {t.bronze_points != null && (
+                      <span className="text-xs text-neutral-500">
+                        ({t.bronze_points} bodů)
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
