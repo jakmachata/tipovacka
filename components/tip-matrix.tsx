@@ -515,13 +515,13 @@ export function TipMatrix({
                   className={"border-b " + stripeBg}
                 >
                   <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[50px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
+                    <div className="leading-tight">{fmtDate(m.starts_at)}</div>
+                    <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                     {stageLabel && (
-                      <div className="mb-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
+                      <div className="mt-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
                         {stageLabel}
                       </div>
                     )}
-                    <div className="leading-tight">{fmtDate(m.starts_at)}</div>
-                    <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                   </td>
                   <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[50px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
@@ -555,61 +555,58 @@ export function TipMatrix({
                       const sideHcp = hcpSideValue(pick, m);
                       content = (
                         <div className="leading-tight">
-                          <div className="grid grid-cols-2 gap-x-1 items-center">
-                            {/* A: fulltime score (left half, centered) */}
-                            <div className="text-center font-medium">
-                              <span
-                                className={
-                                  score && score.exact_points > 0
-                                    ? "text-fuchsia-600 font-bold"
-                                    : ""
-                                }
-                              >
-                                {pick.home_score}:{pick.away_score}
-                              </span>
-                            </div>
-                            {/* B: flag (right half, centered) */}
-                            <div className="flex justify-center items-center h-[14px]">
-                              {sideFlag && (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                  src={sideFlag}
-                                  alt={sideCode ?? ""}
-                                  className="h-[10px] w-auto rounded-sm shadow-sm"
-                                />
-                              )}
-                            </div>
-                            {/* C: 1st period (left half, centered) */}
-                            <div className="text-center text-[11px]">
-                              {pick.home_score_p1 != null ? (
-                                <span
-                                  className={
-                                    score && score.p1_points > 0
-                                      ? "text-fuchsia-400"
-                                      : "text-neutral-500"
-                                  }
-                                >
-                                  ({pick.home_score_p1}:{pick.away_score_p1})
-                                </span>
-                              ) : null}
-                            </div>
-                            {/* D: handicap value (right half, centered) */}
-                            <div className="flex justify-center items-center h-[14px] text-[11px] text-neutral-500">
-                              {sideHcp ?? ""}
-                            </div>
-                          </div>
-                          {score && (
-                            <div
+                          {/* Row 1: fulltime (60m) — centered, zarovnaný s row 1 ve sloupci Výsledek */}
+                          <div className="text-center font-medium">
+                            <span
                               className={
-                                "text-[10px] font-semibold " +
-                                (score.total_points > 0
-                                  ? "text-emerald-700"
-                                  : "text-neutral-400")
+                                score && score.exact_points > 0
+                                  ? "text-fuchsia-600 font-bold"
+                                  : ""
                               }
                             >
-                              {score.total_points > 0 ? `+${score.total_points}` : "-"}
-                            </div>
-                          )}
+                              {pick.home_score}:{pick.away_score}
+                            </span>
+                          </div>
+                          {/* Row 2: 1. třetina — centered, zarovnaný s row 2 ve sloupci Výsledek */}
+                          <div className="text-center text-[11px]">
+                            {pick.home_score_p1 != null ? (
+                              <span
+                                className={
+                                  score && score.p1_points > 0
+                                    ? "text-fuchsia-400"
+                                    : "text-neutral-500"
+                                }
+                              >
+                                ({pick.home_score_p1}:{pick.away_score_p1})
+                              </span>
+                            ) : null}
+                          </div>
+                          {/* Row 3: vlajka, HCP, body — zleva */}
+                          <div className="flex items-center gap-1 text-[11px]">
+                            {sideFlag && (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={sideFlag}
+                                alt={sideCode ?? ""}
+                                className="h-[10px] w-auto rounded-sm shadow-sm"
+                              />
+                            )}
+                            {sideHcp != null && (
+                              <span className="text-neutral-500">{sideHcp}</span>
+                            )}
+                            {score && (
+                              <span
+                                className={
+                                  "font-semibold " +
+                                  (score.total_points > 0
+                                    ? "text-emerald-700"
+                                    : "text-neutral-400")
+                                }
+                              >
+                                {score.total_points > 0 ? `+${score.total_points}` : "-"}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       );
                     } else if (pendingPick) {
@@ -619,29 +616,25 @@ export function TipMatrix({
                       const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
                         <div title="Tip čeká na schválení Kubou" className="leading-tight text-rose-600">
-                          <div className="grid grid-cols-2 gap-x-1 items-center">
-                            <div className="text-center font-medium">
-                              <span className="mr-0.5">?</span>
-                              {pendingPick.home_score}:{pendingPick.away_score}
-                            </div>
-                            <div className="flex justify-center items-center h-[14px] opacity-70">
-                              {sideFlag && (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                  src={sideFlag}
-                                  alt={sideCode ?? ""}
-                                  className="h-[10px] w-auto rounded-sm shadow-sm"
-                                />
-                              )}
-                            </div>
-                            <div className="text-center text-[11px] text-rose-400">
-                              {pendingPick.home_score_p1 != null
-                                ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
-                                : ""}
-                            </div>
-                            <div className="flex justify-center items-center h-[14px] text-[11px] opacity-70">
-                              {sideHcp ?? ""}
-                            </div>
+                          <div className="text-center font-medium">
+                            <span className="mr-0.5">?</span>
+                            {pendingPick.home_score}:{pendingPick.away_score}
+                          </div>
+                          <div className="text-center text-[11px] text-rose-400">
+                            {pendingPick.home_score_p1 != null
+                              ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
+                              : ""}
+                          </div>
+                          <div className="flex items-center gap-1 text-[11px] opacity-70">
+                            {sideFlag && (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={sideFlag}
+                                alt={sideCode ?? ""}
+                                className="h-[10px] w-auto rounded-sm shadow-sm"
+                              />
+                            )}
+                            {sideHcp != null && <span>{sideHcp}</span>}
                           </div>
                         </div>
                       );
