@@ -297,7 +297,8 @@ export function TipMatrix({
       ? null
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
-  const headerBase = "md:sticky md:top-12 z-10 px-2 py-2 whitespace-nowrap text-white";
+  // md:top-[68px] = výška headeru (sticky nav s text-[17px], py-2 + border-y-2 + nav.py-3 ≈ 67 px).
+  const headerBase = "md:sticky md:top-[68px] z-10 px-2 py-2 whitespace-nowrap text-white";
 
   const now = Date.now();
   const startOfDay = new Date();
