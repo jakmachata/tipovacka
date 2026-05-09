@@ -181,10 +181,14 @@ function hcpSideCode(
   match: Match,
 ): string | null {
   const hcp = match.home_handicap;
-  if (hcp == null) return null;
-  // Side musí odpovídat SQL scoring (0002_scoring.sql): pick_diff > 0 → home,
-  // pick_diff < 0 → away, pick_diff == 0 → znaménko hcp.
   const pickDiff = pick.home_score - pick.away_score;
+  if (hcp == null) {
+    // Bez handicapu — vrátíme predicted winner (na vlajku v tipu).
+    if (pickDiff > 0) return match.home_code;
+    if (pickDiff < 0) return match.away_code;
+    return null;
+  }
+  // S handicapem: musí odpovídat SQL scoring (0002_scoring.sql) — pick_diff alone.
   if (pickDiff > 0) return match.home_code;
   if (pickDiff < 0) return match.away_code;
   return hcp >= 0 ? match.home_code : match.away_code;
@@ -218,6 +222,28 @@ export function TipMatrix({
   const [editingTarget, setEditingTarget] = useState<
     { matchId: number; userId: string } | null
   >(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  // Načíst oblíbené z localStorage při mountu.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("tipovacka:favorites");
+      if (raw) setFavorites(new Set(JSON.parse(raw)));
+    } catch {}
+  }, []);
+  function toggleFavorite(id: string) {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      try {
+        localStorage.setItem(
+          "tipovacka:favorites",
+          JSON.stringify(Array.from(next)),
+        );
+      } catch {}
+      return next;
+    });
+  }
   const [hidePast, setHidePast] = useState(false);
   const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
   // Team column width: mobile 80px, desktop 160px. Aktualizujeme přes resize listener.
@@ -409,7 +435,8 @@ export function TipMatrix({
                   inlineStyle.backgroundColor = p.bg_color ?? undefined;
                   inlineStyle.color = p.text_color ?? undefined;
                 }
-                if (isMineHeader) {
+                const isFavoriteHeader = !isAdmin && favorites.has(p.id);
+                if (isMineHeader || isFavoriteHeader) {
                   inlineStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}`;
                 }
                 return (
@@ -420,20 +447,22 @@ export function TipMatrix({
                         ? () => router.push("/profile")
                         : isAdmin
                           ? () => setPickingColorFor(p.id)
-                          : undefined
+                          : () => toggleFavorite(p.id)
                     }
                     title={
                       isMineHeader
                         ? "Klikni pro úpravu profilu (jméno, barvy, heslo)"
                         : isAdmin
                           ? `Uprav profil hráče ${p.display_name}`
-                          : undefined
+                          : isFavoriteHeader
+                            ? `Odebrat ${p.display_name} z oblíbených`
+                            : `Přidat ${p.display_name} k oblíbeným`
                     }
                     className={
                       headerBase +
                       " text-center " +
                       (hasCustom ? "" : fallbackColor + " ") +
-                      (isMineHeader || isAdmin ? " cursor-pointer" : "")
+                      " cursor-pointer"
                     }
                     style={inlineStyle}
                   >
@@ -511,11 +540,12 @@ export function TipMatrix({
                   <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[130px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 text-center align-top whitespace-nowrap w-[75px] sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
                     {m.finalized ? (
-                      <div className="flex h-full flex-col">
-                        <div className="flex h-2/3 items-center justify-center text-base font-semibold leading-tight">{result}</div>
-                        <div className="flex h-1/3 items-center justify-center text-xs text-neutral-400 leading-tight">
+                      <div className="flex flex-col gap-y-1 leading-tight">
+                        <div className="text-center text-base font-semibold">{result}</div>
+                        <div className="h-[17px]" aria-hidden="true">&nbsp;</div>
+                        <div className="text-center text-xs text-neutral-400">
                           {m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
                         </div>
                       </div>
@@ -672,7 +702,8 @@ export function TipMatrix({
                       ? p.bg_color ?? "#000"
                       : "#16a34a";
                     const cellStyle: React.CSSProperties = { width: 77 };
-                    if (isMine) {
+                    const isFavoriteCell = !isAdmin && favorites.has(p.id);
+                    if (isMine || isFavoriteCell) {
                       cellStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}`;
                     }
 
