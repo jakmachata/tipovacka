@@ -434,7 +434,7 @@ export function TipMatrix({
         </div>
       </div>
       <div className="h-[50px]" />
-      <div className="-mx-4 h-[calc(100dvh-130px)] overflow-auto px-4 md:h-auto md:overflow-visible">
+      <div className="-mx-4 h-[calc(100dvh-130px)] overflow-auto md:h-auto md:overflow-visible md:px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -568,7 +568,7 @@ export function TipMatrix({
               rows.push(
                 <tr
                   key={m.id}
-                  className={"border-b " + stripeBg}
+                  className={stripeBg}
                 >
                   <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[50px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
