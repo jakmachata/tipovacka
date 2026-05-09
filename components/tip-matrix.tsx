@@ -336,7 +336,7 @@ export function TipMatrix({
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
   // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
   // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
-  const headerBase = "sticky top-[116px] md:top-[84px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  const headerBase = "sticky top-[120px] md:top-[88px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -371,7 +371,7 @@ export function TipMatrix({
       {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
           overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
           isAdmin checkbox sedí v pevném panelu napravo. */}
-      <div className="fixed inset-x-0 top-[76px] md:top-[44px] z-[45] bg-white transform-gpu">
+      <div className="fixed inset-x-0 top-[80px] md:top-[48px] z-[45] bg-white transform-gpu">
         <div className="mx-auto flex h-[40px] max-w-7xl items-center px-4">
           <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap">
             <span className="text-xs text-neutral-500">
