@@ -45,7 +45,7 @@ export function NavLinks({
           ? "bg-rose-100 text-rose-800 ring-1 ring-rose-300 " + activeMark
           : "bg-rose-100 text-rose-800 ring-1 ring-rose-300 animate-pulse");
     }
-    return adminCls("/hraci");
+    return cls("/hraci");
   })();
 
   // Host: jen Natipovals + Trophy room (Pravidla a Hráči jen pro přihlášené).
@@ -68,6 +68,14 @@ export function NavLinks({
       <Link href="/" className={cls("/", "font-semibold")}>
         🏒 Natipovals?
       </Link>
+      <Link href="/hraci" className={hraciCls}>
+        Hráči
+        {isAdmin && unapprovedCount > 0 && (
+          <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
+            {unapprovedCount}
+          </span>
+        )}
+      </Link>
       <Link href="/rules" className={cls("/rules")}>
         Pravidla
       </Link>
@@ -77,14 +85,6 @@ export function NavLinks({
       {isAdmin && (
         <>
           <span className="mx-2 text-neutral-300">|</span>
-          <Link href="/hraci" className={hraciCls}>
-            Hráči
-            {unapprovedCount > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
-                {unapprovedCount}
-              </span>
-            )}
-          </Link>
           <Link href="/admin/matches" className={adminCls("/admin/matches")}>
             Zápasy & výsledky
           </Link>
