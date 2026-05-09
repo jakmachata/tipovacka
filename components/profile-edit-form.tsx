@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 interface Props {
   userId: string;
   userEmail: string;
+  isAdmin?: boolean;
   initial: {
     name: string;
     bg: string;
@@ -14,7 +15,7 @@ interface Props {
   };
 }
 
-export function ProfileEditForm({ userId, userEmail, initial }: Props) {
+export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }: Props) {
   const [name, setName] = useState(initial.name);
   const [bg, setBg] = useState(initial.bg);
   const [text, setText] = useState(initial.text);
@@ -127,6 +128,7 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
 
   return (
     <div className="max-w-md space-y-6">
+      {!isAdmin && (
       <section className="rounded-lg border p-4">
         <h2 className="mb-3 text-sm font-semibold text-neutral-700">
           Přezdívka & barvy
@@ -210,7 +212,8 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
           {savingProfile ? "Ukládám…" : "Uložit profil"}
         </button>
       </section>
-
+      )}
+      {!isAdmin && (
       <section className="rounded-lg border p-4">
         <h2 className="mb-3 text-sm font-semibold text-neutral-700">
           Nastavení tipovačky
@@ -255,6 +258,7 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
           </span>
         </label>
       </section>
+      )}
 
       <section className="rounded-lg border p-4">
         <h2 className="mb-3 text-sm font-semibold text-neutral-700">

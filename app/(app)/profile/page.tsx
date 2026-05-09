@@ -11,7 +11,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, bg_color, text_color")
+    .select("display_name, bg_color, text_color, is_admin")
     .eq("id", user.id)
     .single();
 
@@ -21,6 +21,7 @@ export default async function ProfilePage() {
       <ProfileEditForm
         userId={user.id}
         userEmail={user.email ?? ""}
+        isAdmin={!!profile?.is_admin}
         initial={{
           name: profile?.display_name ?? "",
           bg: profile?.bg_color ?? "#dc2626",
