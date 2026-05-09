@@ -480,7 +480,8 @@ export function TipMatrix({
                 }
                 const isFavoriteHeader = !isAdmin && favorites.has(p.id);
                 if (isMineHeader || isFavoriteHeader) {
-                  inlineStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}`;
+                  // Příplatek k box-shadow: 1px fill matching bg → konzistentní okraje na zoom 0.7
+                  inlineStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}, inset 0 0 0 1px var(--cell-bg, #ffffff)`;
                 }
                 return (
                   <th
@@ -566,6 +567,7 @@ export function TipMatrix({
                 <tr
                   key={m.id}
                   className={stripeBg}
+                  style={{ ["--cell-bg" as any]: m.is_czech ? "#fef2f2" : "#ffffff" }}
                 >
                   <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[50px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
@@ -788,7 +790,7 @@ export function TipMatrix({
                     const cellStyle: React.CSSProperties = { width: 77 };
                     const isFavoriteCell = !isAdmin && favorites.has(p.id);
                     if (isMine || isFavoriteCell) {
-                      cellStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}`;
+                      cellStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}, inset 0 0 0 1px var(--cell-bg, #ffffff)`;
                     }
 
                     return (
