@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   width: "device-width",
-  initialScale: 0.8,
+  initialScale: 0.7,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
