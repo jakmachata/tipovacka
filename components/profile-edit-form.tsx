@@ -319,75 +319,23 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
           <span className="block text-xs text-neutral-500">
             Nové heslo (min. 6 znaků)
           </span>
-          <div className="relative mt-1">
-            <input
-              type={showPw ? "text" : "password"}
-              value={pwNew}
-              onChange={(e) => setPwNew(e.target.value)}
-              autoComplete="new-password"
-              className="w-full rounded border px-3 py-2 pr-10 text-sm"
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              onClick={() => setShowPw((s) => !s)}
-              title={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
-              aria-label={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
-              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-neutral-500 hover:text-neutral-800"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {showPw ? (
-                  <>
-                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </>
-                ) : (
-                  <>
-                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 11 7 11 7a13.16 13.16 0 0 1-1.67 2.68" />
-                    <path d="M6.61 6.61A13.526 13.526 0 0 0 1 12s4 7 11 7a9.74 9.74 0 0 0 5.39-1.61" />
-                    <line x1="2" y1="2" x2="22" y2="22" />
-                  </>
-                )}
-              </svg>
-            </button>
-          </div>
+          <input
+            type="password"
+            value={pwNew}
+            onChange={(e) => setPwNew(e.target.value)}
+            autoComplete="new-password"
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+          />
         </label>
         <label className="mt-3 block text-sm">
           <span className="block text-xs text-neutral-500">Heslo znovu</span>
-          <div className="relative mt-1">
-            <input
-              type={showPw ? "text" : "password"}
-              value={pwNew2}
-              onChange={(e) => setPwNew2(e.target.value)}
-              autoComplete="new-password"
-              className="w-full rounded border px-3 py-2 pr-10 text-sm"
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              onClick={() => setShowPw((s) => !s)}
-              title={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
-              aria-label={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
-              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-neutral-500 hover:text-neutral-800"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {showPw ? (
-                  <>
-                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </>
-                ) : (
-                  <>
-                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 11 7 11 7a13.16 13.16 0 0 1-1.67 2.68" />
-                    <path d="M6.61 6.61A13.526 13.526 0 0 0 1 12s4 7 11 7a9.74 9.74 0 0 0 5.39-1.61" />
-                    <line x1="2" y1="2" x2="22" y2="22" />
-                  </>
-                )}
-              </svg>
-            </button>
-          </div>
+          <input
+            type="password"
+            value={pwNew2}
+            onChange={(e) => setPwNew2(e.target.value)}
+            autoComplete="new-password"
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+          />
         </label>
         {pwErr && <p className="mt-3 text-sm text-rose-600">{pwErr}</p>}
         {pwMsg && (
