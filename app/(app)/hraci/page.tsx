@@ -7,15 +7,17 @@ import { DeleteAccountButton } from "@/components/delete-account-button";
 
 const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
-type Status = "Neschválen" | "Tipující";
+type Status = "Neschválen" | "Tipující" | "Admin";
 
-function statusOf(p: { is_approved: boolean }): Status {
+function statusOf(p: { is_approved: boolean; is_admin?: boolean }): Status {
+  if (p.is_admin) return "Admin";
   return p.is_approved ? "Tipující" : "Neschválen";
 }
 
 const STATUS_CLS: Record<Status, string> = {
   Neschválen: "bg-neutral-100 text-neutral-600",
   Tipující: "bg-emerald-100 text-emerald-800",
+  Admin: "bg-amber-100 text-amber-800",
 };
 
 function relativeFromNow(iso: string | null | undefined): string {
@@ -152,11 +154,7 @@ export default async function HraciPage() {
                   )}
                 </td>
                 <td>
-                  {p.is_admin ? (
-                    <span className="rounded bg-amber-100 px-2 py-1 text-amber-800">
-                      Admin
-                    </span>
-                  ) : isAdmin ? (
+                  {isAdmin && p.id !== user!.id ? (
                     <StatusMenu id={p.id} current={s} action={setStatus} />
                   ) : (
                     <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>

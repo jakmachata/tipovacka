@@ -397,7 +397,7 @@ export function TipMatrix({
           </label>
         ) : null}
       </div>
-      <div className="-mx-4 px-4">
+      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -421,7 +421,7 @@ export function TipMatrix({
               <th className={headerBase + " bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
               <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[50px] md:left-auto z-40 md:z-10"}>Domácí</th>
               <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[130px] md:left-auto z-40 md:z-10"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[210px] md:left-auto z-40 md:z-10"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[210px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -540,12 +540,21 @@ export function TipMatrix({
                   <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[130px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center align-top whitespace-nowrap w-[75px] sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 text-center w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
                     {m.finalized ? (
-                      <div className="flex flex-col gap-y-1 leading-tight">
-                        <div className="text-center text-base font-semibold">{result}</div>
-                        <div className="h-[17px]" aria-hidden="true">&nbsp;</div>
-                        <div className="text-center text-xs text-neutral-400">
+                      <div className="relative h-full">
+                        {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
+                        <div
+                          className="absolute left-0 right-0 text-center text-base font-semibold"
+                          style={{ top: "9.5px", lineHeight: "20px" }}
+                        >
+                          {result}
+                        </div>
+                        {/* Výsledek po 1. třetině — bottom zarovnaný s tip row 3 bottom; stejná velikost jako result */}
+                        <div
+                          className="absolute left-0 right-0 bottom-0 text-center text-base text-neutral-400"
+                          style={{ lineHeight: "20px" }}
+                        >
                           {m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
                         </div>
                       </div>
