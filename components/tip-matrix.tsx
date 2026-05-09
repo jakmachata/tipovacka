@@ -357,7 +357,7 @@ export function TipMatrix({
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
   // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
   // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
-  const headerBase = "md:sticky md:top-[88px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  const headerBase = "sticky top-0 md:top-[88px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -433,7 +433,7 @@ export function TipMatrix({
         </div>
       </div>
       <div className="h-[50px]" />
-      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
+      <div className="-mx-4 h-[calc(100dvh-130px)] overflow-auto px-4 md:h-auto md:overflow-visible">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).

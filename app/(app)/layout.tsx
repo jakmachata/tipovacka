@@ -86,9 +86,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* Mobile-only fixed login info bar nahoře — uživatelská část je vždy úplně na vrchu. */}
       <div className="fixed inset-x-0 top-0 z-[51] border-b bg-white transform-gpu md:hidden">
         <div className="mx-auto flex h-[32px] max-w-7xl items-center gap-3 px-4 text-sm">
-          <Link href="/profile" className="text-neutral-500 hover:underline">{profile?.display_name}</Link>
+          <span className="font-bold text-neutral-700">{profile?.display_name}</span>
+          <Link href="/profile" className="text-neutral-500 hover:underline">Nastavení</Link>
           <form action={logout}>
-            <button className="hover:underline">Odhlásit</button>
+            <button className="text-neutral-500 hover:underline">Odhlásit</button>
           </form>
         </div>
       </div>
@@ -104,9 +105,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             />
           </nav>
           <div className="hidden flex-shrink-0 items-center gap-2 pl-2 text-sm md:flex">
-            <Link href="/profile" className="text-neutral-500 hover:underline">{profile?.display_name}</Link>
+            <span className="font-bold text-neutral-700">{profile?.display_name}</span>
+            <Link href="/profile" className="text-neutral-500 hover:underline">Nastavení</Link>
             <form action={logout}>
-              <button className="hover:underline">Odhlásit</button>
+              <button className="text-neutral-500 hover:underline">Odhlásit</button>
             </form>
           </div>
         </div>
