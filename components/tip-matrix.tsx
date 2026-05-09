@@ -334,7 +334,9 @@ export function TipMatrix({
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
-  const headerBase = "sticky top-[104px] md:top-[107px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  // Sticky thead pod fixed menu (44 px) + fixed Aktivní bar (36 px).
+  // Aktivní bar je single-line (overflow-x-auto), takže výška je konstantní.
+  const headerBase = "sticky top-[80px] md:top-[80px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -366,45 +368,51 @@ export function TipMatrix({
 
   return (
     <main>
-      <div className="sticky top-[64px] md:top-[67px] z-[45] -mx-4 border-b bg-white px-4 py-2 mb-3">
-        <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-neutral-500">
-          Aktivní uživatelé:
-        </span>
-        {(() => {
-          // Self override: já vidím sám sebe vždy jako online (jsem na stránce).
-          const meEntry =
-            me && !activeUsers.some((u) => u.id === myUserId)
-              ? [{ id: me.id, display_name: me.display_name, last_seen_at: null }]
-              : [];
-          const list = [...meEntry, ...activeUsers];
-          if (list.length === 0) {
-            return <span className="text-xs text-neutral-400">nikdo</span>;
-          }
-          return list.map((u) => (
-            <span
-              key={u.id}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800"
-              title={u.last_seen_at ?? ""}
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-              {u.display_name}
+      {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
+          overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
+          isAdmin checkbox sedí v pevném panelu napravo. */}
+      <div className="fixed inset-x-0 top-[44px] z-[45] border-b bg-white transform-gpu">
+        <div className="mx-auto flex max-w-7xl items-center px-4">
+          <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2">
+            <span className="text-xs text-neutral-500">
+              Aktivní uživatelé:
             </span>
-          ));
-        })()}
-        {isAdmin ? (
-          <label className="ml-auto flex items-center gap-2 text-xs text-neutral-600">
-            <input
-              type="checkbox"
-              checked={hidePast}
-              onChange={(e) => setHidePast(e.target.checked)}
-            />
-            Skrýt odehrané zápasy
-          </label>
-        ) : null}
+            {(() => {
+              // Self override: já vidím sám sebe vždy jako online (jsem na stránce).
+              const meEntry =
+                me && !activeUsers.some((u) => u.id === myUserId)
+                  ? [{ id: me.id, display_name: me.display_name, last_seen_at: null }]
+                  : [];
+              const list = [...meEntry, ...activeUsers];
+              if (list.length === 0) {
+                return <span className="text-xs text-neutral-400">nikdo</span>;
+              }
+              return list.map((u) => (
+                <span
+                  key={u.id}
+                  className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800"
+                  title={u.last_seen_at ?? ""}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                  {u.display_name}
+                </span>
+              ));
+            })()}
+          </div>
+          {isAdmin && (
+            <label className="flex flex-shrink-0 items-center gap-2 py-2 pl-2 text-xs text-neutral-600">
+              <input
+                type="checkbox"
+                checked={hidePast}
+                onChange={(e) => setHidePast(e.target.checked)}
+              />
+              Skrýt odehrané
+            </label>
+          )}
+        </div>
       </div>
-      </div>
-      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
+      <div className="mb-3 h-[36px]" />
+      <div className="-mx-4 px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).

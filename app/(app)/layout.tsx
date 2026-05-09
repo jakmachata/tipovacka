@@ -12,21 +12,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) {
     return (
       <>
-        {/* Mobile-only login bar — v normálním flow, scrolluje pryč, MENU se ukotví. */}
-        <div className="border-b bg-white md:hidden">
-          <div className="mx-auto flex max-w-7xl items-center px-4 py-2 text-sm">
-            <GuestHeader />
-          </div>
-        </div>
-        {/* Menu — sticky na všech velikostech (z-50 nad table sticky cells z-40). */}
-        <header className="sticky top-0 z-50 bg-white">
-          <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 text-sm">
-            <NavLinks isAdmin={false} pendingCount={0} unapprovedCount={0} guest />
-            <div className="ml-auto hidden md:block">
+        {/* Fixed header (mobile + desktop) — drží i při horizontálním scrollu tabulky.
+            overflow-x-auto na nav umožňuje horizontální scroll položek místo wrap. */}
+        <header className="fixed inset-x-0 top-0 z-50 border-b bg-white transform-gpu">
+          <div className="mx-auto flex max-w-7xl items-center px-4">
+            <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2 text-sm">
+              <NavLinks isAdmin={false} pendingCount={0} unapprovedCount={0} guest />
+            </nav>
+            <div className="flex-shrink-0 py-2 pl-2">
               <GuestHeader />
             </div>
-          </nav>
+          </div>
         </header>
+        <div className="h-[44px]" />
         <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
       </>
     );
@@ -80,29 +78,27 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      {/* Mobile-only userinfo bar — v normálním flow, scrolluje pryč, MENU se ukotví. */}
-      <div className="border-b bg-white md:hidden">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 text-sm">
-          <Link href="/profile" className="text-neutral-500 hover:underline">{profile?.display_name}</Link>
-          <form action={logout}>
-            <button className="hover:underline">Odhlásit</button>
-          </form>
+      {/* Fixed header (mobile + desktop) — drží i při horizontálním scrollu tabulky.
+          overflow-x-auto na nav řeší dlouhé admin menu na úzkých displejích.
+          Login info (jméno + Odhlásit) je v pevném panelu napravo, vždy viditelné. */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b bg-white transform-gpu">
+        <div className="mx-auto flex max-w-7xl items-center px-4">
+          <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2 text-sm">
+            <NavLinks
+              isAdmin={!!profile?.is_admin}
+              pendingCount={pendingCount}
+              unapprovedCount={unapprovedCount}
+            />
+          </nav>
+          <div className="flex flex-shrink-0 items-center gap-2 py-2 pl-2 text-sm">
+            <Link href="/profile" className="text-neutral-500 hover:underline">{profile?.display_name}</Link>
+            <form action={logout}>
+              <button className="hover:underline">Odhlásit</button>
+            </form>
+          </div>
         </div>
-      </div>
-      {/* Menu — sticky na všech velikostech (z-50 nad table sticky cells z-40). */}
-      <header className="sticky top-0 z-50 bg-white">
-        <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 text-sm">
-          <NavLinks
-            isAdmin={!!profile?.is_admin}
-            pendingCount={pendingCount}
-            unapprovedCount={unapprovedCount}
-          />
-          <Link href="/profile" className="ml-auto hidden text-neutral-500 hover:underline md:inline">{profile?.display_name}</Link>
-          <form action={logout} className="hidden md:block">
-            <button className="hover:underline">Odhlásit</button>
-          </form>
-        </nav>
       </header>
+      <div className="h-[44px]" />
       <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
     </>
   );
