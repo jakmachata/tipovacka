@@ -480,8 +480,8 @@ export function TipMatrix({
                 }
                 const isFavoriteHeader = !isAdmin && favorites.has(p.id);
                 if (isMineHeader || isFavoriteHeader) {
-                  // Příplatek k box-shadow: 1px fill matching bg → konzistentní okraje na zoom 0.7
-                  inlineStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}, inset 0 0 0 1px var(--cell-bg, #ffffff)`;
+                  // Linear-gradient místo box-shadow: rendererí se na pixel-grid bez anti-aliasing artefaktů
+                  inlineStyle.backgroundImage = `linear-gradient(to right, ${myAccentColor} 2px, transparent 2px, transparent calc(100% - 2px), ${myAccentColor} calc(100% - 2px))`;
                 }
                 return (
                   <th
@@ -790,7 +790,7 @@ export function TipMatrix({
                     const cellStyle: React.CSSProperties = { width: 77 };
                     const isFavoriteCell = !isAdmin && favorites.has(p.id);
                     if (isMine || isFavoriteCell) {
-                      cellStyle.boxShadow = `inset 2px 0 0 ${myAccentColor}, inset -2px 0 0 ${myAccentColor}, inset 0 0 0 1px var(--cell-bg, #ffffff)`;
+                      cellStyle.backgroundImage = `linear-gradient(to right, ${myAccentColor} 2px, transparent 2px, transparent calc(100% - 2px), ${myAccentColor} calc(100% - 2px))`;
                     }
 
                     return (
