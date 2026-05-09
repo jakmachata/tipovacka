@@ -18,6 +18,7 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
   const [name, setName] = useState(initial.name);
   const [bg, setBg] = useState(initial.bg);
   const [text, setText] = useState(initial.text);
+  const [pwOld, setPwOld] = useState("");
   const [pwNew, setPwNew] = useState("");
   const [pwNew2, setPwNew2] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
@@ -61,23 +62,39 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
     setSavingPw(true);
     setPwErr("");
     setPwMsg("");
+    if (!pwOld) {
+      setPwErr("Vyplň stávající heslo.");
+      setSavingPw(false);
+      return;
+    }
     if (pwNew.length < 6) {
       setPwErr("Nové heslo musí mít aspoň 6 znaků.");
       setSavingPw(false);
       return;
     }
     if (pwNew !== pwNew2) {
-      setPwErr("Hesla se neshodují.");
+      setPwErr("Nová hesla se neshodují.");
       setSavingPw(false);
       return;
     }
     const sb = createClient();
+    // Ověření stávajícího hesla přes re-login (Supabase nemá zvláštní verify endpoint).
+    const { error: signInErr } = await sb.auth.signInWithPassword({
+      email: userEmail,
+      password: pwOld,
+    });
+    if (signInErr) {
+      setPwErr("Stávající heslo není správné.");
+      setSavingPw(false);
+      return;
+    }
     const { error } = await sb.auth.updateUser({ password: pwNew });
     setSavingPw(false);
     if (error) {
       setPwErr(error.message);
     } else {
       setPwMsg("Heslo změněno ✓");
+      setPwOld("");
       setPwNew("");
       setPwNew2("");
       setTimeout(() => setPwMsg(""), 5000);
@@ -175,6 +192,18 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
           Změna hesla
         </h2>
         <label className="block text-sm">
+          <span className="block text-xs text-neutral-500">
+            Stávající heslo
+          </span>
+          <input
+            type="password"
+            value={pwOld}
+            onChange={(e) => setPwOld(e.target.value)}
+            autoComplete="current-password"
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+          />
+        </label>
+        <label className="mt-3 block text-sm">
           <span className="block text-xs text-neutral-500">
             Nové heslo (min. 6 znaků)
           </span>

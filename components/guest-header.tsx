@@ -194,6 +194,7 @@ export function GuestHeader() {
                   />
                   <button
                     type="button"
+                    tabIndex={-1}
                     onClick={() => setShowPw((v) => !v)}
                     title={showPw ? "Skrýt heslo" : "Zobrazit heslo"}
                     aria-label={showPw ? "Skrýt heslo" : "Zobrazit heslo"}

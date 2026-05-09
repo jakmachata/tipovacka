@@ -536,10 +536,10 @@ export function TipMatrix({
                   <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[130px] md:static z-30 md:z-auto " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"text-center whitespace-nowrap w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
-                    <div className="flex h-full flex-col">
-                      <div className="flex flex-1 items-center justify-center px-2 pt-2 text-base font-semibold leading-tight">{result}</div>
-                      <div className="flex flex-1 items-center justify-center px-2 pb-2 text-[11px] text-neutral-400 leading-tight">
+                  <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
+                    <div className="flex h-full flex-col justify-between">
+                      <div className="text-base font-semibold leading-tight">{result}</div>
+                      <div className="text-[11px] text-neutral-400 leading-tight">
                         {m.finalized && m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
                       </div>
                     </div>
@@ -563,7 +563,7 @@ export function TipMatrix({
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pick, m);
                       content = (
-                        <div className="leading-tight">
+                        <div className="flex flex-col gap-y-0.5 leading-tight">
                           {/* Row 1: fulltime (60m) */}
                           <div className="text-center font-medium">
                             <span
@@ -615,7 +615,7 @@ export function TipMatrix({
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
-                        <div title="Tip čeká na schválení Kubou" className="leading-tight text-rose-600">
+                        <div title="Tip čeká na schválení Kubou" className="flex flex-col gap-y-0.5 leading-tight text-rose-600">
                           <div className="text-center font-medium">
                             <span className="mr-0.5">?</span>
                             {pendingPick.home_score}:{pendingPick.away_score}

@@ -28,6 +28,7 @@ export function PasswordInput({
       />
       <button
         type="button"
+        tabIndex={-1}
         onClick={() => setShow((s) => !s)}
         title={show ? "Skrýt heslo" : "Zobrazit heslo"}
         aria-label={show ? "Skrýt heslo" : "Zobrazit heslo"}
