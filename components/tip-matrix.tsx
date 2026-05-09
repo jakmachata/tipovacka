@@ -334,7 +334,7 @@ export function TipMatrix({
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
-  const headerBase = "sticky top-[64px] md:top-[67px] z-10 px-2 py-2 whitespace-nowrap text-white";
+  const headerBase = "sticky top-[64px] md:top-[67px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -428,10 +428,10 @@ export function TipMatrix({
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
               {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-              <th className={headerBase + " md:hidden bg-neutral-900 text-left w-[160px] sticky left-[50px] z-40"}>Zápas</th>
+              <th className={headerBase + " md:invisible md:overflow-hidden bg-neutral-900 text-left w-[160px] sticky left-[50px] z-40"}>Zápas</th>
               {/* Desktop-only Domácí/Hosté */}
-              <th className={headerBase + " hidden md:table-cell bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
-              <th className={headerBase + " hidden md:table-cell bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
+              <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
+              <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
               <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[210px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
@@ -546,7 +546,7 @@ export function TipMatrix({
                     )}
                   </td>
                   {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-                  <td className={"md:hidden px-2 py-2 whitespace-nowrap font-medium w-[160px] sticky left-[50px] z-30 " + stripeBg}>
+                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[160px] sticky left-[50px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
                       <div className="flex items-center gap-1.5">
                         {home && (() => {
@@ -577,11 +577,11 @@ export function TipMatrix({
                     </div>
                   </td>
                   {/* Desktop-only Domácí */}
-                  <td className={"hidden md:table-cell px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
+                  <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
                   {/* Desktop-only Hosté */}
-                  <td className={"hidden md:table-cell px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
+                  <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className={"px-2 py-2 text-center w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
