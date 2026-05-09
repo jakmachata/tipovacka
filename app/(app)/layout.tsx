@@ -12,19 +12,24 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) {
     return (
       <>
-        {/* Fixed header (mobile + desktop) — drží i při horizontálním scrollu tabulky.
-            overflow-x-auto na nav umožňuje horizontální scroll položek místo wrap. */}
-        <header className="fixed inset-x-0 top-0 z-50 border-b bg-white transform-gpu">
+        {/* Mobile-only fixed login bar nahoře — registrace/login je vždy úplně na vrchu. */}
+        <div className="fixed inset-x-0 top-0 z-[51] border-b bg-white transform-gpu md:hidden">
+          <div className="mx-auto flex max-w-7xl items-center px-4 py-1.5 text-sm">
+            <GuestHeader />
+          </div>
+        </div>
+        {/* Menu — fixed pod mobile login barem (mobil) nebo úplně nahoře (desktop). */}
+        <header className="fixed inset-x-0 top-[32px] md:top-0 z-50 border-b bg-white transform-gpu">
           <div className="mx-auto flex max-w-7xl items-center px-4">
             <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2 text-sm">
               <NavLinks isAdmin={false} pendingCount={0} unapprovedCount={0} guest />
             </nav>
-            <div className="flex-shrink-0 py-2 pl-2">
+            <div className="hidden flex-shrink-0 items-center gap-2 py-2 pl-2 md:flex">
               <GuestHeader />
             </div>
           </div>
         </header>
-        <div className="h-[44px]" />
+        <div className="h-[76px] md:h-[44px]" />
         <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
       </>
     );
@@ -78,10 +83,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      {/* Fixed header (mobile + desktop) — drží i při horizontálním scrollu tabulky.
-          overflow-x-auto na nav řeší dlouhé admin menu na úzkých displejích.
-          Login info (jméno + Odhlásit) je v pevném panelu napravo, vždy viditelné. */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b bg-white transform-gpu">
+      {/* Mobile-only fixed login info bar nahoře — uživatelská část je vždy úplně na vrchu. */}
+      <div className="fixed inset-x-0 top-0 z-[51] border-b bg-white transform-gpu md:hidden">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-1.5 text-sm">
+          <Link href="/profile" className="text-neutral-500 hover:underline">{profile?.display_name}</Link>
+          <form action={logout}>
+            <button className="hover:underline">Odhlásit</button>
+          </form>
+        </div>
+      </div>
+      {/* Menu — fixed pod mobile login barem (mobil) nebo úplně nahoře (desktop).
+          Na desktopu má login info v pevném panelu napravo. */}
+      <header className="fixed inset-x-0 top-[32px] md:top-0 z-50 border-b bg-white transform-gpu">
         <div className="mx-auto flex max-w-7xl items-center px-4">
           <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2 text-sm">
             <NavLinks
@@ -90,7 +103,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               unapprovedCount={unapprovedCount}
             />
           </nav>
-          <div className="flex flex-shrink-0 items-center gap-2 py-2 pl-2 text-sm">
+          <div className="hidden flex-shrink-0 items-center gap-2 py-2 pl-2 text-sm md:flex">
             <Link href="/profile" className="text-neutral-500 hover:underline">{profile?.display_name}</Link>
             <form action={logout}>
               <button className="hover:underline">Odhlásit</button>
@@ -98,7 +111,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </header>
-      <div className="h-[44px]" />
+      <div className="h-[76px] md:h-[44px]" />
       <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
     </>
   );

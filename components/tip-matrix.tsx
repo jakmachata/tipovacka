@@ -334,9 +334,9 @@ export function TipMatrix({
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
-  // Sticky thead pod fixed menu (44 px) + fixed Aktivní bar (36 px).
-  // Aktivní bar je single-line (overflow-x-auto), takže výška je konstantní.
-  const headerBase = "sticky top-[80px] md:top-[80px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
+  // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
+  const headerBase = "sticky top-[140px] md:top-[108px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -371,9 +371,9 @@ export function TipMatrix({
       {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
           overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
           isAdmin checkbox sedí v pevném panelu napravo. */}
-      <div className="fixed inset-x-0 top-[44px] z-[45] border-b bg-white transform-gpu">
+      <div className="fixed inset-x-0 top-[76px] md:top-[44px] z-[45] bg-white transform-gpu pb-5">
         <div className="mx-auto flex max-w-7xl items-center px-4">
-          <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2">
+          <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2.5">
             <span className="text-xs text-neutral-500">
               Aktivní uživatelé:
             </span>
@@ -411,7 +411,7 @@ export function TipMatrix({
           )}
         </div>
       </div>
-      <div className="mb-3 h-[36px]" />
+      <div className="h-[64px]" />
       <div className="-mx-4 px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
@@ -420,12 +420,12 @@ export function TipMatrix({
         */}
         <table
           className="text-xs border-separate border-spacing-0 table-fixed"
-          style={{ width: 50 + teamColWidth * 2 + 75 + players.length * 77 }}
+          style={{ width: 50 + (teamColWidth < 160 ? teamColWidth * 2 - 15 : teamColWidth * 2) + 75 + players.length * 77 }}
         >
           <colgroup>
             <col style={{ width: 50 }} />
             {/* Zápas col — viditelný jen na mobilu (=teamColWidth*2). Desktop má 0. */}
-            <col style={{ width: teamColWidth < 160 ? teamColWidth * 2 : 0 }} />
+            <col style={{ width: teamColWidth < 160 ? teamColWidth * 2 - 15 : 0 }} />
             {/* Domácí/Hosté cols — viditelné jen na desktopu. Mobile má 0. */}
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
@@ -438,11 +438,11 @@ export function TipMatrix({
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
               {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-              <th className={headerBase + " md:invisible md:overflow-hidden bg-neutral-900 text-left w-[160px] sticky left-[50px] z-40"}>Zápas</th>
+              <th className={headerBase + " md:invisible md:overflow-hidden bg-neutral-900 text-left w-[145px] sticky left-[50px] z-40"}>Zápas</th>
               {/* Desktop-only Domácí/Hosté */}
               <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
               <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[210px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[195px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -556,7 +556,7 @@ export function TipMatrix({
                     )}
                   </td>
                   {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[160px] sticky left-[50px] z-30 " + stripeBg}>
+                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[145px] sticky left-[50px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
                       <div className="flex items-center gap-1.5">
                         {home && (() => {
@@ -594,7 +594,7 @@ export function TipMatrix({
                   <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
+                  <td className={"px-2 py-2 text-center w-[75px] h-px sticky left-[195px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
                     {m.finalized ? (
                       <div className="relative h-full">
                         {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}

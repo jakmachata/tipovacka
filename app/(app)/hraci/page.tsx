@@ -47,11 +47,15 @@ export default async function HraciPage() {
     .single();
   const isAdmin = !!meProfile?.is_admin;
 
-  const { data: profiles } = await supabase
+  // Načteme všechny profily a rozdělíme. Non-admin viewer: jen hráči (is_admin=false).
+  // Admin viewer: hráči + adminy ve druhé tabulce dole.
+  const { data: allProfiles } = await supabase
     .from("profiles")
     .select("*")
-    .order("is_admin", { ascending: false })
     .order("created_at", { ascending: false });
+
+  const players = (allProfiles ?? []).filter((p: any) => !p.is_admin);
+  const admins = (allProfiles ?? []).filter((p: any) => p.is_admin);
 
   async function togglePaid(formData: FormData) {
     "use server";
@@ -75,7 +79,6 @@ export default async function HraciPage() {
 
   async function deleteAccount(formData: FormData) {
     "use server";
-    // Re-ověř, že volající je admin
     const sb = await createClient();
     const { data: { user: caller } } = await sb.auth.getUser();
     if (!caller) return;
@@ -87,16 +90,121 @@ export default async function HraciPage() {
     if (!callerProfile?.is_admin) return;
 
     const id = String(formData.get("id"));
-    if (id === caller.id) return; // sám sebe ne (admin nechce smazat sebe omylem)
+    if (id === caller.id) return;
 
-    // Smazat lze jakýkoli účet (dummy i reálný); klient-side confirm dialog
-    // už proběhl pro non-dummy. Server jen ověří admin práva.
     const admin = createServiceClient();
     await admin.auth.admin.deleteUser(id);
-    // FK kaskáda smaže profile, picks, scores, picks_audit, pending_picks.
 
     revalidatePath("/hraci");
     revalidatePath("/schedule");
+  }
+
+  function renderRow(p: any) {
+    const s = statusOf(p);
+    const isDummyEmail =
+      typeof p.email === "string" &&
+      p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX);
+    return (
+      <tr key={p.id} className="border-b">
+        {isAdmin && (
+          <td
+            className="py-2 text-xs text-neutral-600 truncate"
+            style={{ width: "210px", maxWidth: "210px" }}
+            title={p.email ?? ""}
+          >
+            {p.email ?? "-"}
+          </td>
+        )}
+        <td className="py-2 font-medium">
+          {isAdmin && !p.is_admin ? (
+            <form action={updateDisplayName} className="inline-flex items-center gap-1">
+              <input type="hidden" name="id" value={p.id} />
+              <input
+                name="display_name"
+                defaultValue={p.display_name ?? ""}
+                maxLength={12}
+                className="w-32 rounded border px-2 py-0.5 text-sm"
+              />
+              <button className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs hover:bg-neutral-200">
+                ✓
+              </button>
+            </form>
+          ) : (
+            p.display_name
+          )}
+        </td>
+        <td>
+          {isAdmin && p.id !== user!.id ? (
+            <StatusMenu id={p.id} current={s} action={setStatus} />
+          ) : (
+            <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
+              {s}
+            </span>
+          )}
+        </td>
+        {!p.is_admin && (
+          <td>
+            {isAdmin ? (
+              <form action={togglePaid} className="inline">
+                <input type="hidden" name="id" value={p.id} />
+                <input
+                  type="hidden"
+                  name="value"
+                  value={(!p.has_paid).toString()}
+                />
+                <button
+                  className={
+                    p.has_paid
+                      ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
+                      : "rounded bg-neutral-100 px-2 py-1 text-neutral-600"
+                  }
+                >
+                  {p.has_paid ? "✓ ano" : "- ne"}
+                </button>
+              </form>
+            ) : (
+              <span
+                className={
+                  p.has_paid
+                    ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
+                    : "rounded bg-neutral-100 px-2 py-1 text-neutral-600"
+                }
+              >
+                {p.has_paid ? "✓ ano" : "- ne"}
+              </span>
+            )}
+          </td>
+        )}
+        <td
+          className="text-neutral-500"
+          title={p.last_seen_at ? formatPraguePretty(p.last_seen_at) : ""}
+        >
+          {p.id === user!.id ||
+          (p.last_seen_at &&
+            Date.now() - new Date(p.last_seen_at).getTime() <= 3 * 60 * 1000) ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              online
+            </span>
+          ) : (
+            relativeFromNow(p.last_seen_at)
+          )}
+        </td>
+        {isAdmin && (
+          <td className="py-2 text-right pr-2">
+            {p.id !== user!.id && (
+              <DeleteAccountButton
+                id={p.id}
+                email={p.email ?? ""}
+                displayName={p.display_name}
+                isDummy={isDummyEmail}
+                action={deleteAccount}
+              />
+            )}
+          </td>
+        )}
+      </tr>
+    );
   }
 
   return (
@@ -118,114 +226,28 @@ export default async function HraciPage() {
             {isAdmin && <th className="py-2 text-right pr-2">Smazat</th>}
           </tr>
         </thead>
-        <tbody>
-          {(profiles ?? []).map((p: any) => {
-            const s = statusOf(p);
-            const isDummyEmail =
-              typeof p.email === "string" &&
-              p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX);
-            return (
-              <tr key={p.id} className="border-b">
-                {isAdmin && (
-                  <td
-                    className="py-2 text-xs text-neutral-600 truncate"
-                    style={{ width: "210px", maxWidth: "210px" }}
-                    title={p.email ?? ""}
-                  >
-                    {p.email ?? "-"}
-                  </td>
-                )}
-                <td className="py-2 font-medium">
-                  {isAdmin && !p.is_admin ? (
-                    <form action={updateDisplayName} className="inline-flex items-center gap-1">
-                      <input type="hidden" name="id" value={p.id} />
-                      <input
-                        name="display_name"
-                        defaultValue={p.display_name ?? ""}
-                        maxLength={12}
-                        className="w-32 rounded border px-2 py-0.5 text-sm"
-                      />
-                      <button className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs hover:bg-neutral-200">
-                        ✓
-                      </button>
-                    </form>
-                  ) : (
-                    p.display_name
-                  )}
-                </td>
-                <td>
-                  {isAdmin && p.id !== user!.id ? (
-                    <StatusMenu id={p.id} current={s} action={setStatus} />
-                  ) : (
-                    <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
-                      {s}
-                    </span>
-                  )}
-                </td>
-                <td>
-                  {isAdmin ? (
-                    <form action={togglePaid} className="inline">
-                      <input type="hidden" name="id" value={p.id} />
-                      <input
-                        type="hidden"
-                        name="value"
-                        value={(!p.has_paid).toString()}
-                      />
-                      <button
-                        className={
-                          p.has_paid
-                            ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
-                            : "rounded bg-neutral-100 px-2 py-1 text-neutral-600"
-                        }
-                      >
-                        {p.has_paid ? "✓ ano" : "- ne"}
-                      </button>
-                    </form>
-                  ) : (
-                    <span
-                      className={
-                        p.has_paid
-                          ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
-                          : "rounded bg-neutral-100 px-2 py-1 text-neutral-600"
-                      }
-                    >
-                      {p.has_paid ? "✓ ano" : "- ne"}
-                    </span>
-                  )}
-                </td>
-                <td
-                  className="text-neutral-500"
-                  title={p.last_seen_at ? formatPraguePretty(p.last_seen_at) : ""}
-                >
-                  {p.id === user!.id ||
-                  (p.last_seen_at &&
-                    Date.now() - new Date(p.last_seen_at).getTime() <= 3 * 60 * 1000) ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                      online
-                    </span>
-                  ) : (
-                    relativeFromNow(p.last_seen_at)
-                  )}
-                </td>
-                {isAdmin && (
-                  <td className="py-2 text-right pr-2">
-                    {!p.is_admin && p.id !== user!.id && (
-                      <DeleteAccountButton
-                        id={p.id}
-                        email={p.email ?? ""}
-                        displayName={p.display_name}
-                        isDummy={isDummyEmail}
-                        action={deleteAccount}
-                      />
-                    )}
-                  </td>
-                )}
-              </tr>
-            );
-          })}
-        </tbody>
+        <tbody>{players.map(renderRow)}</tbody>
       </table>
+
+      {isAdmin && admins.length > 0 && (
+        <>
+          <h2 className="mb-3 mt-10 text-lg font-semibold text-amber-800">Adminy</h2>
+          <table className="text-sm">
+            <thead className="border-b text-left text-neutral-500">
+              <tr>
+                <th className="py-2 pr-4 text-xs font-medium" style={{ width: "210px" }}>
+                  Email
+                </th>
+                <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
+                <th className="pr-4" style={{ width: "130px" }}>Status</th>
+                <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
+                <th className="py-2 text-right pr-2">Smazat</th>
+              </tr>
+            </thead>
+            <tbody>{admins.map(renderRow)}</tbody>
+          </table>
+        </>
+      )}
     </main>
   );
 }
