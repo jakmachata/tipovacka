@@ -182,10 +182,12 @@ function hcpSideCode(
 ): string | null {
   const hcp = match.home_handicap;
   if (hcp == null) return null;
-  // Strana, která vyhrává handicapový tip podle pick + handicapu domácích.
-  // Handicap je vždy půlový, takže adjusted není nikdy 0.
-  const adjusted = pick.home_score - pick.away_score + hcp;
-  return adjusted > 0 ? match.home_code : match.away_code;
+  // Side musí odpovídat SQL scoring (0002_scoring.sql): pick_diff > 0 → home,
+  // pick_diff < 0 → away, pick_diff == 0 → znaménko hcp.
+  const pickDiff = pick.home_score - pick.away_score;
+  if (pickDiff > 0) return match.home_code;
+  if (pickDiff < 0) return match.away_code;
+  return hcp >= 0 ? match.home_code : match.away_code;
 }
 
 function hcpSideValue(
@@ -194,8 +196,9 @@ function hcpSideValue(
 ): string | null {
   const hcp = match.home_handicap;
   if (hcp == null) return null;
-  const adjusted = pick.home_score - pick.away_score + hcp;
-  const sideHome = adjusted > 0;
+  const pickDiff = pick.home_score - pick.away_score;
+  const sideHome =
+    pickDiff > 0 || (pickDiff === 0 && hcp >= 0);
   const v = sideHome ? hcp : -hcp;
   return v > 0 ? `+${v}` : `${v}`;
 }
@@ -573,21 +576,7 @@ export function TipMatrix({
                               {pick.home_score}:{pick.away_score}
                             </span>
                           </div>
-                          {/* Row 2: 1. třetina */}
-                          <div className="text-center text-[11px]">
-                            {pick.home_score_p1 != null ? (
-                              <span
-                                className={
-                                  score && score.p1_points > 0
-                                    ? "text-fuchsia-400"
-                                    : "text-neutral-500"
-                                }
-                              >
-                                ({pick.home_score_p1}:{pick.away_score_p1})
-                              </span>
-                            ) : null}
-                          </div>
-                          {/* Row 3: vlajka centered, větší. Grayscale když HCP špatně. HCP text jen pokud nevyhodnoceno. */}
+                          {/* Row 2: vlajka centered, větší. Grayscale když HCP špatně. HCP text jen pokud nevyhodnoceno. */}
                           <div className="flex items-center justify-center gap-1 text-[11px]">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
@@ -604,6 +593,20 @@ export function TipMatrix({
                               <span className="text-neutral-500">{sideHcp}</span>
                             )}
                           </div>
+                          {/* Row 3: 1. třetina */}
+                          <div className="text-center text-[11px]">
+                            {pick.home_score_p1 != null ? (
+                              <span
+                                className={
+                                  score && score.p1_points > 0
+                                    ? "text-fuchsia-400"
+                                    : "text-neutral-500"
+                                }
+                              >
+                                ({pick.home_score_p1}:{pick.away_score_p1})
+                              </span>
+                            ) : null}
+                          </div>
                         </div>
                       );
                     } else if (pendingPick) {
@@ -617,11 +620,6 @@ export function TipMatrix({
                             <span className="mr-0.5">?</span>
                             {pendingPick.home_score}:{pendingPick.away_score}
                           </div>
-                          <div className="text-center text-[11px] text-rose-400">
-                            {pendingPick.home_score_p1 != null
-                              ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
-                              : ""}
-                          </div>
                           <div className="flex items-center justify-center gap-1 text-[11px] opacity-70">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
@@ -632,6 +630,11 @@ export function TipMatrix({
                               />
                             )}
                             {sideHcp != null && <span>{sideHcp}</span>}
+                          </div>
+                          <div className="text-center text-[11px] text-rose-400">
+                            {pendingPick.home_score_p1 != null
+                              ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
+                              : ""}
                           </div>
                         </div>
                       );
