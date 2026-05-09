@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -21,6 +21,9 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
   const [pwOld, setPwOld] = useState("");
   const [pwNew, setPwNew] = useState("");
   const [pwNew2, setPwNew2] = useState("");
+  const [filterMode, setFilterMode] = useState<"all" | "near" | "future">("all");
+  const [emailPref, setEmailPref] = useState(false);
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPw, setSavingPw] = useState(false);
   const [profileErr, setProfileErr] = useState("");
@@ -28,6 +31,27 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
   const [pwErr, setPwErr] = useState("");
   const [pwMsg, setPwMsg] = useState("");
   const router = useRouter();
+
+  // Load tipovačka preferences from localStorage on mount.
+  useEffect(() => {
+    try {
+      const fm = localStorage.getItem("tipovacka:filterMode");
+      if (fm === "all" || fm === "near" || fm === "future") setFilterMode(fm);
+      const ep = localStorage.getItem("tipovacka:emailPref");
+      if (ep != null) setEmailPref(ep === "1");
+    } catch {}
+    setPrefsLoaded(true);
+  }, []);
+
+  // Persist to localStorage whenever changed (po prvním načtení).
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    try { localStorage.setItem("tipovacka:filterMode", filterMode); } catch {}
+  }, [filterMode, prefsLoaded]);
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    try { localStorage.setItem("tipovacka:emailPref", emailPref ? "1" : "0"); } catch {}
+  }, [emailPref, prefsLoaded]);
 
   async function saveProfile() {
     setSavingProfile(true);
@@ -185,6 +209,51 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
         >
           {savingProfile ? "Ukládám…" : "Uložit profil"}
         </button>
+      </section>
+
+      <section className="rounded-lg border p-4">
+        <h2 className="mb-3 text-sm font-semibold text-neutral-700">
+          Nastavení tipovačky
+        </h2>
+        <label className="block text-sm">
+          <span className="block text-xs text-neutral-500">Zobrazit zápasy</span>
+          <select
+            value={filterMode}
+            onChange={(e) =>
+              setFilterMode(e.target.value as "all" | "near" | "future")
+            }
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+          >
+            <option value="all">Všechny zápasy</option>
+            <option value="near">Nejbližší dny</option>
+            <option value="future">Pohled vpřed</option>
+          </select>
+          <p className="mt-1 text-[11px] leading-snug text-neutral-500">
+            <strong>Všechny zápasy</strong> – kompletní rozlosování turnaje.
+            <br />
+            <strong>Nejbližší dny</strong> – pouze včerejšek, dnešek a zítřek.
+            <br />
+            <strong>Pohled vpřed</strong> – od dnešního rána dál (skryje minulé).
+          </p>
+        </label>
+
+        <label className="mt-4 flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={emailPref}
+            onChange={(e) => setEmailPref(e.target.checked)}
+            className="mt-1"
+          />
+          <span>
+            <span className="block">E-mail upozornění před začátkem zápasu</span>
+            <span className="block text-[11px] leading-snug text-neutral-500">
+              Pošle ti upozornění ~30 min před prvním buly daného dne.{" "}
+              <span className="rounded bg-rose-100 px-1 text-rose-800">
+                Zatím nefunkční.
+              </span>
+            </span>
+          </span>
+        </label>
       </section>
 
       <section className="rounded-lg border p-4">

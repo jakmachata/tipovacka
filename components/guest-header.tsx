@@ -113,7 +113,7 @@ export function GuestHeader() {
         Přihlásit / Registrace
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-72 rounded-lg border bg-white p-4 shadow-xl md:left-auto md:right-0">
+        <div className="absolute left-0 top-full z-[100] mt-1 w-72 rounded-lg border bg-white p-4 shadow-xl md:left-auto md:right-0">
           {registerSuccess ? (
             <div className="space-y-3 text-sm">
               <h3 className="font-semibold">Skoro hotovo! ✅</h3>

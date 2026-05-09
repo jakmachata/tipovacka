@@ -369,32 +369,7 @@ export function TipMatrix({
             />
             Skrýt odehrané zápasy
           </label>
-        ) : (
-          <div className="ml-auto flex flex-wrap items-center gap-3 text-xs text-neutral-600">
-            <label className="flex items-center gap-1">
-              Zobrazit:
-              <select
-                value={filterMode}
-                onChange={(e) => setFilterMode(e.target.value as "all" | "near" | "future")}
-                className="rounded border px-2 py-1"
-              >
-                <option value="all">Všechny zápasy</option>
-                <option value="near">Nejbližší dny</option>
-                <option value="future">Pohled vpřed</option>
-              </select>
-            </label>
-            <label className="flex items-center gap-1.5">
-              <input
-                type="checkbox"
-                checked={emailPref}
-                onChange={(e) => setEmailPref(e.target.checked)}
-              />
-              <span className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800">
-                Email upozornění (30 min před začátkem) - zatím nefunkční
-              </span>
-            </label>
-          </div>
-        )}
+        ) : null}
       </div>
       <div className="-mx-4 px-4">
         {/*
