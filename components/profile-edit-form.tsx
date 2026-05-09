@@ -153,7 +153,7 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
           {(name || "Náhled") + " (náhled)"}
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-2">
           <label className="flex-1 text-xs">
             <span className="block text-neutral-500">Pozadí</span>
             <div className="mt-1 flex items-center gap-2">
@@ -161,7 +161,7 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
                 type="color"
                 value={bg}
                 onChange={(e) => setBg(e.target.value)}
-                className="h-9 w-12 rounded border"
+                className="h-9 w-8 rounded border"
               />
               <input
                 type="text"
@@ -179,7 +179,7 @@ export function ProfileEditForm({ userId, userEmail, initial }: Props) {
                 type="color"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="h-9 w-12 rounded border"
+                className="h-9 w-8 rounded border"
               />
               <input
                 type="text"

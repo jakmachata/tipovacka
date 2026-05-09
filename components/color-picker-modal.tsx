@@ -82,7 +82,7 @@ export function ColorPickerModal({
           {(name || displayName) + " (náhled)"}
         </div>
 
-        <div className="mb-4 flex gap-4">
+        <div className="mb-4 flex gap-2">
           <label className="flex-1 text-xs">
             <span className="block text-neutral-500">Pozadí</span>
             <div className="mt-1 flex items-center gap-2">
@@ -90,7 +90,7 @@ export function ColorPickerModal({
                 type="color"
                 value={bg}
                 onChange={(e) => setBg(e.target.value)}
-                className="h-9 w-12 rounded border"
+                className="h-9 w-8 rounded border"
               />
               <input
                 type="text"
@@ -108,7 +108,7 @@ export function ColorPickerModal({
                 type="color"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="h-9 w-12 rounded border"
+                className="h-9 w-8 rounded border"
               />
               <input
                 type="text"

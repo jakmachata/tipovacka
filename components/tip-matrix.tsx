@@ -74,6 +74,24 @@ const HEADER_BORDERS = [
   "border-pink-600",
 ];
 
+const HEADER_COLOR_HEX = [
+  "#e11d48", // rose-600
+  "#ea580c", // orange-600
+  "#d97706", // amber-600
+  "#ca8a04", // yellow-600
+  "#65a30d", // lime-600
+  "#16a34a", // green-600
+  "#059669", // emerald-600
+  "#0d9488", // teal-600
+  "#0891b2", // cyan-600
+  "#0284c7", // sky-600
+  "#2563eb", // blue-600
+  "#4f46e5", // indigo-600
+  "#7c3aed", // violet-600
+  "#c026d3", // fuchsia-600
+  "#db2777", // pink-600
+];
+
 function userColorIdx(userId: string) {
   let h = 0;
   for (const c of userId) h = (h * 31 + c.charCodeAt(0)) >>> 0;
@@ -84,6 +102,9 @@ function colorForUser(userId: string) {
 }
 function borderForUser(userId: string) {
   return HEADER_BORDERS[userColorIdx(userId)];
+}
+function hexForUser(userId: string) {
+  return HEADER_COLOR_HEX[userColorIdx(userId)];
 }
 
 // Mapování IIHF 3-písmenných kódů na ISO 3166-1 alpha-2 kódy (pro flagcdn.com)
@@ -336,7 +357,7 @@ export function TipMatrix({
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
   // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
   // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
-  const headerBase = "sticky top-[120px] md:top-[88px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  const headerBase = "md:sticky md:top-[88px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -412,7 +433,7 @@ export function TipMatrix({
         </div>
       </div>
       <div className="h-[50px]" />
-      <div className="-mx-4 px-4">
+      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -450,7 +471,7 @@ export function TipMatrix({
                 // Pro isMine zvýrazníme sloupec přes inset box-shadow — neovlivňuje šířku.
                 const myAccentColor = hasCustom
                   ? p.bg_color ?? "#000"
-                  : "#16a34a"; // emerald-600 jako fallback pro vlastníka
+                  : hexForUser(p.id); // deterministický hex pro hráče bez vlastních barev
                 const inlineStyle: React.CSSProperties = { width: 77 };
                 if (hasCustom) {
                   inlineStyle.backgroundColor = p.bg_color ?? undefined;
@@ -763,7 +784,7 @@ export function TipMatrix({
                     const hasCustomCell = !!p.bg_color;
                     const myAccentColor = hasCustomCell
                       ? p.bg_color ?? "#000"
-                      : "#16a34a";
+                      : hexForUser(p.id);
                     const cellStyle: React.CSSProperties = { width: 77 };
                     const isFavoriteCell = !isAdmin && favorites.has(p.id);
                     if (isMine || isFavoriteCell) {
@@ -818,8 +839,8 @@ export function TipMatrix({
         <ColorPickerModal
           userId={colorTarget.id}
           displayName={colorTarget.display_name}
-          initialBg={colorTarget.bg_color}
-          initialText={colorTarget.text_color}
+          initialBg={colorTarget.bg_color ?? hexForUser(colorTarget.id)}
+          initialText={colorTarget.text_color ?? "#ffffff"}
           canEditName={isAdmin || colorTarget.id === myUserId}
           onClose={() => setPickingColorFor(null)}
           onSaved={() => {
