@@ -336,7 +336,7 @@ export function TipMatrix({
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
   // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
   // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
-  const headerBase = "sticky top-[140px] md:top-[108px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  const headerBase = "sticky top-[136px] md:top-[104px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -371,9 +371,9 @@ export function TipMatrix({
       {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
           overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
           isAdmin checkbox sedí v pevném panelu napravo. */}
-      <div className="fixed inset-x-0 top-[76px] md:top-[44px] z-[45] bg-white transform-gpu pb-5">
-        <div className="mx-auto flex max-w-7xl items-center px-4">
-          <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap py-2.5">
+      <div className="fixed inset-x-0 top-[76px] md:top-[44px] z-[45] bg-white transform-gpu">
+        <div className="mx-auto flex h-[40px] max-w-7xl items-center px-4">
+          <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap">
             <span className="text-xs text-neutral-500">
               Aktivní uživatelé:
             </span>
@@ -400,7 +400,7 @@ export function TipMatrix({
             })()}
           </div>
           {isAdmin && (
-            <label className="flex flex-shrink-0 items-center gap-2 py-2 pl-2 text-xs text-neutral-600">
+            <label className="flex flex-shrink-0 items-center gap-2 pl-2 text-xs text-neutral-600">
               <input
                 type="checkbox"
                 checked={hidePast}
@@ -410,8 +410,9 @@ export function TipMatrix({
             </label>
           )}
         </div>
+        <div className="h-5" />
       </div>
-      <div className="h-[64px]" />
+      <div className="h-[60px]" />
       <div className="-mx-4 px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
@@ -536,10 +537,10 @@ export function TipMatrix({
               // Striping ignoruje oddělení dní - natvrdo podle indexu zápasu (idx).
               // CZE zápas má vlastní červené pozadí, jinak střídání bílá / velmi světlá žlutá.
               const stripeBg = m.is_czech
-                ? "bg-red-50 hover:bg-red-100"
+                ? "bg-red-50"
                 : idx % 2 === 0
-                  ? "bg-neutral-50 hover:bg-neutral-100"
-                  : "bg-[#fffef2] hover:bg-yellow-100";
+                  ? "bg-neutral-50"
+                  : "bg-[#fffef2]";
               const stageLabel = m.stage !== "group" ? STAGE_LABEL[m.stage] : null;
               rows.push(
                 <tr
