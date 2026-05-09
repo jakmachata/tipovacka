@@ -414,8 +414,11 @@ export function TipMatrix({
         >
           <colgroup>
             <col style={{ width: 50 }} />
-            <col style={{ width: teamColWidth }} />
-            <col style={{ width: teamColWidth }} />
+            {/* Zápas col — viditelný jen na mobilu (=teamColWidth*2). Desktop má 0. */}
+            <col style={{ width: teamColWidth < 160 ? teamColWidth * 2 : 0 }} />
+            {/* Domácí/Hosté cols — viditelné jen na desktopu. Mobile má 0. */}
+            <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
+            <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
             <col style={{ width: 75 }} />
             {players.map((p) => (
               <col key={p.id} style={{ width: 77 }} />
