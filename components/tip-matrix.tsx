@@ -587,31 +587,21 @@ export function TipMatrix({
                               </span>
                             ) : null}
                           </div>
-                          {/* Row 3: vlajka + (HCP value | ✓/✗ pokud vyhodnoceno) */}
-                          <div className="flex items-center gap-1 text-[11px]">
+                          {/* Row 3: vlajka centered, větší. Grayscale když HCP špatně. HCP text jen pokud nevyhodnoceno. */}
+                          <div className="flex items-center justify-center gap-1 text-[11px]">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[10px] w-auto rounded-sm shadow-sm"
+                                className={
+                                  "h-[14px] w-auto rounded-sm shadow-sm" +
+                                  (score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
+                                }
                               />
                             )}
-                            {score ? (
-                              <span
-                                className={
-                                  "font-semibold " +
-                                  (score.hcp_points > 0
-                                    ? "text-emerald-600"
-                                    : "text-rose-600")
-                                }
-                              >
-                                {score.hcp_points > 0 ? "✓" : "✗"}
-                              </span>
-                            ) : (
-                              sideHcp != null && (
-                                <span className="text-neutral-500">{sideHcp}</span>
-                              )
+                            {!score && sideHcp != null && (
+                              <span className="text-neutral-500">{sideHcp}</span>
                             )}
                           </div>
                         </div>
@@ -632,13 +622,13 @@ export function TipMatrix({
                               ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
                               : ""}
                           </div>
-                          <div className="flex items-center gap-1 text-[11px] opacity-70">
+                          <div className="flex items-center justify-center gap-1 text-[11px] opacity-70">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[10px] w-auto rounded-sm shadow-sm"
+                                className="h-[14px] w-auto rounded-sm shadow-sm"
                               />
                             )}
                             {sideHcp != null && <span>{sideHcp}</span>}
