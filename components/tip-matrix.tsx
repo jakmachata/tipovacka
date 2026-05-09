@@ -147,7 +147,7 @@ function TeamCell({
           <img
             src={url}
             alt={t.code}
-            className="inline-block h-[15px] w-auto rounded-sm shadow-sm"
+            className="inline-block h-[16px] w-auto rounded-sm shadow-sm"
           />
         )}
         <span className="inline-flex flex-col leading-tight">
@@ -164,7 +164,7 @@ function TeamCell({
           <img
             src={url}
             alt={t.code}
-            className="inline-block h-[15px] w-auto rounded-sm shadow-sm"
+            className="inline-block h-[16px] w-auto rounded-sm shadow-sm"
           />
         )}
         <span>
@@ -589,7 +589,7 @@ export function TipMatrix({
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
                                 className={
-                                  "h-[14px] w-auto rounded-sm shadow-sm" +
+                                  "h-[17px] w-auto rounded-sm shadow-sm" +
                                   (score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
                                 }
                               />
@@ -626,7 +626,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[14px] w-auto rounded-sm shadow-sm"
+                                className="h-[17px] w-auto rounded-sm shadow-sm"
                               />
                             )}
                           </div>
@@ -659,7 +659,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[14px] w-auto rounded-sm shadow-sm"
+                                className="h-[17px] w-auto rounded-sm shadow-sm"
                               />
                             )}
                           </div>
@@ -904,11 +904,11 @@ function TipModal({
             </p>
           )}
           <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
-            {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[15px] w-auto rounded-sm shadow-sm" />}
+            {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[16px] w-auto rounded-sm shadow-sm" />}
             <span className="md:hidden">{match.home_code}</span>
             <span className="hidden md:inline">{home?.name_cs}</span>
             <span className="text-neutral-400">vs</span>
-            {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[15px] w-auto rounded-sm shadow-sm" />}
+            {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[16px] w-auto rounded-sm shadow-sm" />}
             <span className="md:hidden">{match.away_code}</span>
             <span className="hidden md:inline">{away?.name_cs}</span>
           </h2>
