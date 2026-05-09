@@ -334,7 +334,7 @@ export function TipMatrix({
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
-  const headerBase = "sticky top-[64px] md:top-[67px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  const headerBase = "sticky top-[104px] md:top-[107px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -366,7 +366,8 @@ export function TipMatrix({
 
   return (
     <main>
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="sticky top-[64px] md:top-[67px] z-[45] -mx-4 border-b bg-white px-4 py-2 mb-3">
+        <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-neutral-500">
           Aktivní uživatelé:
         </span>
@@ -402,7 +403,7 @@ export function TipMatrix({
           </label>
         ) : null}
       </div>
-      <div className="-mx-4 px-4">
+      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
