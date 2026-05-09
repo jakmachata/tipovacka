@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 import { ColorPickerModal } from "@/components/color-picker-modal";
+import { notifyLateTip } from "@/lib/admin-notify";
 
 interface PlayerWithTotal extends Profile {
   total?: number;
@@ -489,7 +490,9 @@ export function TipMatrix({
                         ? () => router.push("/profile")
                         : isAdmin
                           ? () => setPickingColorFor(p.id)
-                          : () => toggleFavorite(p.id)
+                          : myUserId
+                            ? () => toggleFavorite(p.id)
+                            : undefined
                     }
                     title={
                       isMineHeader
@@ -947,6 +950,8 @@ function TipModal({
       if (error) {
         setErr(error.message);
       } else {
+        // Fire-and-forget notifikace adminovi (selže-li, neblokuje UX)
+        notifyLateTip(targetUser.display_name, match.id).catch(() => {});
         alert("Zápas už začal. Tvůj tip jsme uložili a čeká na schválení Kubou.");
         onSaved();
       }

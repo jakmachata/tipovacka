@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { notifyNewRegistration } from "@/lib/admin-notify";
 
 /**
  * Inline login + register pro nepřihlášené hosty.
@@ -98,6 +99,8 @@ export function GuestHeader() {
         setBusy(false);
         return;
       }
+      // Fire-and-forget notifikace adminovi
+      notifyNewRegistration(email).catch(() => {});
       setRegisterSuccess(true);
       setBusy(false);
     }
