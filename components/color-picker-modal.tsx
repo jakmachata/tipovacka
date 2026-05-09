@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 interface Props {
@@ -28,6 +28,15 @@ export function ColorPickerModal({
   const [text, setText] = useState(initialText ?? "#ffffff");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
+
+  // Esc zavře modal
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   async function save() {
     setSaving(true);

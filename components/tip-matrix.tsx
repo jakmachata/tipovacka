@@ -1036,6 +1036,9 @@ function TipModal({
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={1}
+                autoComplete="off"
+                data-1p-ignore="true"
+                data-lpignore="true"
                 value={hs}
                 onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
                 onFocus={(e) => e.currentTarget.select()}
@@ -1050,6 +1053,9 @@ function TipModal({
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={1}
+                autoComplete="off"
+                data-1p-ignore="true"
+                data-lpignore="true"
                 value={as_}
                 onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
@@ -1070,6 +1076,9 @@ function TipModal({
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={1}
+                autoComplete="off"
+                data-1p-ignore="true"
+                data-lpignore="true"
                 value={h1}
                 onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
@@ -1083,6 +1092,9 @@ function TipModal({
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={1}
+                autoComplete="off"
+                data-1p-ignore="true"
+                data-lpignore="true"
                 value={a1}
                 onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
                 onFocus={(e) => e.currentTarget.select()}

@@ -264,6 +264,12 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
         <h2 className="mb-3 text-sm font-semibold text-neutral-700">
           Změna hesla
         </h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!savingPw) changePassword();
+          }}
+        >
         <label className="block text-sm">
           <span className="block text-xs text-neutral-500">
             Stávající heslo
@@ -301,13 +307,13 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
           <p className="mt-3 text-sm font-semibold text-emerald-700">{pwMsg}</p>
         )}
         <button
-          type="button"
-          onClick={changePassword}
+          type="submit"
           disabled={savingPw}
           className="mt-3 rounded bg-black px-4 py-2 text-sm text-white hover:bg-neutral-800 disabled:opacity-50"
         >
           {savingPw ? "Měním…" : "Změnit heslo"}
         </button>
+        </form>
       </section>
     </div>
   );
