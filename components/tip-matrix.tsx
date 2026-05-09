@@ -537,9 +537,9 @@ export function TipMatrix({
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
-                    <div className="flex h-full flex-col justify-between">
-                      <div className="text-base font-semibold leading-tight">{result}</div>
-                      <div className="text-[11px] text-neutral-400 leading-tight">
+                    <div className="flex h-full flex-col">
+                      <div className="flex h-2/3 items-center justify-center text-base font-semibold leading-tight">{result}</div>
+                      <div className="flex h-1/3 items-center justify-center text-[11px] text-neutral-400 leading-tight">
                         {m.finalized && m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
                       </div>
                     </div>
@@ -563,7 +563,7 @@ export function TipMatrix({
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pick, m);
                       content = (
-                        <div className="flex flex-col gap-y-0.5 leading-tight">
+                        <div className="flex flex-col gap-y-1 leading-tight">
                           {/* Row 1: fulltime (60m) */}
                           <div className="text-center font-medium">
                             <span
@@ -615,7 +615,7 @@ export function TipMatrix({
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
-                        <div title="Tip čeká na schválení Kubou" className="flex flex-col gap-y-0.5 leading-tight text-rose-600">
+                        <div title="Tip čeká na schválení Kubou" className="flex flex-col gap-y-1 leading-tight text-rose-600">
                           <div className="text-center font-medium">
                             <span className="mr-0.5">?</span>
                             {pendingPick.home_score}:{pendingPick.away_score}
