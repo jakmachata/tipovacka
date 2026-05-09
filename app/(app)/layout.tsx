@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NavLinks } from "@/components/nav-links";
@@ -74,7 +75,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     "use server";
     const sb = await createClient();
     await sb.auth.signOut();
-    redirect("/schedule");
+    redirect("/");
   }
 
   return (
@@ -82,7 +83,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* Mobile-only userinfo bar — v normálním flow, scrolluje pryč, MENU se ukotví. */}
       <div className="border-b bg-white md:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 text-sm">
-          <span className="text-neutral-500">{profile?.display_name}</span>
+          <Link href="/profile" className="text-neutral-500 hover:underline">{profile?.display_name}</Link>
           <form action={logout}>
             <button className="hover:underline">Odhlásit</button>
           </form>
@@ -96,7 +97,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             pendingCount={pendingCount}
             unapprovedCount={unapprovedCount}
           />
-          <span className="ml-auto hidden text-neutral-500 md:inline">{profile?.display_name}</span>
+          <Link href="/profile" className="ml-auto hidden text-neutral-500 hover:underline md:inline">{profile?.display_name}</Link>
           <form action={logout} className="hidden md:block">
             <button className="hover:underline">Odhlásit</button>
           </form>

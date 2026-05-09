@@ -596,11 +596,11 @@ export function TipMatrix({
                                 alt={sideCode ?? ""}
                                 className={
                                   "h-[14px] w-auto rounded-sm shadow-sm" +
-                                  (score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
+                                  (m.finalized && score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
                                 }
                               />
                             )}
-                            {!score && sideHcp != null && (
+                            {(!m.finalized || !score) && sideHcp != null && (
                               <span className="text-neutral-500">{sideHcp}</span>
                             )}
                           </div>
