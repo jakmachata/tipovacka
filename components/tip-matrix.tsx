@@ -537,12 +537,18 @@ export function TipMatrix({
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
-                    <div className="flex h-full flex-col">
-                      <div className="flex h-2/3 items-center justify-center text-base font-semibold leading-tight">{result}</div>
-                      <div className="flex h-1/3 items-center justify-center text-xs text-neutral-400 leading-tight">
-                        {m.finalized && m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
+                    {m.finalized ? (
+                      <div className="flex h-full flex-col">
+                        <div className="flex h-2/3 items-center justify-center text-base font-semibold leading-tight">{result}</div>
+                        <div className="flex h-1/3 items-center justify-center text-xs text-neutral-400 leading-tight">
+                          {m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-base font-semibold leading-tight text-neutral-400">
+                        {result}
+                      </div>
+                    )}
                   </td>
 
                   {players.map((p) => {
@@ -562,9 +568,9 @@ export function TipMatrix({
                       const sideCode = hcpSideCode(pick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pick, m);
-                      content = (
+                      content = m.finalized ? (
+                        // Vyhodnocený tip — 3 řádky: fulltime tip / vlajka (grayscale když HCP špatně) / 1. třetina tip
                         <div className="flex flex-col gap-y-1 leading-tight">
-                          {/* Row 1: fulltime (60m) */}
                           <div className="text-center text-sm font-medium">
                             <span
                               className={
@@ -576,7 +582,6 @@ export function TipMatrix({
                               {pick.home_score}:{pick.away_score}
                             </span>
                           </div>
-                          {/* Row 2: vlajka centered, větší. Grayscale když HCP špatně. HCP text jen pokud nevyhodnoceno. */}
                           <div className="flex items-center justify-center gap-1 text-xs">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
@@ -585,15 +590,11 @@ export function TipMatrix({
                                 alt={sideCode ?? ""}
                                 className={
                                   "h-[14px] w-auto rounded-sm shadow-sm" +
-                                  (m.finalized && score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
+                                  (score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
                                 }
                               />
                             )}
-                            {(!m.finalized || !score) && sideHcp != null && (
-                              <span className="text-neutral-500">{sideHcp}</span>
-                            )}
                           </div>
-                          {/* Row 3: 1. třetina */}
                           <div className="text-center text-xs">
                             {pick.home_score_p1 != null ? (
                               <span
@@ -608,6 +609,33 @@ export function TipMatrix({
                             ) : null}
                           </div>
                         </div>
+                      ) : (
+                        // Nevyhodnocený tip — kompaktní layout: 60(20) / vlajka / CODE+hcp
+                        <div className="flex flex-col gap-y-1 leading-tight">
+                          <div className="text-center text-sm font-medium">
+                            {pick.home_score}:{pick.away_score}
+                            {pick.home_score_p1 != null && (
+                              <span className="ml-1 text-neutral-500">
+                                ({pick.home_score_p1}:{pick.away_score_p1})
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-center text-xs">
+                            {sideFlag && (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={sideFlag}
+                                alt={sideCode ?? ""}
+                                className="h-[14px] w-auto rounded-sm shadow-sm"
+                              />
+                            )}
+                          </div>
+                          <div className="text-center text-xs text-neutral-500">
+                            {sideCode && sideHcp != null
+                              ? sideCode.toUpperCase() + sideHcp
+                              : ""}
+                          </div>
+                        </div>
                       );
                     } else if (pendingPick) {
                       // tip čeká na schválení Masterem
@@ -619,8 +647,13 @@ export function TipMatrix({
                           <div className="text-center text-sm font-medium">
                             <span className="mr-0.5">?</span>
                             {pendingPick.home_score}:{pendingPick.away_score}
+                            {pendingPick.home_score_p1 != null && (
+                              <span className="ml-1 text-rose-400">
+                                ({pendingPick.home_score_p1}:{pendingPick.away_score_p1})
+                              </span>
+                            )}
                           </div>
-                          <div className="flex items-center justify-center gap-1 text-xs opacity-70">
+                          <div className="flex items-center justify-center text-xs opacity-70">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img
@@ -629,11 +662,10 @@ export function TipMatrix({
                                 className="h-[14px] w-auto rounded-sm shadow-sm"
                               />
                             )}
-                            {sideHcp != null && <span>{sideHcp}</span>}
                           </div>
-                          <div className="text-center text-xs text-rose-400">
-                            {pendingPick.home_score_p1 != null
-                              ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
+                          <div className="text-center text-xs opacity-70">
+                            {sideCode && sideHcp != null
+                              ? sideCode.toUpperCase() + sideHcp
                               : ""}
                           </div>
                         </div>
