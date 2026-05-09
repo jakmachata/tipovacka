@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 import { ColorPickerModal } from "@/components/color-picker-modal";
@@ -210,6 +211,7 @@ export function TipMatrix({
   activeUsers = [],
   pendingPicks = [],
 }: Props) {
+  const router = useRouter();
   const [editingTarget, setEditingTarget] = useState<
     { matchId: number; userId: string } | null
   >(null);
@@ -436,13 +438,15 @@ export function TipMatrix({
                   <th
                     key={p.id}
                     onClick={
-                      isMineHeader || isAdmin
-                        ? () => setPickingColorFor(p.id)
-                        : undefined
+                      isMineHeader
+                        ? () => router.push("/profile")
+                        : isAdmin
+                          ? () => setPickingColorFor(p.id)
+                          : undefined
                     }
                     title={
                       isMineHeader
-                        ? "Kliknutím uprav profil (jméno + barvu)"
+                        ? "Klikni pro úpravu profilu (jméno, barvy, heslo)"
                         : isAdmin
                           ? `Uprav profil hráče ${p.display_name}`
                           : undefined
@@ -583,7 +587,7 @@ export function TipMatrix({
                               </span>
                             ) : null}
                           </div>
-                          {/* Row 3: vlajka + HCP zleva */}
+                          {/* Row 3: vlajka + (HCP value | ✓/✗ pokud vyhodnoceno) */}
                           <div className="flex items-center gap-1 text-[11px]">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
@@ -593,25 +597,21 @@ export function TipMatrix({
                                 className="h-[10px] w-auto rounded-sm shadow-sm"
                               />
                             )}
-                            {sideHcp != null && (
-                              <span className="text-neutral-500">{sideHcp}</span>
-                            )}
-                          </div>
-                          {/* Row 4: body */}
-                          <div className="text-[11px]">
                             {score ? (
                               <span
                                 className={
                                   "font-semibold " +
-                                  (score.total_points > 0
-                                    ? "text-emerald-700"
-                                    : "text-neutral-400")
+                                  (score.hcp_points > 0
+                                    ? "text-emerald-600"
+                                    : "text-rose-600")
                                 }
                               >
-                                {score.total_points > 0 ? `+${score.total_points}` : "-"}
+                                {score.hcp_points > 0 ? "✓" : "✗"}
                               </span>
                             ) : (
-                              <span>&nbsp;</span>
+                              sideHcp != null && (
+                                <span className="text-neutral-500">{sideHcp}</span>
+                              )
                             )}
                           </div>
                         </div>
@@ -643,7 +643,6 @@ export function TipMatrix({
                             )}
                             {sideHcp != null && <span>{sideHcp}</span>}
                           </div>
-                          <div className="text-[11px]">&nbsp;</div>
                         </div>
                       );
                     } else if (isMine && started && !inGrace && !isAdmin) {
