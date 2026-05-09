@@ -403,6 +403,7 @@ export function TipMatrix({
           </label>
         ) : null}
       </div>
+      </div>
       <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
