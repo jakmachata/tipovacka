@@ -207,6 +207,11 @@ function hcpSideValue(
   return v > 0 ? `+${v}` : `${v}`;
 }
 
+// Pomocná: signovaná hodnota handicapu (pro mobilní Zápas zobrazení).
+function fmtHcp(v: number): string {
+  return v > 0 ? `+${v}` : `${v}`;
+}
+
 export function TipMatrix({
   myUserId,
   isAdmin = false,
@@ -397,7 +402,7 @@ export function TipMatrix({
           </label>
         ) : null}
       </div>
-      <div className="-mx-4 overflow-x-auto px-4 md:overflow-visible">
+      <div className="-mx-4 px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -419,8 +424,11 @@ export function TipMatrix({
           <thead>
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
-              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[50px] md:left-auto z-40 md:z-10"}>Domácí</th>
-              <th className={headerBase + " bg-neutral-900 text-left w-[80px] md:w-[160px] sticky left-[130px] md:left-auto z-40 md:z-10"}>Hosté</th>
+              {/* Mobile-only Zápas (merged Domácí + Hosté) */}
+              <th className={headerBase + " md:hidden bg-neutral-900 text-left w-[160px] sticky left-[50px] z-40"}>Zápas</th>
+              {/* Desktop-only Domácí/Hosté */}
+              <th className={headerBase + " hidden md:table-cell bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
+              <th className={headerBase + " hidden md:table-cell bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
               <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[210px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
@@ -534,10 +542,43 @@ export function TipMatrix({
                       </div>
                     )}
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[50px] md:static z-30 md:z-auto " + stripeBg}>
+                  {/* Mobile-only Zápas (merged Domácí + Hosté) */}
+                  <td className={"md:hidden px-2 py-2 whitespace-nowrap font-medium w-[160px] sticky left-[50px] z-30 " + stripeBg}>
+                    <div className="flex flex-col gap-y-1 leading-tight text-xs">
+                      <div className="flex items-center gap-1.5">
+                        {home && (() => {
+                          const url = flagUrl(home.code);
+                          return url ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={url} alt={home.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" />
+                          ) : null;
+                        })()}
+                        <span className="font-medium">{home?.code ?? "?"}</span>
+                        {m.home_handicap != null && (
+                          <span className="text-[11px] text-neutral-500">{fmtHcp(m.home_handicap)}</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {away && (() => {
+                          const url = flagUrl(away.code);
+                          return url ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={url} alt={away.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" />
+                          ) : null;
+                        })()}
+                        <span className="font-medium">{away?.code ?? "?"}</span>
+                        {m.home_handicap != null && (
+                          <span className="text-[11px] text-neutral-500">{fmtHcp(-m.home_handicap)}</span>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  {/* Desktop-only Domácí */}
+                  <td className={"hidden md:table-cell px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  <td className={"px-2 py-2 whitespace-nowrap font-medium w-[80px] md:w-[160px] sticky left-[130px] md:static z-30 md:z-auto " + stripeBg}>
+                  {/* Desktop-only Hosté */}
+                  <td className={"hidden md:table-cell px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className={"px-2 py-2 text-center w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
