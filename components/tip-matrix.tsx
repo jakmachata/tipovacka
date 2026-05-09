@@ -539,7 +539,7 @@ export function TipMatrix({
                   <td className={"px-2 py-2 text-center whitespace-nowrap w-[75px] h-px sticky left-[210px] md:static z-30 md:z-auto " + stripeBg}>
                     <div className="flex h-full flex-col">
                       <div className="flex h-2/3 items-center justify-center text-base font-semibold leading-tight">{result}</div>
-                      <div className="flex h-1/3 items-center justify-center text-[11px] text-neutral-400 leading-tight">
+                      <div className="flex h-1/3 items-center justify-center text-xs text-neutral-400 leading-tight">
                         {m.finalized && m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
                       </div>
                     </div>
@@ -565,7 +565,7 @@ export function TipMatrix({
                       content = (
                         <div className="flex flex-col gap-y-1 leading-tight">
                           {/* Row 1: fulltime (60m) */}
-                          <div className="text-center font-medium">
+                          <div className="text-center text-sm font-medium">
                             <span
                               className={
                                 score && score.exact_points > 0
@@ -577,7 +577,7 @@ export function TipMatrix({
                             </span>
                           </div>
                           {/* Row 2: vlajka centered, větší. Grayscale když HCP špatně. HCP text jen pokud nevyhodnoceno. */}
-                          <div className="flex items-center justify-center gap-1 text-[11px]">
+                          <div className="flex items-center justify-center gap-1 text-xs">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img
@@ -594,7 +594,7 @@ export function TipMatrix({
                             )}
                           </div>
                           {/* Row 3: 1. třetina */}
-                          <div className="text-center text-[11px]">
+                          <div className="text-center text-xs">
                             {pick.home_score_p1 != null ? (
                               <span
                                 className={
@@ -616,11 +616,11 @@ export function TipMatrix({
                       const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
                         <div title="Tip čeká na schválení Kubou" className="flex flex-col gap-y-1 leading-tight text-rose-600">
-                          <div className="text-center font-medium">
+                          <div className="text-center text-sm font-medium">
                             <span className="mr-0.5">?</span>
                             {pendingPick.home_score}:{pendingPick.away_score}
                           </div>
-                          <div className="flex items-center justify-center gap-1 text-[11px] opacity-70">
+                          <div className="flex items-center justify-center gap-1 text-xs opacity-70">
                             {sideFlag && (
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img
@@ -631,7 +631,7 @@ export function TipMatrix({
                             )}
                             {sideHcp != null && <span>{sideHcp}</span>}
                           </div>
-                          <div className="text-center text-[11px] text-rose-400">
+                          <div className="text-center text-xs text-rose-400">
                             {pendingPick.home_score_p1 != null
                               ? `(${pendingPick.home_score_p1}:${pendingPick.away_score_p1})`
                               : ""}
