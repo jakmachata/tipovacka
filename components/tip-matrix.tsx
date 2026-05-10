@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
@@ -984,7 +985,17 @@ function TipModal({
   const homeFlag = flagUrl(match.home_code);
   const awayFlag = flagUrl(match.away_code);
 
-  return (
+  // Portal: render modal jako přímé dítě <body> aby se obešel jakýkoli ancestor
+  // s transform/filter/contain (vytvářející containing block pro position:fixed
+  // — způsobovalo right-aligned modal na mobilu).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
+
+  return createPortal(
+    (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
@@ -1172,5 +1183,7 @@ function TipModal({
         </div>
       </div>
     </div>
+    ),
+    document.body,
   );
 }
