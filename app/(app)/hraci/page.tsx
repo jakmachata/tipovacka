@@ -47,14 +47,18 @@ export default async function HraciPage() {
     .single();
   const isAdmin = !!meProfile?.is_admin;
 
-  // Načteme všechny profily a rozdělíme. Non-admin viewer: jen hráči (is_admin=false).
-  // Admin viewer: hráči + adminy ve druhé tabulce dole.
+  // 3 skupiny: approved players (Hráči), unapproved players (Neschválení), admins (Adminy)
   const { data: allProfiles } = await supabase
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });
 
-  const players = (allProfiles ?? []).filter((p: any) => !p.is_admin);
+  const approvedPlayers = (allProfiles ?? []).filter(
+    (p: any) => !p.is_admin && p.is_approved,
+  );
+  const unapprovedPlayers = (allProfiles ?? []).filter(
+    (p: any) => !p.is_admin && !p.is_approved,
+  );
   const admins = (allProfiles ?? []).filter((p: any) => p.is_admin);
 
   async function togglePaid(formData: FormData) {
@@ -92,6 +96,14 @@ export default async function HraciPage() {
     const id = String(formData.get("id"));
     if (id === caller.id) return;
 
+    // Server-side guard: smazat lze jen neschváleného non-admin hráče
+    const { data: target } = await sb
+      .from("profiles")
+      .select("is_admin, is_approved")
+      .eq("id", id)
+      .single();
+    if (!target || target.is_admin || target.is_approved) return;
+
     const admin = createServiceClient();
     await admin.auth.admin.deleteUser(id);
 
@@ -99,7 +111,7 @@ export default async function HraciPage() {
     revalidatePath("/schedule");
   }
 
-  function renderRow(p: any) {
+  function renderRow(p: any, opts: { showDelete: boolean; showZaplatil: boolean }) {
     const s = statusOf(p);
     const isDummyEmail =
       typeof p.email === "string" &&
@@ -108,8 +120,7 @@ export default async function HraciPage() {
       <tr key={p.id} className="border-b">
         {isAdmin && (
           <td
-            className="py-2 text-xs text-neutral-600 truncate"
-            style={{ width: "210px", maxWidth: "210px" }}
+            className="w-[240px] max-w-[240px] truncate py-2 text-xs text-neutral-600 md:w-[210px] md:max-w-[210px]"
             title={p.email ?? ""}
           >
             {p.email ?? "-"}
@@ -142,16 +153,12 @@ export default async function HraciPage() {
             </span>
           )}
         </td>
-        {!p.is_admin && (
+        {opts.showZaplatil && (
           <td>
             {isAdmin ? (
               <form action={togglePaid} className="inline">
                 <input type="hidden" name="id" value={p.id} />
-                <input
-                  type="hidden"
-                  name="value"
-                  value={(!p.has_paid).toString()}
-                />
+                <input type="hidden" name="value" value={(!p.has_paid).toString()} />
                 <button
                   className={
                     p.has_paid
@@ -190,8 +197,8 @@ export default async function HraciPage() {
             relativeFromNow(p.last_seen_at)
           )}
         </td>
-        {isAdmin && (
-          <td className="py-2 text-right pr-2">
+        {opts.showDelete && (
+          <td className="py-2 pr-2 text-right">
             {p.id !== user!.id && (
               <DeleteAccountButton
                 id={p.id}
@@ -207,6 +214,16 @@ export default async function HraciPage() {
     );
   }
 
+  function EmailTh() {
+    return (
+      <th
+        className="w-[240px] py-2 pr-4 text-xs font-medium md:w-[210px]"
+      >
+        Email
+      </th>
+    );
+  }
+
   return (
     <main>
       <h1 className="mb-4 text-xl font-semibold">Hráči</h1>
@@ -214,20 +231,44 @@ export default async function HraciPage() {
       <table className="text-sm">
         <thead className="border-b text-left text-neutral-500">
           <tr>
-            {isAdmin && (
-              <th className="py-2 pr-4 text-xs font-medium" style={{ width: "210px" }}>
-                Email
-              </th>
-            )}
+            {isAdmin && <EmailTh />}
             <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
             <th className="pr-4" style={{ width: "130px" }}>Status</th>
             <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>
             <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
-            {isAdmin && <th className="py-2 text-right pr-2">Smazat</th>}
           </tr>
         </thead>
-        <tbody>{players.map(renderRow)}</tbody>
+        <tbody>
+          {approvedPlayers.map((p: any) =>
+            renderRow(p, { showDelete: false, showZaplatil: true }),
+          )}
+        </tbody>
       </table>
+
+      {isAdmin && unapprovedPlayers.length > 0 && (
+        <>
+          <h2 className="mb-3 mt-10 text-lg font-semibold text-neutral-700">
+            Neschválení
+          </h2>
+          <table className="text-sm">
+            <thead className="border-b text-left text-neutral-500">
+              <tr>
+                <EmailTh />
+                <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
+                <th className="pr-4" style={{ width: "130px" }}>Status</th>
+                <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>
+                <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
+                <th className="py-2 pr-2 text-right">Smazat</th>
+              </tr>
+            </thead>
+            <tbody>
+              {unapprovedPlayers.map((p: any) =>
+                renderRow(p, { showDelete: true, showZaplatil: true }),
+              )}
+            </tbody>
+          </table>
+        </>
+      )}
 
       {isAdmin && admins.length > 0 && (
         <>
@@ -235,16 +276,17 @@ export default async function HraciPage() {
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
-                <th className="py-2 pr-4 text-xs font-medium" style={{ width: "210px" }}>
-                  Email
-                </th>
+                <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
                 <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
-                <th className="py-2 text-right pr-2">Smazat</th>
               </tr>
             </thead>
-            <tbody>{admins.map(renderRow)}</tbody>
+            <tbody>
+              {admins.map((p: any) =>
+                renderRow(p, { showDelete: false, showZaplatil: false }),
+              )}
+            </tbody>
           </table>
         </>
       )}
