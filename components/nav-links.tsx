@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export function NavLinks({
@@ -54,13 +53,13 @@ export function NavLinks({
     return (
       <>
         <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
-          <Image
+          <img
           src="/natipovals.png"
           alt="Natipovals"
           width={50}
           height={50}
-          priority
-          unoptimized
+          loading="eager"
+          decoding="async"
           className="h-[35px] w-[35px] md:h-[50px] md:w-[50px]"
         />
           Natipovals?
@@ -76,13 +75,13 @@ export function NavLinks({
   return (
     <>
       <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
-        <Image
+        <img
           src="/natipovals.png"
           alt="Natipovals"
           width={50}
           height={50}
-          priority
-          unoptimized
+          loading="eager"
+          decoding="async"
           className="h-[35px] w-[35px] md:h-[50px] md:w-[50px]"
         />
         Natipovals?

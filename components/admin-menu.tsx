@@ -68,13 +68,6 @@ export function AdminMenu({ displayName, isAdmin, pendingCount = 0, bold = true 
             Zápasy & výsledky
           </Link>
           <Link
-            href="/admin/history"
-            onClick={() => setOpen(false)}
-            className={linkBase + " " + (isActive("/admin/history") ? linkActive : linkIdle)}
-          >
-            Historie tipů
-          </Link>
-          <Link
             href="/admin/trophies"
             onClick={() => setOpen(false)}
             className={linkBase + " " + (isActive("/admin/trophies") ? linkActive : linkIdle)}

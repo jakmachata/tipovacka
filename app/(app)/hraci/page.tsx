@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { formatPraguePretty } from "@/lib/tz";
+import { STAGE_LABEL, type Match, type Team } from "@/lib/types";
 import { StatusMenu } from "@/components/status-menu";
 import { setStatus } from "./actions";
 import { DeleteAccountButton } from "@/components/delete-account-button";
@@ -18,6 +19,31 @@ const STATUS_CLS: Record<Status, string> = {
   Neschválen: "bg-neutral-100 text-neutral-600",
   Tipující: "bg-emerald-100 text-emerald-800",
   Admin: "bg-amber-100 text-amber-800",
+};
+
+interface AuditRow {
+  id: number;
+  user_id: string;
+  match_id: number;
+  home_score: number | null;
+  away_score: number | null;
+  home_score_p1: number | null;
+  away_score_p1: number | null;
+  action: "INSERT" | "UPDATE" | "DELETE";
+  changed_by: string | null;
+  changed_at: string;
+}
+
+const ACTION_CLS: Record<AuditRow["action"], string> = {
+  INSERT: "bg-emerald-100 text-emerald-800",
+  UPDATE: "bg-sky-100 text-sky-800",
+  DELETE: "bg-rose-100 text-rose-800",
+};
+
+const ACTION_LABEL: Record<AuditRow["action"], string> = {
+  INSERT: "vytvořeno",
+  UPDATE: "upraveno",
+  DELETE: "smazáno",
 };
 
 function relativeFromNow(iso: string | null | undefined): string {
@@ -47,11 +73,23 @@ export default async function HraciPage() {
     .single();
   const isAdmin = !!meProfile?.is_admin;
 
-  // 3 skupiny: approved players (Hráči), unapproved players (Neschválení), admins (Adminy)
   const { data: allProfiles } = await supabase
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });
+
+  // Aktivita: picks_audit má RLS jen pro admina, takže pro non-admin viewers
+  // čteme přes service client. Limit 100 řádků.
+  const adminSb = createServiceClient();
+  const [{ data: auditData }, { data: matchesData }, { data: teamsData }] = await Promise.all([
+    adminSb
+      .from("picks_audit")
+      .select("*")
+      .order("changed_at", { ascending: false })
+      .limit(100),
+    supabase.from("matches").select("*"),
+    supabase.from("teams").select("*"),
+  ]);
 
   const approvedPlayers = (allProfiles ?? []).filter(
     (p: any) => !p.is_admin && p.is_approved,
@@ -60,6 +98,20 @@ export default async function HraciPage() {
     (p: any) => !p.is_admin && !p.is_approved,
   );
   const admins = (allProfiles ?? []).filter((p: any) => p.is_admin);
+
+  const profileMap = new Map(
+    (allProfiles ?? []).map((p: { id: string; display_name: string }) => [
+      p.id,
+      p.display_name,
+    ]),
+  );
+  const matchMap = new Map(
+    (matchesData ?? []).map((m: any) => [m.id, m as Match]),
+  );
+  const teamMap = new Map(
+    (teamsData ?? []).map((t: any) => [t.code, t as Team]),
+  );
+  const auditRows = (auditData ?? []) as AuditRow[];
 
   async function togglePaid(formData: FormData) {
     "use server";
@@ -96,7 +148,6 @@ export default async function HraciPage() {
     const id = String(formData.get("id"));
     if (id === caller.id) return;
 
-    // Server-side guard: smazat lze jen neschváleného non-admin hráče
     const { data: target } = await sb
       .from("profiles")
       .select("is_admin, is_approved")
@@ -155,24 +206,12 @@ export default async function HraciPage() {
             )}
           </td>
         )}
-        {opts.showZaplatil && (
+        {isAdmin && opts.showZaplatil && (
           <td>
-            {isAdmin ? (
-              <form action={togglePaid} className="inline">
-                <input type="hidden" name="id" value={p.id} />
-                <input type="hidden" name="value" value={(!p.has_paid).toString()} />
-                <button
-                  className={
-                    p.has_paid
-                      ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
-                      : "rounded bg-neutral-100 px-2 py-1 text-neutral-600"
-                  }
-                >
-                  {p.has_paid ? "✓ ano" : "- ne"}
-                </button>
-              </form>
-            ) : (
-              <span
+            <form action={togglePaid} className="inline">
+              <input type="hidden" name="id" value={p.id} />
+              <input type="hidden" name="value" value={(!p.has_paid).toString()} />
+              <button
                 className={
                   p.has_paid
                     ? "rounded bg-emerald-100 px-2 py-1 text-emerald-800"
@@ -180,8 +219,8 @@ export default async function HraciPage() {
                 }
               >
                 {p.has_paid ? "✓ ano" : "- ne"}
-              </span>
-            )}
+              </button>
+            </form>
           </td>
         )}
         <td
@@ -218,9 +257,7 @@ export default async function HraciPage() {
 
   function EmailTh() {
     return (
-      <th
-        className="w-[240px] py-2 pr-4 text-xs font-medium md:w-[210px]"
-      >
+      <th className="w-[240px] py-2 pr-4 text-xs font-medium md:w-[210px]">
         Email
       </th>
     );
@@ -228,7 +265,7 @@ export default async function HraciPage() {
 
   return (
     <main>
-      <h1 className="mb-4 text-xl font-semibold">Hráči</h1>
+      <h1 className="mb-4 text-xl font-semibold">Hráči a aktivita</h1>
 
       <table className="text-sm">
         <thead className="border-b text-left text-neutral-500">
@@ -236,7 +273,7 @@ export default async function HraciPage() {
             {isAdmin && <EmailTh />}
             <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
             {isAdmin && <th className="pr-4" style={{ width: "130px" }}>Status</th>}
-            <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>
+            {isAdmin && <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>}
             <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
           </tr>
         </thead>
@@ -292,6 +329,105 @@ export default async function HraciPage() {
           </table>
         </>
       )}
+
+      <h2 className="mb-3 mt-10 text-lg font-semibold text-neutral-700">Aktivita</h2>
+      <p className="mb-3 text-xs text-neutral-500">
+        Posledních 100 změn tipů (vytvoření, úpravy, smazání).
+      </p>
+      <div className="overflow-x-auto">
+        <table className="text-sm">
+          <thead className="border-b text-left text-neutral-500">
+            <tr>
+              <th className="py-2 pr-3">Kdy</th>
+              <th className="pr-3">Hráč</th>
+              <th className="pr-3">Akce</th>
+              <th className="pr-3">Zápas</th>
+              <th className="pr-3">60'</th>
+              <th className="pr-3">1. třetina</th>
+              <th className="pr-3">Změnil</th>
+            </tr>
+          </thead>
+          <tbody>
+            {auditRows.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="py-6 text-center text-neutral-500">
+                  Zatím nic.
+                </td>
+              </tr>
+            ) : (
+              auditRows.map((r) => {
+                const m = matchMap.get(r.match_id);
+                const home = m ? teamMap.get(m.home_code) : null;
+                const away = m ? teamMap.get(m.away_code) : null;
+                const matchLabel = m
+                  ? `${home?.name_cs ?? m.home_code} vs ${away?.name_cs ?? m.away_code}`
+                  : `#${r.match_id}`;
+                const stageLabel = m && m.stage !== "group" ? STAGE_LABEL[m.stage] : "";
+                const tip60 =
+                  r.home_score == null || r.away_score == null
+                    ? "-"
+                    : `${r.home_score}:${r.away_score}`;
+                const tipP1 =
+                  r.home_score_p1 == null || r.away_score_p1 == null
+                    ? "-"
+                    : `${r.home_score_p1}:${r.away_score_p1}`;
+                const changedByName = r.changed_by
+                  ? profileMap.get(r.changed_by) ?? "-"
+                  : "-";
+                const isAdminOverride =
+                  r.changed_by !== null && r.changed_by !== r.user_id;
+                return (
+                  <tr key={r.id} className="border-b">
+                    <td className="whitespace-nowrap py-2 pr-3 text-neutral-600">
+                      {formatPraguePretty(r.changed_at)}
+                    </td>
+                    <td className="pr-3 font-medium">
+                      {profileMap.get(r.user_id) ?? r.user_id.slice(0, 8)}
+                    </td>
+                    <td className="pr-3">
+                      <span
+                        className={
+                          "rounded px-2 py-0.5 text-xs " + ACTION_CLS[r.action]
+                        }
+                      >
+                        {ACTION_LABEL[r.action]}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap pr-3">
+                      {m && (
+                        <span className="mr-2 text-neutral-500">
+                          {formatPraguePretty(m.starts_at)}
+                        </span>
+                      )}
+                      {stageLabel && (
+                        <span className="mr-2 rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">
+                          {stageLabel}
+                        </span>
+                      )}
+                      {matchLabel}
+                      {m?.is_czech && (
+                        <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-[11px] text-red-700">
+                          🇨🇿
+                        </span>
+                      )}
+                    </td>
+                    <td className="pr-3 tabular-nums">{tip60}</td>
+                    <td className="pr-3 tabular-nums text-neutral-500">{tipP1}</td>
+                    <td className="pr-3 text-neutral-600">
+                      {changedByName}
+                      {isAdminOverride && (
+                        <span className="ml-1 rounded bg-amber-100 px-1 py-0.5 text-[10px] text-amber-800">
+                          admin
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </main>
   );
 }
