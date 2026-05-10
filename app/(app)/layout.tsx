@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
         {/* Menu — fixed pod mobile login barem (mobil) nebo úplně nahoře (desktop). */}
         <header className="fixed inset-x-0 top-[32px] md:top-0 z-50 border-b bg-white transform-gpu">
-          <div className="mx-auto flex h-[48px] max-w-7xl items-center px-4 md:h-[56px]">
+          <div className="mx-auto flex h-[60px] max-w-7xl items-center px-4 md:h-[72px]">
             <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap text-sm">
               <NavLinks isAdmin={false} pendingCount={0} unapprovedCount={0} guest />
             </nav>
@@ -30,7 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </header>
-        <div className="h-[80px] md:h-[56px]" />
+        <div className="h-[92px] md:h-[72px]" />
         <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
       </>
     );
@@ -101,7 +101,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* Menu — fixed pod mobile login barem (mobil) nebo úplně nahoře (desktop).
           Na desktopu má login info v pevném panelu napravo. */}
       <header className="fixed inset-x-0 top-[32px] md:top-0 z-50 border-b bg-white transform-gpu">
-        <div className="mx-auto flex h-[48px] max-w-7xl items-center px-4 md:h-[56px]">
+        <div className="mx-auto flex h-[60px] max-w-7xl items-center px-4 md:h-[72px]">
           <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap text-sm">
             <NavLinks
               isAdmin={!!profile?.is_admin}
@@ -122,7 +122,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </header>
-      <div className="h-[80px] md:h-[56px]" />
+      <div className="h-[92px] md:h-[72px]" />
       <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
     </>
   );

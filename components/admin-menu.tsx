@@ -34,6 +34,11 @@ export function AdminMenu({ displayName, isAdmin, pendingCount = 0 }: Props) {
   if (!isAdmin) {
     return <span className="font-bold text-neutral-700">{displayName}</span>;
   }
+  // Admin barevné odlišení: alert (rose) když má čekající Pozdní tipy, jinak admin amber.
+  const nameClass =
+    pendingCount > 0
+      ? "font-bold text-rose-600 hover:underline animate-pulse"
+      : "font-bold text-amber-700 hover:underline";
 
   const isActive = (href: string) => path === href || path.startsWith(href + "/");
   const linkBase = "block px-3 py-1.5 text-sm hover:bg-amber-50";
@@ -45,16 +50,13 @@ export function AdminMenu({ displayName, isAdmin, pendingCount = 0 }: Props) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="font-bold text-neutral-700 hover:underline"
+        className={nameClass}
         title="Admin menu"
       >
         {displayName}
-        {pendingCount > 0 && (
-          <span className="ml-1 inline-block h-2 w-2 rounded-full bg-rose-500 align-middle"></span>
-        )}
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1 min-w-[180px] rounded border bg-white py-1 shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-1 min-w-[180px] rounded border bg-white py-1 shadow-lg md:left-auto md:right-0">
           <Link
             href="/admin/matches"
             onClick={() => setOpen(false)}
