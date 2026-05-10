@@ -1011,34 +1011,48 @@ function TipModal({
             })}
           </p>
           {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
-          {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
-          <h2 className="mt-2 inline-flex items-center justify-center gap-2 text-lg font-semibold">
-            {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
-            <span>{home?.name_cs ?? match.home_code}</span>
-            <span className="text-neutral-400">vs</span>
-            <span>{away?.name_cs ?? match.away_code}</span>
-            {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
-          </h2>
-          {/* Row 3: handicapy — zarovnaní na střed vlaječek (kopíruje h2 strukturu
-              s neviditelnými placeholdery pro názvy týmů). Handicap text je v relative
-              wrapperu o šířce 20px (= šířka vlaječky), absolutně vycentrovaný kolem středu. */}
-          {match.home_handicap != null && (
-            <div className="mt-1 inline-flex items-center gap-2 text-xs text-neutral-500">
-              <span className="relative w-[20px]">
-                <span className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap">
+          {/* Row 2 + 3 v jednom inline-gridu: 5 sloupců (flag, name, vs, name, flag).
+              Handicapy v Row 2 obsadí col 1 a col 5 (= sloupce vlaječek), text-center → 
+              centrovaný na střed vlajkového sloupce. Text může být širší a přečuhuje
+              symetricky vlevo/vpravo. */}
+          <div
+            className="mt-2 inline-grid items-center gap-x-2 gap-y-0.5"
+            style={{ gridTemplateColumns: "20px auto auto auto 20px" }}
+          >
+            {homeFlag && (
+              <img
+                src={homeFlag}
+                alt={match.home_code}
+                className="row-start-1 col-start-1 h-[20px] w-[20px] rounded-sm shadow-sm"
+              />
+            )}
+            <span className="row-start-1 col-start-2 text-lg font-semibold">
+              {home?.name_cs ?? match.home_code}
+            </span>
+            <span className="row-start-1 col-start-3 text-lg font-semibold text-neutral-400">
+              vs
+            </span>
+            <span className="row-start-1 col-start-4 text-lg font-semibold">
+              {away?.name_cs ?? match.away_code}
+            </span>
+            {awayFlag && (
+              <img
+                src={awayFlag}
+                alt={match.away_code}
+                className="row-start-1 col-start-5 h-[20px] w-[20px] rounded-sm shadow-sm"
+              />
+            )}
+            {match.home_handicap != null && (
+              <>
+                <span className="row-start-2 col-start-1 whitespace-nowrap text-center text-xs text-neutral-500">
                   {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
                 </span>
-              </span>
-              <span className="invisible text-lg font-semibold">{home?.name_cs ?? match.home_code}</span>
-              <span className="invisible text-lg font-semibold">vs</span>
-              <span className="invisible text-lg font-semibold">{away?.name_cs ?? match.away_code}</span>
-              <span className="relative w-[20px]">
-                <span className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap">
+                <span className="row-start-2 col-start-5 whitespace-nowrap text-center text-xs text-neutral-500">
                   {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
                 </span>
-              </span>
-            </div>
-          )}
+              </>
+            )}
+          </div>
         </div>
 
         <div className="mt-6 space-y-5">
