@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -54,6 +54,21 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
     if (!prefsLoaded) return;
     try { localStorage.setItem("tipovacka:emailPref", emailPref ? "1" : "0"); } catch {}
   }, [emailPref, prefsLoaded]);
+
+  // Auto-save Přezdívka & barvy s debounce po změně.
+  const initialMount = useRef(true);
+  useEffect(() => {
+    if (initialMount.current) {
+      initialMount.current = false;
+      return;
+    }
+    if (!name.trim()) return;
+    const t = setTimeout(() => {
+      void saveProfile();
+    }, 500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, bg, text]);
 
   async function saveProfile() {
     setSavingProfile(true);
@@ -210,14 +225,9 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
           </p>
         )}
 
-        <button
-          type="button"
-          onClick={saveProfile}
-          disabled={savingProfile}
-          className="mt-3 rounded bg-black px-4 py-2 text-sm text-white hover:bg-neutral-800 disabled:opacity-50"
-        >
-          {savingProfile ? "Ukládám…" : "Uložit profil"}
-        </button>
+        {savingProfile && (
+          <p className="mt-3 text-xs text-neutral-500">Ukládám…</p>
+        )}
       </section>
       )}
       {!isAdmin && (

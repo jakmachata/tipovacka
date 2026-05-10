@@ -144,15 +144,17 @@ export default async function HraciPage() {
             p.display_name
           )}
         </td>
-        <td>
-          {isAdmin && p.id !== user!.id ? (
-            <StatusMenu id={p.id} current={s} action={setStatus} />
-          ) : (
-            <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
-              {s}
-            </span>
-          )}
-        </td>
+        {isAdmin && (
+          <td>
+            {p.id !== user!.id ? (
+              <StatusMenu id={p.id} current={s} action={setStatus} />
+            ) : (
+              <span className={"rounded px-2 py-1 " + STATUS_CLS[s]}>
+                {s}
+              </span>
+            )}
+          </td>
+        )}
         {opts.showZaplatil && (
           <td>
             {isAdmin ? (
@@ -233,7 +235,7 @@ export default async function HraciPage() {
           <tr>
             {isAdmin && <EmailTh />}
             <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
-            <th className="pr-4" style={{ width: "130px" }}>Status</th>
+            {isAdmin && <th className="pr-4" style={{ width: "130px" }}>Status</th>}
             <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>
             <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
           </tr>

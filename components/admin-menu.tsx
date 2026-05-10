@@ -8,9 +8,10 @@ interface Props {
   displayName: string;
   isAdmin: boolean;
   pendingCount?: number;
+  bold?: boolean;
 }
 
-export function AdminMenu({ displayName, isAdmin, pendingCount = 0 }: Props) {
+export function AdminMenu({ displayName, isAdmin, pendingCount = 0, bold = true }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const path = usePathname() ?? "";
@@ -32,13 +33,15 @@ export function AdminMenu({ displayName, isAdmin, pendingCount = 0 }: Props) {
   }, [open]);
 
   if (!isAdmin) {
-    return <span className="font-bold text-neutral-700">{displayName}</span>;
+    return <span className={(bold ? "font-bold " : "") + "text-neutral-700"}>{displayName}</span>;
   }
   // Admin barevné odlišení: alert (rose) když má čekající Pozdní tipy, jinak admin amber.
+  // bold flag řídí font-weight (false když je uživatel na /profile a Nastavení je active).
   const nameClass =
-    pendingCount > 0
-      ? "font-bold text-rose-600 hover:underline animate-pulse"
-      : "font-bold text-amber-700 hover:underline";
+    (bold ? "font-bold " : "") +
+    (pendingCount > 0
+      ? "text-rose-600 hover:underline animate-pulse"
+      : "text-amber-700 hover:underline");
 
   const isActive = (href: string) => path === href || path.startsWith(href + "/");
   const linkBase = "block px-3 py-1.5 text-sm hover:bg-amber-50";

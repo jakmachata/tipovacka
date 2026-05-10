@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NavLinks } from "@/components/nav-links";
 import { GuestHeader } from "@/components/guest-header";
-import { AdminMenu } from "@/components/admin-menu";
+import { UserBar } from "@/components/user-bar";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -87,15 +87,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* Mobile-only fixed login info bar nahoře — uživatelská část je vždy úplně na vrchu. */}
       <div className="fixed inset-x-0 top-0 z-[51] border-b bg-white transform-gpu md:hidden">
         <div className="mx-auto flex h-[32px] max-w-7xl items-center gap-3 px-4 text-sm">
-          <AdminMenu
+          <UserBar
             displayName={profile?.display_name ?? ""}
             isAdmin={!!profile?.is_admin}
             pendingCount={pendingCount}
+            logoutAction={logout}
           />
-          <Link href="/profile" className="text-neutral-500 hover:underline">Nastavení</Link>
-          <form action={logout}>
-            <button className="text-neutral-500 hover:underline">Odhlásit</button>
-          </form>
         </div>
       </div>
       {/* Menu — fixed pod mobile login barem (mobil) nebo úplně nahoře (desktop).
@@ -110,15 +107,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             />
           </nav>
           <div className="hidden flex-shrink-0 items-center gap-2 pl-2 text-sm md:flex">
-            <AdminMenu
+            <UserBar
               displayName={profile?.display_name ?? ""}
               isAdmin={!!profile?.is_admin}
               pendingCount={pendingCount}
+              logoutAction={logout}
             />
-            <Link href="/profile" className="text-neutral-500 hover:underline">Nastavení</Link>
-            <form action={logout}>
-              <button className="text-neutral-500 hover:underline">Odhlásit</button>
-            </form>
           </div>
         </div>
       </header>

@@ -54,7 +54,7 @@ export function NavLinks({
       <>
         <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/natipovals.png" alt="" className="h-[35px] w-[35px] md:h-[50px] md:w-[50px]" />
+          <img src="/natipovals.png" alt="Natipovals" width={50} height={50} loading="eager" className="h-[35px] w-[35px] md:h-[50px] md:w-[50px]" />
           Natipovals?
         </Link>
         <Link href="/trophies" className={cls("/trophies")}>
@@ -69,7 +69,7 @@ export function NavLinks({
     <>
       <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/natipovals.png" alt="" className="h-[35px] w-[35px] md:h-[50px] md:w-[50px]" />
+        <img src="/natipovals.png" alt="Natipovals" width={50} height={50} loading="eager" className="h-[35px] w-[35px] md:h-[50px] md:w-[50px]" />
         Natipovals?
       </Link>
       <Link href="/hraci" className={hraciCls}>
