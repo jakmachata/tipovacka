@@ -28,7 +28,7 @@ interface PendingPick {
 }
 
 interface Props {
-  // null = host (nepřihlášený)
+  // null = host (nepÅihlÃ¡Å¡enÃ½)
   myUserId: string | null;
   isAdmin?: boolean;
   matches: Match[];
@@ -109,7 +109,7 @@ function hexForUser(userId: string) {
   return HEADER_COLOR_HEX[userColorIdx(userId)];
 }
 
-// Mapování IIHF 3-písmenných kódů na ISO 3166-1 alpha-2 kódy (pro flagcdn.com)
+// MapovÃ¡nÃ­ IIHF 3-pÃ­smennÃ½ch kÃ³dÅ¯ na ISO 3166-1 alpha-2 kÃ³dy (pro flagcdn.com)
 const TEAM_ISO2: Record<string, string> = {
   CAN: "ca", USA: "us", FIN: "fi", SWE: "se", CZE: "cz",
   SUI: "ch", GER: "de", SVK: "sk", LAT: "lv", DEN: "dk",
@@ -206,12 +206,12 @@ function hcpSideCode(
   const hcp = match.home_handicap;
   const pickDiff = pick.home_score - pick.away_score;
   if (hcp == null) {
-    // Bez handicapu — vrátíme predicted winner (na vlajku v tipu).
+    // Bez handicapu â vrÃ¡tÃ­me predicted winner (na vlajku v tipu).
     if (pickDiff > 0) return match.home_code;
     if (pickDiff < 0) return match.away_code;
     return null;
   }
-  // S handicapem: musí odpovídat SQL scoring (0002_scoring.sql) — pick_diff alone.
+  // S handicapem: musÃ­ odpovÃ­dat SQL scoring (0002_scoring.sql) â pick_diff alone.
   if (pickDiff > 0) return match.home_code;
   if (pickDiff < 0) return match.away_code;
   return hcp >= 0 ? match.home_code : match.away_code;
@@ -230,7 +230,7 @@ function hcpSideValue(
   return v > 0 ? `+${v}` : `${v}`;
 }
 
-// Pomocná: signovaná hodnota handicapu (pro mobilní Zápas zobrazení).
+// PomocnÃ¡: signovanÃ¡ hodnota handicapu (pro mobilnÃ­ ZÃ¡pas zobrazenÃ­).
 function fmtHcp(v: number): string {
   return v > 0 ? `+${v}` : `${v}`;
 }
@@ -251,7 +251,7 @@ export function TipMatrix({
     { matchId: number; userId: string } | null
   >(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  // Načíst oblíbené z localStorage při mountu.
+  // NaÄÃ­st oblÃ­benÃ© z localStorage pÅi mountu.
   useEffect(() => {
     try {
       const raw = localStorage.getItem("tipovacka:favorites");
@@ -274,7 +274,7 @@ export function TipMatrix({
   }
   const [hidePast, setHidePast] = useState(false);
   const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
-  // Team column width: mobile 80px, desktop 160px. Aktualizujeme přes resize listener.
+  // Team column width: mobile 80px, desktop 160px. Aktualizujeme pÅes resize listener.
   const [teamColWidth, setTeamColWidth] = useState(80);
   useEffect(() => {
     const update = () =>
@@ -292,7 +292,7 @@ export function TipMatrix({
   const [filterMode, setFilterMode] = useState<"all" | "near" | "future">("all");
   const [emailPref, setEmailPref] = useState(false);
 
-  // Načíst persistované preference
+  // NaÄÃ­st persistovanÃ© preference
   useEffect(() => {
     try {
       const fm = localStorage.getItem("tipovacka:filterMode");
@@ -308,7 +308,7 @@ export function TipMatrix({
     try { localStorage.setItem("tipovacka:emailPref", emailPref ? "1" : "0"); } catch {}
   }, [emailPref]);
 
-  // Heartbeat: každé 2 min poslat last_seen_at (jen když je tab v popředí).
+  // Heartbeat: kaÅ¾dÃ© 2 min poslat last_seen_at (jen kdyÅ¾ je tab v popÅedÃ­).
   // Skip pro hosta (myUserId == null).
   useEffect(() => {
     if (!myUserId) return;
@@ -356,9 +356,9 @@ export function TipMatrix({
       ? null
       : pickMap.get(k(editingTarget.userId, editingTarget.matchId)) ?? null;
 
-  // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
-  // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
-  // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
+  // Thead sticky lehce pod menu (60 px) â menu bg-white pÅekrÃ½vÃ¡ vrchnÃ­ch ~7 px thead pÅes z-stacking, takÅ¾e Å¾Ã¡dnÃ½ gray gap.
+  // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + AktivnÃ­ bar (64 px).
+  // AktivnÃ­ bar mÃ¡ 20 px symbolickÃ½ gap dolÅ¯ (pb-5) â tipy âneprosvÃ­tajÃ­" pod thead.
   const headerBase = "sticky top-0 md:top-[124px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
@@ -374,7 +374,7 @@ export function TipMatrix({
     }
   } else {
     if (filterMode === "near") {
-      // dnešek + 1 den dozadu + 1 den dopředu
+      // dneÅ¡ek + 1 den dozadu + 1 den dopÅedu
       const minMs = todayStartMs - oneDay;
       const maxMs = todayStartMs + 2 * oneDay; // exclusive
       visibleMatches = matches.filter((m) => {
@@ -382,7 +382,7 @@ export function TipMatrix({
         return ms >= minMs && ms < maxMs;
       });
     } else if (filterMode === "future") {
-      // od začátku dnešního dne dál
+      // od zaÄÃ¡tku dneÅ¡nÃ­ho dne dÃ¡l
       visibleMatches = matches.filter(
         (m) => new Date(m.starts_at).getTime() >= todayStartMs,
       );
@@ -391,17 +391,17 @@ export function TipMatrix({
 
   return (
     <main>
-      {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
-          overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
-          isAdmin checkbox sedí v pevném panelu napravo. */}
+      {/* Fixed AktivnÃ­ bar â drÅ¾Ã­ pod menu (44 px) na obou breakpointech.
+          overflow-x-auto na user listu zajiÅ¡Å¥uje konstantnÃ­ vÃ½Å¡ku 36 px;
+          isAdmin checkbox sedÃ­ v pevnÃ©m panelu napravo. */}
       <div className="fixed inset-x-0 top-[104px] md:top-[84px] z-[45] bg-white transform-gpu">
         <div className="mx-auto flex h-[40px] max-w-7xl items-center px-4">
           <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap">
             <span className="text-xs text-neutral-500">
-              Aktivní uživatelé:
+              AktivnÃ­ uÅ¾ivatelÃ©:
             </span>
             {(() => {
-              // Self override: já vidím sám sebe vždy jako online (jsem na stránce).
+              // Self override: jÃ¡ vidÃ­m sÃ¡m sebe vÅ¾dy jako online (jsem na strÃ¡nce).
               const meEntry =
                 me && !activeUsers.some((u) => u.id === myUserId)
                   ? [{ id: me.id, display_name: me.display_name, last_seen_at: null }]
@@ -429,7 +429,7 @@ export function TipMatrix({
                 checked={hidePast}
                 onChange={(e) => setHidePast(e.target.checked)}
               />
-              Skrýt odehrané
+              SkrÃ½t odehranÃ©
             </label>
           )}
         </div>
@@ -437,9 +437,9 @@ export function TipMatrix({
       <div className="h-[50px]" />
       <div className="-mx-4 h-[calc(100dvh-154px)] overflow-auto md:h-auto md:overflow-visible md:px-4">
         {/*
-          FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
-          aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
-          Team col je 80px mobile / 160px desktop (přes JS state, viz teamColWidth).
+          FIXNÃ Å¡Ã­Åky sloupcÅ¯ â bez explicitnÃ­ Å¡Ã­Åky tabulky ji browser zmenÅ¡uje
+          aby fitla do kontejneru, coÅ¾ rozbÃ­jÃ­ table-layout: fixed (pozorovÃ¡no).
+          Team col je 80px mobile / 160px desktop (pÅes JS state, viz teamColWidth).
         */}
         <table
           className="text-xs border-separate border-spacing-0 table-fixed"
@@ -447,9 +447,9 @@ export function TipMatrix({
         >
           <colgroup>
             <col style={{ width: 50 }} />
-            {/* Zápas col — viditelný jen na mobilu (=teamColWidth*2). Desktop má 0. */}
+            {/* ZÃ¡pas col â viditelnÃ½ jen na mobilu (=teamColWidth*2). Desktop mÃ¡ 0. */}
             <col style={{ width: teamColWidth < 160 ? teamColWidth * 2 - 15 : 0 }} />
-            {/* Domácí/Hosté cols — viditelné jen na desktopu. Mobile má 0. */}
+            {/* DomÃ¡cÃ­/HostÃ© cols â viditelnÃ© jen na desktopu. Mobile mÃ¡ 0. */}
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
             <col style={{ width: 75 }} />
@@ -460,20 +460,20 @@ export function TipMatrix({
           <thead>
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
-              {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-              <th className={headerBase + " md:invisible md:overflow-hidden bg-neutral-900 text-left w-[145px] sticky left-[50px] z-40"}>Zápas</th>
-              {/* Desktop-only Domácí/Hosté */}
-              <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
-              <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[195px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>Výsledek</th>
+              {/* Mobile-only ZÃ¡pas (merged DomÃ¡cÃ­ + HostÃ©) */}
+              <th className={headerBase + " md:invisible md:overflow-hidden bg-neutral-900 text-left w-[145px] sticky left-[50px] z-40"}>ZÃ¡pas</th>
+              {/* Desktop-only DomÃ¡cÃ­/HostÃ© */}
+              <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>DomÃ¡cÃ­</th>
+              <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>HostÃ©</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[195px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>VÃ½sledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
                 const fallbackColor = colorForUser(p.id);
-                // Pro isMine zvýrazníme sloupec přes inset box-shadow — neovlivňuje šířku.
+                // Pro isMine zvÃ½raznÃ­me sloupec pÅes inset box-shadow â neovlivÅuje Å¡Ã­Åku.
                 const myAccentColor = hasCustom
                   ? p.bg_color ?? "#000"
-                  : hexForUser(p.id); // deterministický hex pro hráče bez vlastních barev
+                  : hexForUser(p.id); // deterministickÃ½ hex pro hrÃ¡Äe bez vlastnÃ­ch barev
                 const inlineStyle: React.CSSProperties = { width: 77 };
                 if (hasCustom) {
                   inlineStyle.backgroundColor = p.bg_color ?? undefined;
@@ -481,7 +481,7 @@ export function TipMatrix({
                 }
                 const isFavoriteHeader = !isAdmin && favorites.has(p.id);
                 if (isMineHeader || isFavoriteHeader) {
-                  // Linear-gradient místo box-shadow: rendererí se na pixel-grid bez anti-aliasing artefaktů
+                  // Linear-gradient mÃ­sto box-shadow: rendererÃ­ se na pixel-grid bez anti-aliasing artefaktÅ¯
                   inlineStyle.backgroundImage = `linear-gradient(to right, ${myAccentColor} 2px, transparent 2px, transparent calc(100% - 2px), ${myAccentColor} calc(100% - 2px))`;
                 }
                 return (
@@ -498,12 +498,12 @@ export function TipMatrix({
                     }
                     title={
                       isMineHeader
-                        ? "Klikni pro úpravu profilu (jméno, barvy, heslo)"
+                        ? "Klikni pro Ãºpravu profilu (jmÃ©no, barvy, heslo)"
                         : isAdmin
-                          ? `Uprav profil hráče ${p.display_name}`
+                          ? `Uprav profil hrÃ¡Äe ${p.display_name}`
                           : isFavoriteHeader
-                            ? `Odebrat ${p.display_name} z oblíbených`
-                            : `Přidat ${p.display_name} k oblíbeným`
+                            ? `Odebrat ${p.display_name} z oblÃ­benÃ½ch`
+                            : `PÅidat ${p.display_name} k oblÃ­benÃ½m`
                     }
                     className={
                       headerBase +
@@ -559,9 +559,9 @@ export function TipMatrix({
                   </tr>,
                 );
               }
-              // Striping ignoruje oddělení dní - natvrdo podle indexu zápasu (idx).
-              // CZE zápas má vlastní červené pozadí, jinak střídání bílá / velmi světlá žlutá.
-              // Single solid bg per řádek; alternace odstraněna kvůli iter56 (vizuální linky v highlightnutých sloupcích).
+              // Striping ignoruje oddÄlenÃ­ dnÃ­ - natvrdo podle indexu zÃ¡pasu (idx).
+              // CZE zÃ¡pas mÃ¡ vlastnÃ­ ÄervenÃ© pozadÃ­, jinak stÅÃ­dÃ¡nÃ­ bÃ­lÃ¡ / velmi svÄtlÃ¡ Å¾lutÃ¡.
+              // Single solid bg per ÅÃ¡dek; alternace odstranÄna kvÅ¯li iter56 (vizuÃ¡lnÃ­ linky v highlightnutÃ½ch sloupcÃ­ch).
               const stripeBg = m.is_czech ? "bg-red-50" : "bg-white";
               const stageLabel = m.stage !== "group" ? STAGE_LABEL[m.stage] : null;
               rows.push(
@@ -579,7 +579,7 @@ export function TipMatrix({
                       </div>
                     )}
                   </td>
-                  {/* Mobile-only Zápas (merged Domácí + Hosté) */}
+                  {/* Mobile-only ZÃ¡pas (merged DomÃ¡cÃ­ + HostÃ©) */}
                   <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[145px] sticky left-[50px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
                       <div className="flex items-center gap-1.5">
@@ -610,25 +610,25 @@ export function TipMatrix({
                       </div>
                     </div>
                   </td>
-                  {/* Desktop-only Domácí */}
+                  {/* Desktop-only DomÃ¡cÃ­ */}
                   <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={home} hcp={m.home_handicap} isHome />
                   </td>
-                  {/* Desktop-only Hosté */}
+                  {/* Desktop-only HostÃ© */}
                   <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className={"px-2 py-2 text-center w-[75px] h-px sticky left-[195px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
                     {m.finalized ? (
                       <div className="relative h-full">
-                        {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
+                        {/* VÃ½sledek po 60 min â vertikÃ¡lnÄ centrovanÃ½ v gapu mezi tip row 1 a row 2 */}
                         <div
                           className="absolute left-0 right-0 text-center text-lg font-semibold"
                           style={{ top: "9px", lineHeight: "22px" }}
                         >
                           {result}
                         </div>
-                        {/* Výsledek po 1. třetině — bottom zarovnaný s tip row 3 bottom; stejná velikost jako result */}
+                        {/* VÃ½sledek po 1. tÅetinÄ â bottom zarovnanÃ½ s tip row 3 bottom; stejnÃ¡ velikost jako result */}
                         <div
                           className="absolute left-0 right-0 bottom-0 text-center text-sm text-neutral-400"
                           style={{ lineHeight: "18px" }}
@@ -655,13 +655,13 @@ export function TipMatrix({
 
                     let content: React.ReactNode;
                     if (!visible) {
-                      content = <span className="text-neutral-400">🔒</span>;
+                      content = <span className="text-neutral-400">ð</span>;
                     } else if (pick) {
                       const sideCode = hcpSideCode(pick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pick, m);
                       content = m.finalized ? (
-                        // Vyhodnocený tip — 3 řádky: fulltime tip / vlajka (grayscale když HCP špatně) / 1. třetina tip
+                        // VyhodnocenÃ½ tip â 3 ÅÃ¡dky: fulltime tip / vlajka (grayscale kdyÅ¾ HCP Å¡patnÄ) / 1. tÅetina tip
                         <div className="flex flex-col gap-y-1 leading-tight">
                           <div className="text-center text-sm font-medium">
                             <span
@@ -704,7 +704,7 @@ export function TipMatrix({
                           </div>
                         </div>
                       ) : (
-                        // Nevyhodnocený tip — kompaktní layout: 60(20) / vlajka / CODE+hcp
+                        // NevyhodnocenÃ½ tip â kompaktnÃ­ layout: 60(20) / vlajka / CODE+hcp
                         <div className="flex flex-col gap-y-1 leading-tight">
                           <div className="text-center text-sm font-medium">
                             {pick.home_score}:{pick.away_score}
@@ -732,12 +732,12 @@ export function TipMatrix({
                         </div>
                       );
                     } else if (pendingPick) {
-                      // tip čeká na schválení Masterem
+                      // tip ÄekÃ¡ na schvÃ¡lenÃ­ Masterem
                       const sideCode = hcpSideCode(pendingPick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pendingPick, m);
                       content = (
-                        <div title="Tip čeká na schválení Kubou" className="flex flex-col gap-y-1 leading-tight text-rose-600">
+                        <div title="Tip ÄekÃ¡ na schvÃ¡lenÃ­ Kubou" className="flex flex-col gap-y-1 leading-tight text-rose-600">
                           <div className="text-center text-sm font-medium">
                             <span className="mr-0.5">?</span>
                             {pendingPick.home_score}:{pendingPick.away_score}
@@ -765,12 +765,12 @@ export function TipMatrix({
                         </div>
                       );
                     } else if (isMine && started && !inGrace && !isAdmin) {
-                      // hráč nestihl tip - promeškal čas startu (i 10min grace)
+                      // hrÃ¡Ä nestihl tip - promeÅ¡kal Äas startu (i 10min grace)
                       content = (
-                        <span title="Nestihl jsi tip" className="text-base">😞</span>
+                        <span title="Nestihl jsi tip" className="text-base">ð</span>
                       );
                     } else {
-                      // chybějící tip: klikatelná buňka = tučné "+" (vyzývá k tipu), nekl. = pomlčka
+                      // chybÄjÃ­cÃ­ tip: klikatelnÃ¡ buÅka = tuÄnÃ© "+" (vyzÃ½vÃ¡ k tipu), nekl. = pomlÄka
                       content = (
                         <span className={clickable ? "text-neutral-500 text-lg font-bold leading-none" : "text-neutral-400"}>
                           {clickable ? "+" : "-"}
@@ -875,7 +875,7 @@ function TipModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  // Pokud existuje tip, předvyplnit. Jinak prázdné (mobile UX).
+  // Pokud existuje tip, pÅedvyplnit. Jinak prÃ¡zdnÃ© (mobile UX).
   const [hs, setHs] = useState<string>(
     existing?.home_score != null ? String(existing.home_score) : "",
   );
@@ -891,7 +891,7 @@ function TipModal({
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
-  // Refs pro sekvenční zadávání skóre na mobilu (auto-advance po každé číslici)
+  // Refs pro sekvenÄnÃ­ zadÃ¡vÃ¡nÃ­ skÃ³re na mobilu (auto-advance po kaÅ¾dÃ© ÄÃ­slici)
   const hsRef = useRef<HTMLInputElement>(null);
   const asRef = useRef<HTMLInputElement>(null);
   const h1Ref = useRef<HTMLInputElement>(null);
@@ -915,11 +915,11 @@ function TipModal({
 
   async function save() {
     if (hs === "" || as_ === "") {
-      setErr("Vyplň skóre po 60 minutách.");
+      setErr("VyplÅ skÃ³re po 60 minutÃ¡ch.");
       return;
     }
     if (h1 === "" || a1 === "") {
-      setErr("Vyplň skóre po 1. třetině.");
+      setErr("VyplÅ skÃ³re po 1. tÅetinÄ.");
       return;
     }
     const hsN = Number(hs);
@@ -927,7 +927,7 @@ function TipModal({
     const h1N = Number(h1);
     const a1N = Number(a1);
     if (h1N > hsN || a1N > asN) {
-      setErr("Skóre po 1. třetině nemůže být vyšší než finální skóre.");
+      setErr("SkÃ³re po 1. tÅetinÄ nemÅ¯Å¾e bÃ½t vyÅ¡Å¡Ã­ neÅ¾ finÃ¡lnÃ­ skÃ³re.");
       return;
     }
     setSaving(true);
@@ -952,9 +952,9 @@ function TipModal({
       if (error) {
         setErr(error.message);
       } else {
-        // Fire-and-forget notifikace adminovi (selže-li, neblokuje UX)
+        // Fire-and-forget notifikace adminovi (selÅ¾e-li, neblokuje UX)
         notifyLateTip(targetUser.display_name, match.id).catch(() => {});
-        alert("Zápas už začal. Tvůj tip jsme uložili a čeká na schválení Kubou.");
+        alert("ZÃ¡pas uÅ¾ zaÄal. TvÅ¯j tip jsme uloÅ¾ili a ÄekÃ¡ na schvÃ¡lenÃ­ Kubou.");
         onSaved();
       }
       return;
@@ -968,7 +968,7 @@ function TipModal({
 
   async function deletePick() {
     if (!existing) return;
-    if (!confirm(`Smazat tip hráče ${targetUser.display_name}?`)) return;
+    if (!confirm(`Smazat tip hrÃ¡Äe ${targetUser.display_name}?`)) return;
     setSaving(true);
     setErr("");
     const sb = createClient();
@@ -985,32 +985,87 @@ function TipModal({
   const homeFlag = flagUrl(match.home_code);
   const awayFlag = flagUrl(match.away_code);
 
-  // Portal: render modal jako přímé dítě <body> aby se obešel jakýkoli ancestor
-  // s transform/filter/contain (vytvářející containing block pro position:fixed
-  // — způsobovalo right-aligned modal na mobilu).
+  // Portal: render modal jako pÅÃ­mÃ© dÃ­tÄ <body> aby se obeÅ¡el jakÃ½koli ancestor
+  // s transform/filter/contain (vytvÃ¡ÅejÃ­cÃ­ containing block pro position:fixed
+  // â zpÅ¯sobovalo right-aligned modal na mobilu).
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
+  }, []);
+  // visualViewport-anchored modal centering — fixes iOS Safari right-alignment when
+  // viewport meta initial-scale<1 makes layout viewport wider than visual viewport.
+  const [vvCenter, setVvCenter] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => {
+      const vv = window.visualViewport;
+      if (vv) {
+        setVvCenter({
+          x: vv.offsetLeft + vv.width / 2,
+          y: vv.offsetTop + vv.height / 2,
+          w: vv.width,
+          h: vv.height,
+        });
+      } else {
+        setVvCenter({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        });
+      }
+    };
+    update();
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener("resize", update);
+      vv.addEventListener("scroll", update);
+      return () => {
+        vv.removeEventListener("resize", update);
+        vv.removeEventListener("scroll", update);
+      };
+    }
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
   if (!mounted) return null;
 
   return createPortal(
     (
+    <>
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4"
+      className="fixed inset-0 z-40 bg-black/40"
       onClick={onClose}
+    />
+    <div
+      className="fixed z-50 rounded-lg bg-white p-6 shadow-xl"
+      style={
+        vvCenter
+          ? {
+              left: vvCenter.x + "px",
+              top: vvCenter.y + "px",
+              transform: "translate(-50%, -50%)",
+              width: Math.min(vvCenter.w - 32, 448) + "px",
+              maxHeight: vvCenter.h - 32 + "px",
+              overflowY: "auto",
+            }
+          : {
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "calc(100vw - 2rem)",
+              maxWidth: "28rem",
+            }
+      }
+      onClick={(e) => e.stopPropagation()}
     >
-      <div
-        className="mx-auto w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
         <div className="text-center">
           {asAdmin && (
             <p className="text-sm font-semibold text-neutral-700">
               {targetUser.display_name}
             </p>
           )}
-          {/* Row 1: datum + čas */}
+          {/* Row 1: datum + Äas */}
           <p className="text-sm text-neutral-600">
             {new Date(match.starts_at).toLocaleString("cs-CZ", {
               weekday: "short",
@@ -1021,11 +1076,11 @@ function TipModal({
               timeZone: "Europe/Prague",
             })}
           </p>
-          {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
-          {/* Row 2: tým vs tým. Vlajky v původních proporcích (h-[20px] w-auto).
-              Handicapy jsou absolute-positioned POD každou vlajkou, vycentrované na střed
-              vlajky (left-1/2 -translate-x-1/2). Nezasahují do flex layoutu — h2 zůstává
-              stejně široký jako bez handicapu. mb-5 přidá místo pro overflow handicap textu. */}
+          {/* Row 2: tÃ½m vs tÃ½m s vlajeÄkami z obou stran (full names i na mobilu) */}
+          {/* Row 2: tÃ½m vs tÃ½m. Vlajky v pÅ¯vodnÃ­ch proporcÃ­ch (h-[20px] w-auto).
+              Handicapy jsou absolute-positioned POD kaÅ¾dou vlajkou, vycentrovanÃ© na stÅed
+              vlajky (left-1/2 -translate-x-1/2). NezasahujÃ­ do flex layoutu â h2 zÅ¯stÃ¡vÃ¡
+              stejnÄ Å¡irokÃ½ jako bez handicapu. mb-5 pÅidÃ¡ mÃ­sto pro overflow handicap textu. */}
           <h2
             className={
               "mt-2 inline-flex items-center justify-center gap-2 text-lg font-semibold " +
@@ -1069,7 +1124,7 @@ function TipModal({
         <div className="mt-6 space-y-5">
           <div className="text-center">
             <label className="text-xs uppercase tracking-wide text-neutral-500">
-              Skóre po 60 minutách
+              SkÃ³re po 60 minutÃ¡ch
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
               <input
@@ -1109,7 +1164,7 @@ function TipModal({
 
           <div className="text-center">
             <label className="text-xs uppercase tracking-wide text-neutral-500">
-              Skóre po 1. třetině
+              SkÃ³re po 1. tÅetinÄ
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
               <input
@@ -1168,7 +1223,7 @@ function TipModal({
               onClick={onClose}
               className="rounded border px-4 py-2 text-sm hover:bg-neutral-50"
             >
-              Zrušit
+              ZruÅ¡it
             </button>
             <button
               ref={saveBtnRef}
@@ -1177,12 +1232,12 @@ function TipModal({
               disabled={saving}
               className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
             >
-              {saving ? "Ukládám…" : "Uložit tip"}
+              {saving ? "UklÃ¡dÃ¡mâ¦" : "UloÅ¾it tip"}
             </button>
           </div>
         </div>
-      </div>
     </div>
+    </>
     ),
     document.body,
   );
