@@ -87,7 +87,7 @@ export function NavLinks({
         Natipovals?
       </Link>
       <Link href="/hraci" className={hraciCls}>
-        Hráči
+        Hráči a aktivita
         {isAdmin && unapprovedCount > 0 && (
           <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
             {unapprovedCount}

@@ -111,7 +111,9 @@ export default async function HraciPage() {
   const teamMap = new Map(
     (teamsData ?? []).map((t: any) => [t.code, t as Team]),
   );
-  const auditRows = (auditData ?? []) as AuditRow[];
+  const allAudit = (auditData ?? []) as AuditRow[];
+  // Pro non-admin viewers schovej řádky bez changed_by (= cascadové smazání dummy účtů apod.)
+  const auditRows = isAdmin ? allAudit : allAudit.filter((r) => r.changed_by !== null);
 
   async function togglePaid(formData: FormData) {
     "use server";
@@ -147,13 +149,6 @@ export default async function HraciPage() {
 
     const id = String(formData.get("id"));
     if (id === caller.id) return;
-
-    const { data: target } = await sb
-      .from("profiles")
-      .select("is_admin, is_approved")
-      .eq("id", id)
-      .single();
-    if (!target || target.is_admin || target.is_approved) return;
 
     const admin = createServiceClient();
     await admin.auth.admin.deleteUser(id);
@@ -275,11 +270,12 @@ export default async function HraciPage() {
             {isAdmin && <th className="pr-4" style={{ width: "130px" }}>Status</th>}
             {isAdmin && <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>}
             <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
+            {isAdmin && <th className="py-2 pr-2 text-right">Smazat</th>}
           </tr>
         </thead>
         <tbody>
           {approvedPlayers.map((p: any) =>
-            renderRow(p, { showDelete: false, showZaplatil: true }),
+            renderRow(p, { showDelete: isAdmin, showZaplatil: true }),
           )}
         </tbody>
       </table>
@@ -319,11 +315,12 @@ export default async function HraciPage() {
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
                 <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
+                <th className="py-2 pr-2 text-right">Smazat</th>
               </tr>
             </thead>
             <tbody>
               {admins.map((p: any) =>
-                renderRow(p, { showDelete: false, showZaplatil: false }),
+                renderRow(p, { showDelete: isAdmin, showZaplatil: false }),
               )}
             </tbody>
           </table>
