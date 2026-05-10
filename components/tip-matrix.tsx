@@ -1019,15 +1019,23 @@ function TipModal({
             <span>{away?.name_cs ?? match.away_code}</span>
             {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
           </h2>
-          {/* Row 3: handicapy — home zarovnaný doprava (na pravý okraj home názvu),
-              away zarovnaný doleva (na levý okraj away názvu) */}
+          {/* Row 3: handicapy — zarovnaní na střed vlaječek (kopíruje h2 strukturu
+              s neviditelnými placeholdery pro názvy týmů). Handicap text je v relative
+              wrapperu o šířce 20px (= šířka vlaječky), absolutně vycentrovaný kolem středu. */}
           {match.home_handicap != null && (
-            <div className="mx-auto mt-1 grid max-w-fit grid-cols-2 gap-x-6 text-xs text-neutral-500">
-              <span className="text-right">
-                {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
+            <div className="mt-1 inline-flex items-center gap-2 text-xs text-neutral-500">
+              <span className="relative w-[20px]">
+                <span className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap">
+                  {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
+                </span>
               </span>
-              <span className="text-left">
-                {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
+              <span className="invisible text-lg font-semibold">{home?.name_cs ?? match.home_code}</span>
+              <span className="invisible text-lg font-semibold">vs</span>
+              <span className="invisible text-lg font-semibold">{away?.name_cs ?? match.away_code}</span>
+              <span className="relative w-[20px]">
+                <span className="absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap">
+                  {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
+                </span>
               </span>
             </div>
           )}
