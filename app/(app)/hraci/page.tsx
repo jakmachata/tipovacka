@@ -86,7 +86,7 @@ export default async function HraciPage() {
       .from("picks_audit")
       .select("*")
       .order("changed_at", { ascending: false })
-      .limit(100),
+      .limit(50),
     supabase.from("matches").select("*"),
     supabase.from("teams").select("*"),
   ]);
@@ -112,8 +112,14 @@ export default async function HraciPage() {
     (teamsData ?? []).map((t: any) => [t.code, t as Team]),
   );
   const allAudit = (auditData ?? []) as AuditRow[];
-  // Pro non-admin viewers schovej řádky bez changed_by (= cascadové smazání dummy účtů apod.)
-  const auditRows = isAdmin ? allAudit : allAudit.filter((r) => r.changed_by !== null);
+  // Pro non-admin viewers schovej řádky kde "Změnil" by se zobrazil jako "-":
+  // - changed_by je null (cascadové DELETE bez auth.uid())
+  // - changed_by je UUID smazaného uživatele (nemáme jeho profile)
+  const auditRows = isAdmin
+    ? allAudit
+    : allAudit.filter(
+        (r) => r.changed_by !== null && profileMap.has(r.changed_by),
+      );
 
   async function togglePaid(formData: FormData) {
     "use server";
@@ -329,7 +335,7 @@ export default async function HraciPage() {
 
       <h2 className="mb-3 mt-10 text-lg font-semibold text-neutral-700">Aktivita</h2>
       <p className="mb-3 text-xs text-neutral-500">
-        Posledních 100 změn tipů (vytvoření, úpravy, smazání).
+        Posledních 50 změn tipů (vytvoření, úpravy, smazání).
       </p>
       <div className="overflow-x-auto">
         <table className="text-sm">

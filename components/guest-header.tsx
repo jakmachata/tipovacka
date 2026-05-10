@@ -183,7 +183,7 @@ export function GuestHeader() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="email"
-                  className="w-full rounded border px-2 py-1.5 text-sm"
+                  className="w-full rounded border px-2 py-1.5 text-base"
                 />
                 <div className="relative">
                   <input
@@ -193,7 +193,7 @@ export function GuestHeader() {
                     required
                     minLength={mode === "register" ? 6 : undefined}
                     placeholder={mode === "register" ? "heslo (min. 6 znaků)" : "heslo"}
-                    className="w-full rounded border px-2 py-1.5 pr-9 text-sm"
+                    className="w-full rounded border px-2 py-1.5 pr-9 text-base"
                   />
                   <button
                     type="button"
@@ -214,7 +214,7 @@ export function GuestHeader() {
                     required
                     minLength={6}
                     placeholder="heslo znovu"
-                    className="w-full rounded border px-2 py-1.5 text-sm"
+                    className="w-full rounded border px-2 py-1.5 text-base"
                   />
                 )}
                 {err && <p className="text-xs text-rose-600">{err}</p>}
