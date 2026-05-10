@@ -668,7 +668,7 @@ export function TipMatrix({
                                 score
                                   ? score.exact_points > 0
                                     ? "text-fuchsia-600 font-bold"
-                                    : "text-neutral-700"
+                                    : "text-[#333333]"
                                   : ""
                               }
                             >
