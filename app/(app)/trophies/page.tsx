@@ -65,7 +65,7 @@ export default async function TrophiesPage() {
             return (
               <li
                 key={t.id}
-                className="w-full max-w-[440px] rounded-lg border p-4"
+                className="w-full max-w-[456px] rounded-lg border p-4"
               >
                 {rows.length === 0 ? (
                   <>
@@ -83,8 +83,8 @@ export default async function TrophiesPage() {
                         <col style={{ width: 40 }} />
                         <col style={{ width: 170 }} />
                         <col style={{ width: 40 }} />
-                        <col style={{ width: 60 }} />
-                        <col style={{ width: 60 }} />
+                        <col style={{ width: 68 }} />
+                        <col style={{ width: 68 }} />
                       </colgroup>
                       <thead>
                         <tr className="text-left">

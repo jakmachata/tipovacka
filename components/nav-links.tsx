@@ -21,7 +21,7 @@ export function NavLinks({
   // Aktivní stav přebarví obě 2px linky (přes font-bold + border-current).
   // Mobile menší (14 px), desktop 17 px.
   const baseCls =
-    "inline-flex min-h-[51px] items-center px-2 py-2 rounded transition text-[15px] md:text-[18px] border-y-2 border-transparent md:min-h-[66px]";
+    "inline-flex min-h-[51px] items-center px-2 py-2 rounded transition text-[16px] md:text-[18px] border-y-2 border-transparent md:min-h-[66px]";
   // !border-current forsuje barvu nad baseCls .border-transparent (Tailwind class source order).
   const activeMark = "font-bold !border-current";
   const cls = (href: string, extra = "") =>
