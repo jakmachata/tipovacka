@@ -999,16 +999,8 @@ function TipModal({
               {targetUser.display_name}
             </p>
           )}
-          <h2 className="mt-1 inline-flex items-center gap-2 text-lg font-semibold">
-            {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[16px] w-auto rounded-sm shadow-sm" />}
-            <span className="md:hidden">{match.home_code}</span>
-            <span className="hidden md:inline">{home?.name_cs}</span>
-            <span className="text-neutral-400">vs</span>
-            {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[16px] w-auto rounded-sm shadow-sm" />}
-            <span className="md:hidden">{match.away_code}</span>
-            <span className="hidden md:inline">{away?.name_cs}</span>
-          </h2>
-          <p className="mt-1 text-sm text-neutral-600">
+          {/* Row 1: datum + čas */}
+          <p className="text-sm text-neutral-600">
             {new Date(match.starts_at).toLocaleString("cs-CZ", {
               weekday: "short",
               day: "numeric",
@@ -1017,13 +1009,23 @@ function TipModal({
               minute: "2-digit",
               timeZone: "Europe/Prague",
             })}
-            {match.home_handicap != null && (
-              <span className="ml-2">
-                · handicap {match.home_handicap > 0 ? "+" : ""}
-                {match.home_handicap}
-              </span>
-            )}
           </p>
+          {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
+          <h2 className="mt-2 inline-flex items-center justify-center gap-2 text-lg font-semibold">
+            {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
+            <span>{home?.name_cs ?? match.home_code}</span>
+            <span className="text-neutral-400">vs</span>
+            <span>{away?.name_cs ?? match.away_code}</span>
+            {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
+          </h2>
+          {/* Row 3: handicap obou týmů */}
+          {match.home_handicap != null && (
+            <p className="mt-1 text-xs text-neutral-500">
+              <span>{match.home_code} ({match.home_handicap > 0 ? "+" : ""}{match.home_handicap})</span>
+              <span className="mx-2">·</span>
+              <span>{match.away_code} ({-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap})</span>
+            </p>
+          )}
         </div>
 
         <div className="mt-6 space-y-5">
