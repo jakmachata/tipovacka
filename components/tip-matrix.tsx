@@ -1019,13 +1019,17 @@ function TipModal({
             <span>{away?.name_cs ?? match.away_code}</span>
             {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
           </h2>
-          {/* Row 3: handicapy obou týmů (CAN-2.5  CZE+1.5) */}
+          {/* Row 3: handicapy — home zarovnaný doprava (na pravý okraj home názvu),
+              away zarovnaný doleva (na levý okraj away názvu) */}
           {match.home_handicap != null && (
-            <p className="mt-1 text-xs text-neutral-500">
-              <span>{match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}</span>
-              <span className="mx-3"> </span>
-              <span>{match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}</span>
-            </p>
+            <div className="mx-auto mt-1 grid max-w-fit grid-cols-2 gap-x-6 text-xs text-neutral-500">
+              <span className="text-right">
+                {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
+              </span>
+              <span className="text-left">
+                {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
+              </span>
+            </div>
           )}
         </div>
 
