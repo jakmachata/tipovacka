@@ -622,15 +622,15 @@ export function TipMatrix({
                       <div className="relative h-full">
                         {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
                         <div
-                          className="absolute left-0 right-0 text-center text-base font-semibold"
-                          style={{ top: "9.5px", lineHeight: "20px" }}
+                          className="absolute left-0 right-0 text-center text-lg font-semibold"
+                          style={{ top: "9px", lineHeight: "22px" }}
                         >
                           {result}
                         </div>
                         {/* Výsledek po 1. třetině — bottom zarovnaný s tip row 3 bottom; stejná velikost jako result */}
                         <div
-                          className="absolute left-0 right-0 bottom-0 text-center text-base text-neutral-400"
-                          style={{ lineHeight: "20px" }}
+                          className="absolute left-0 right-0 bottom-0 text-center text-sm text-neutral-400"
+                          style={{ lineHeight: "18px" }}
                         >
                           {m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
                         </div>
@@ -668,7 +668,7 @@ export function TipMatrix({
                                 score
                                   ? score.exact_points > 0
                                     ? "text-fuchsia-600 font-bold"
-                                    : "text-[#333333]"
+                                    : "text-[#595959]"
                                   : ""
                               }
                             >
