@@ -358,7 +358,7 @@ export function TipMatrix({
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
   // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
   // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
-  const headerBase = "sticky top-0 md:top-[120px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  const headerBase = "sticky top-0 md:top-[124px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -393,7 +393,7 @@ export function TipMatrix({
       {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
           overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
           isAdmin checkbox sedí v pevném panelu napravo. */}
-      <div className="fixed inset-x-0 top-[104px] md:top-[80px] z-[45] bg-white transform-gpu">
+      <div className="fixed inset-x-0 top-[104px] md:top-[84px] z-[45] bg-white transform-gpu">
         <div className="mx-auto flex h-[40px] max-w-7xl items-center px-4">
           <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap">
             <span className="text-xs text-neutral-500">
@@ -1011,23 +1011,22 @@ function TipModal({
             })}
           </p>
           {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
+          {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
           <h2 className="mt-2 inline-flex items-center justify-center gap-2 text-lg font-semibold">
             {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
-            {match.home_handicap != null && (
-              <span className="text-sm font-normal text-neutral-500">
-                {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
-              </span>
-            )}
             <span>{home?.name_cs ?? match.home_code}</span>
             <span className="text-neutral-400">vs</span>
-            {match.home_handicap != null && (
-              <span className="text-sm font-normal text-neutral-500">
-                {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
-              </span>
-            )}
             <span>{away?.name_cs ?? match.away_code}</span>
             {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
           </h2>
+          {/* Row 3: handicapy obou týmů (CAN-2.5  CZE+1.5) */}
+          {match.home_handicap != null && (
+            <p className="mt-1 text-xs text-neutral-500">
+              <span>{match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}</span>
+              <span className="mx-3"> </span>
+              <span>{match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}</span>
+            </p>
+          )}
         </div>
 
         <div className="mt-6 space-y-5">
@@ -1048,11 +1047,11 @@ function TipModal({
                 value={hs}
                 onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-20 w-20 rounded border px-3 text-center text-2xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
                 placeholder=""
                 autoFocus
               />
-              <span className="text-2xl">:</span>
+              <span className="text-xl">:</span>
               <input
                 ref={asRef}
                 type="text"
@@ -1065,7 +1064,7 @@ function TipModal({
                 value={as_}
                 onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-20 w-20 rounded border px-3 text-center text-2xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
                 placeholder=""
               />
             </div>
@@ -1088,10 +1087,10 @@ function TipModal({
                 value={h1}
                 onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-20 w-20 rounded border px-3 text-center text-2xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
                 placeholder=""
               />
-              <span className="text-2xl">:</span>
+              <span className="text-xl">:</span>
               <input
                 ref={a1Ref}
                 type="text"
@@ -1104,7 +1103,7 @@ function TipModal({
                 value={a1}
                 onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-20 w-20 rounded border px-3 text-center text-2xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
                 placeholder=""
               />
             </div>
