@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { saveProfileAction } from "@/app/(app)/profile/actions";
 
 interface Props {
   userId: string;
@@ -55,43 +56,14 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
     try { localStorage.setItem("tipovacka:emailPref", emailPref ? "1" : "0"); } catch {}
   }, [emailPref, prefsLoaded]);
 
-  // Auto-save Přezdívka & barvy s debounce po změně.
-  const initialMount = useRef(true);
-  useEffect(() => {
-    if (initialMount.current) {
-      initialMount.current = false;
-      return;
-    }
-    if (!name.trim()) return;
-    const t = setTimeout(() => {
-      void saveProfile();
-    }, 500);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, bg, text]);
-
   async function saveProfile() {
     setSavingProfile(true);
     setProfileErr("");
     setProfileMsg("");
-    const sb = createClient();
-    const trimmed = name.trim().slice(0, 12);
-    if (!trimmed) {
-      setProfileErr("Přezdívka nemůže být prázdná.");
-      setSavingProfile(false);
-      return;
-    }
-    const { error } = await sb
-      .from("profiles")
-      .update({
-        display_name: trimmed,
-        bg_color: bg,
-        text_color: text,
-      })
-      .eq("id", userId);
+    const result = await saveProfileAction({ name, bg, text });
     setSavingProfile(false);
-    if (error) {
-      setProfileErr(error.message);
+    if ("error" in result) {
+      setProfileErr(result.error);
     } else {
       setProfileMsg("Uloženo ✓");
       setTimeout(() => setProfileMsg(""), 3000);
@@ -225,9 +197,14 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
           </p>
         )}
 
-        {savingProfile && (
-          <p className="mt-3 text-xs text-neutral-500">Ukládám…</p>
-        )}
+        <button
+          type="button"
+          onClick={saveProfile}
+          disabled={savingProfile}
+          className="mt-3 rounded bg-black px-4 py-2 text-sm text-white hover:bg-neutral-800 disabled:opacity-50"
+        >
+          {savingProfile ? "Ukládám…" : "Uložit profil"}
+        </button>
       </section>
       )}
       {!isAdmin && (
