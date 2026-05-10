@@ -54,7 +54,7 @@ export function NavLinks({
       <>
         <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/natipovals.png" alt="" className="h-5 w-5 md:h-6 md:w-6" />
+          <img src="/natipovals.png" alt="" className="h-7 w-7 md:h-8 md:w-8" />
           Natipovals?
         </Link>
         <Link href="/trophies" className={cls("/trophies")}>
@@ -69,7 +69,7 @@ export function NavLinks({
     <>
       <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/natipovals.png" alt="" className="h-5 w-5 md:h-6 md:w-6" />
+        <img src="/natipovals.png" alt="" className="h-7 w-7 md:h-8 md:w-8" />
         Natipovals?
       </Link>
       <Link href="/hraci" className={hraciCls}>
@@ -86,39 +86,6 @@ export function NavLinks({
       <Link href="/trophies" className={cls("/trophies")}>
         Trophy room
       </Link>
-      {isAdmin && (
-        <>
-          <span className="mx-2 text-neutral-300">|</span>
-          <Link href="/admin/matches" className={adminCls("/admin/matches")}>
-            Zápasy & výsledky
-          </Link>
-          <Link href="/admin/history" className={adminCls("/admin/history")}>
-            Historie tipů
-          </Link>
-          <Link href="/admin/trophies" className={adminCls("/admin/trophies")}>
-            Trophy edit
-          </Link>
-          <Link
-            href="/admin/pending"
-            className={
-              baseCls +
-              " " +
-              (active("/admin/pending")
-                ? "text-rose-700 " + activeMark
-                : pendingCount > 0
-                  ? "bg-rose-100 text-rose-800 ring-1 ring-rose-300 animate-pulse"
-                  : "text-amber-700 hover:bg-amber-50")
-            }
-          >
-            Pozdní tipy
-            {pendingCount > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
-                {pendingCount}
-              </span>
-            )}
-          </Link>
-        </>
-      )}
     </>
   );
 }

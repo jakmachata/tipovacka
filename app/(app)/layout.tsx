@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NavLinks } from "@/components/nav-links";
 import { GuestHeader } from "@/components/guest-header";
+import { AdminMenu } from "@/components/admin-menu";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -20,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
         {/* Menu — fixed pod mobile login barem (mobil) nebo úplně nahoře (desktop). */}
         <header className="fixed inset-x-0 top-[32px] md:top-0 z-50 border-b bg-white transform-gpu">
-          <div className="mx-auto flex h-[48px] max-w-7xl items-center px-4">
+          <div className="mx-auto flex h-[48px] max-w-7xl items-center px-4 md:h-[56px]">
             <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap text-sm">
               <NavLinks isAdmin={false} pendingCount={0} unapprovedCount={0} guest />
             </nav>
@@ -29,7 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </header>
-        <div className="h-[80px] md:h-[48px]" />
+        <div className="h-[80px] md:h-[56px]" />
         <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
       </>
     );
@@ -86,7 +87,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* Mobile-only fixed login info bar nahoře — uživatelská část je vždy úplně na vrchu. */}
       <div className="fixed inset-x-0 top-0 z-[51] border-b bg-white transform-gpu md:hidden">
         <div className="mx-auto flex h-[32px] max-w-7xl items-center gap-3 px-4 text-sm">
-          <span className="font-bold text-neutral-700">{profile?.display_name}</span>
+          <AdminMenu
+            displayName={profile?.display_name ?? ""}
+            isAdmin={!!profile?.is_admin}
+            pendingCount={pendingCount}
+          />
           <Link href="/profile" className="text-neutral-500 hover:underline">Nastavení</Link>
           <form action={logout}>
             <button className="text-neutral-500 hover:underline">Odhlásit</button>
@@ -96,7 +101,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* Menu — fixed pod mobile login barem (mobil) nebo úplně nahoře (desktop).
           Na desktopu má login info v pevném panelu napravo. */}
       <header className="fixed inset-x-0 top-[32px] md:top-0 z-50 border-b bg-white transform-gpu">
-        <div className="mx-auto flex h-[48px] max-w-7xl items-center px-4">
+        <div className="mx-auto flex h-[48px] max-w-7xl items-center px-4 md:h-[56px]">
           <nav className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap text-sm">
             <NavLinks
               isAdmin={!!profile?.is_admin}
@@ -105,7 +110,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             />
           </nav>
           <div className="hidden flex-shrink-0 items-center gap-2 pl-2 text-sm md:flex">
-            <span className="font-bold text-neutral-700">{profile?.display_name}</span>
+            <AdminMenu
+              displayName={profile?.display_name ?? ""}
+              isAdmin={!!profile?.is_admin}
+              pendingCount={pendingCount}
+            />
             <Link href="/profile" className="text-neutral-500 hover:underline">Nastavení</Link>
             <form action={logout}>
               <button className="text-neutral-500 hover:underline">Odhlásit</button>
@@ -113,7 +122,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </header>
-      <div className="h-[80px] md:h-[48px]" />
+      <div className="h-[80px] md:h-[56px]" />
       <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
     </>
   );
