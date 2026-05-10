@@ -665,8 +665,10 @@ export function TipMatrix({
                           <div className="text-center text-sm font-medium">
                             <span
                               className={
-                                score && score.exact_points > 0
-                                  ? "text-fuchsia-600 font-bold"
+                                score
+                                  ? score.exact_points > 0
+                                    ? "text-fuchsia-600 font-bold"
+                                    : "text-neutral-700"
                                   : ""
                               }
                             >
