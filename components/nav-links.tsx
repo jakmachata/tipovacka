@@ -52,8 +52,10 @@ export function NavLinks({
   if (guest) {
     return (
       <>
-        <Link href="/" className={cls("/", "font-semibold")}>
-          🏒 Natipovals?
+        <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/natipovals.png" alt="" className="h-5 w-5 md:h-6 md:w-6" />
+          Natipovals?
         </Link>
         <Link href="/trophies" className={cls("/trophies")}>
           Trophy room
@@ -65,8 +67,10 @@ export function NavLinks({
   // Pořadí pro přihlášené: Natipovals → Pravidla → Trophy room. Hráči jen admin.
   return (
     <>
-      <Link href="/" className={cls("/", "font-semibold")}>
-        🏒 Natipovals?
+      <Link href="/" className={cls("/", "font-semibold inline-flex items-center gap-1.5")}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/natipovals.png" alt="" className="h-5 w-5 md:h-6 md:w-6" />
+        Natipovals?
       </Link>
       <Link href="/hraci" className={hraciCls}>
         Hráči
