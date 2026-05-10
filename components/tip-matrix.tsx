@@ -692,7 +692,7 @@ export function TipMatrix({
                                 className={
                                   score && score.p1_points > 0
                                     ? "text-fuchsia-400"
-                                    : "text-neutral-500"
+                                    : "text-neutral-400"
                                 }
                               >
                                 ({pick.home_score_p1}:{pick.away_score_p1})
