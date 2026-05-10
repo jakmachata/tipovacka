@@ -358,7 +358,7 @@ export function TipMatrix({
   // Thead sticky lehce pod menu (60 px) — menu bg-white překrývá vrchních ~7 px thead přes z-stacking, takže žádný gray gap.
   // Sticky thead pod fixed login barem (mobil 32 px) + menu (44 px) + Aktivní bar (64 px).
   // Aktivní bar má 20 px symbolický gap dolů (pb-5) — tipy „neprosvítají" pod thead.
-  const headerBase = "sticky top-0 md:top-[112px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
+  const headerBase = "sticky top-0 md:top-[120px] z-10 px-2 py-2 whitespace-nowrap text-white transform-gpu";
 
   const now = Date.now();
   const startOfDay = new Date();
@@ -393,7 +393,7 @@ export function TipMatrix({
       {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
           overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
           isAdmin checkbox sedí v pevném panelu napravo. */}
-      <div className="fixed inset-x-0 top-[92px] md:top-[72px] z-[45] bg-white transform-gpu">
+      <div className="fixed inset-x-0 top-[92px] md:top-[80px] z-[45] bg-white transform-gpu">
         <div className="mx-auto flex h-[40px] max-w-7xl items-center px-4">
           <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap">
             <span className="text-xs text-neutral-500">
@@ -1032,6 +1032,7 @@ function TipModal({
               Skóre po 60 minutách
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
+              {homeFlag && <img src={homeFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
               <input
                 ref={hsRef}
                 type="text"
@@ -1064,6 +1065,7 @@ function TipModal({
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
                 placeholder=""
               />
+              {awayFlag && <img src={awayFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
             </div>
           </div>
 
@@ -1072,6 +1074,7 @@ function TipModal({
               Skóre po 1. třetině
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
+              {homeFlag && <img src={homeFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
               <input
                 ref={h1Ref}
                 type="text"
@@ -1103,6 +1106,7 @@ function TipModal({
                 className="w-20 rounded border px-3 py-2 text-center text-2xl"
                 placeholder=""
               />
+              {awayFlag && <img src={awayFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
             </div>
           </div>
         </div>
