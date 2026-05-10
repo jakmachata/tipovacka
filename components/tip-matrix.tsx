@@ -1011,22 +1011,48 @@ function TipModal({
             })}
           </p>
           {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
-          {/* Row 2: tým vs tým s vlaječkami v původních proporcích */}
-          <h2 className="mt-2 inline-flex items-center justify-center gap-2 text-lg font-semibold">
-            {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
+          {/* Row 2: tým vs tým. Vlajky v původních proporcích (h-[20px] w-auto).
+              Handicapy jsou absolute-positioned POD každou vlajkou, vycentrované na střed
+              vlajky (left-1/2 -translate-x-1/2). Nezasahují do flex layoutu — h2 zůstává
+              stejně široký jako bez handicapu. mb-5 přidá místo pro overflow handicap textu. */}
+          <h2
+            className={
+              "mt-2 inline-flex items-center justify-center gap-2 text-lg font-semibold " +
+              (match.home_handicap != null ? "mb-5" : "")
+            }
+          >
+            <span className="relative">
+              {homeFlag && (
+                <img
+                  src={homeFlag}
+                  alt={match.home_code}
+                  className="h-[20px] w-auto rounded-sm shadow-sm"
+                />
+              )}
+              {match.home_handicap != null && (
+                <span className="absolute left-1/2 top-full mt-0.5 -translate-x-1/2 whitespace-nowrap text-xs font-normal text-neutral-500">
+                  {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
+                </span>
+              )}
+            </span>
             <span>{home?.name_cs ?? match.home_code}</span>
             <span className="text-neutral-400">vs</span>
             <span>{away?.name_cs ?? match.away_code}</span>
-            {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
+            <span className="relative">
+              {awayFlag && (
+                <img
+                  src={awayFlag}
+                  alt={match.away_code}
+                  className="h-[20px] w-auto rounded-sm shadow-sm"
+                />
+              )}
+              {match.home_handicap != null && (
+                <span className="absolute left-1/2 top-full mt-0.5 -translate-x-1/2 whitespace-nowrap text-xs font-normal text-neutral-500">
+                  {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
+                </span>
+              )}
+            </span>
           </h2>
-          {/* Row 3: handicapy obou týmů — prostě vycentrované v modalu */}
-          {match.home_handicap != null && (
-            <p className="mt-1 text-xs text-neutral-500">
-              {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
-              {"  "}
-              {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
-            </p>
-          )}
         </div>
 
         <div className="mt-6 space-y-5">
