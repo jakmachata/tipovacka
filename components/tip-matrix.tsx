@@ -393,7 +393,7 @@ export function TipMatrix({
       {/* Fixed Aktivní bar — drží pod menu (44 px) na obou breakpointech.
           overflow-x-auto na user listu zajišťuje konstantní výšku 36 px;
           isAdmin checkbox sedí v pevném panelu napravo. */}
-      <div className="fixed inset-x-0 top-[92px] md:top-[80px] z-[45] bg-white transform-gpu">
+      <div className="fixed inset-x-0 top-[104px] md:top-[80px] z-[45] bg-white transform-gpu">
         <div className="mx-auto flex h-[40px] max-w-7xl items-center px-4">
           <div className="flex flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap">
             <span className="text-xs text-neutral-500">
@@ -434,7 +434,7 @@ export function TipMatrix({
         </div>
       </div>
       <div className="h-[50px]" />
-      <div className="-mx-4 h-[calc(100dvh-142px)] overflow-auto md:h-auto md:overflow-visible md:px-4">
+      <div className="-mx-4 h-[calc(100dvh-154px)] overflow-auto md:h-auto md:overflow-visible md:px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -1013,19 +1013,21 @@ function TipModal({
           {/* Row 2: tým vs tým s vlaječkami z obou stran (full names i na mobilu) */}
           <h2 className="mt-2 inline-flex items-center justify-center gap-2 text-lg font-semibold">
             {homeFlag && <img src={homeFlag} alt={match.home_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
+            {match.home_handicap != null && (
+              <span className="text-sm font-normal text-neutral-500">
+                {match.home_code}{match.home_handicap > 0 ? "+" : ""}{match.home_handicap}
+              </span>
+            )}
             <span>{home?.name_cs ?? match.home_code}</span>
             <span className="text-neutral-400">vs</span>
+            {match.home_handicap != null && (
+              <span className="text-sm font-normal text-neutral-500">
+                {match.away_code}{-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap}
+              </span>
+            )}
             <span>{away?.name_cs ?? match.away_code}</span>
             {awayFlag && <img src={awayFlag} alt={match.away_code} className="h-[20px] w-auto rounded-sm shadow-sm" />}
           </h2>
-          {/* Row 3: handicap obou týmů */}
-          {match.home_handicap != null && (
-            <p className="mt-1 text-xs text-neutral-500">
-              <span>{match.home_code} ({match.home_handicap > 0 ? "+" : ""}{match.home_handicap})</span>
-              <span className="mx-2">·</span>
-              <span>{match.away_code} ({-match.home_handicap > 0 ? "+" : ""}{-match.home_handicap})</span>
-            </p>
-          )}
         </div>
 
         <div className="mt-6 space-y-5">
@@ -1034,7 +1036,6 @@ function TipModal({
               Skóre po 60 minutách
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
-              {homeFlag && <img src={homeFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
               <input
                 ref={hsRef}
                 type="text"
@@ -1047,7 +1048,7 @@ function TipModal({
                 value={hs}
                 onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="w-20 rounded border px-3 py-2 text-center text-2xl"
+                className="h-20 w-20 rounded border px-3 text-center text-2xl"
                 placeholder=""
                 autoFocus
               />
@@ -1064,10 +1065,9 @@ function TipModal({
                 value={as_}
                 onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="w-20 rounded border px-3 py-2 text-center text-2xl"
+                className="h-20 w-20 rounded border px-3 text-center text-2xl"
                 placeholder=""
               />
-              {awayFlag && <img src={awayFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
             </div>
           </div>
 
@@ -1076,7 +1076,6 @@ function TipModal({
               Skóre po 1. třetině
             </label>
             <div className="mt-1 flex items-center justify-center gap-3">
-              {homeFlag && <img src={homeFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
               <input
                 ref={h1Ref}
                 type="text"
@@ -1089,7 +1088,7 @@ function TipModal({
                 value={h1}
                 onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="w-20 rounded border px-3 py-2 text-center text-2xl"
+                className="h-20 w-20 rounded border px-3 text-center text-2xl"
                 placeholder=""
               />
               <span className="text-2xl">:</span>
@@ -1105,10 +1104,9 @@ function TipModal({
                 value={a1}
                 onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="w-20 rounded border px-3 py-2 text-center text-2xl"
+                className="h-20 w-20 rounded border px-3 text-center text-2xl"
                 placeholder=""
               />
-              {awayFlag && <img src={awayFlag} alt="" className="h-[20px] w-auto rounded-sm shadow-sm" />}
             </div>
           </div>
         </div>
