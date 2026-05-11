@@ -835,7 +835,7 @@ export function TipMatrix({
           onClose={() => setEditingTarget(null)}
           onSaved={() => {
             setEditingTarget(null);
-            location.reload();
+            router.refresh();
           }}
         />
       )}
@@ -850,7 +850,7 @@ export function TipMatrix({
           onClose={() => setPickingColorFor(null)}
           onSaved={() => {
             setPickingColorFor(null);
-            location.reload();
+            router.refresh();
           }}
         />
       )}
