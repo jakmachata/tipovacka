@@ -175,7 +175,7 @@ function TeamCell({
         </span>
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
-          <span className="inline-block w-[24px] text-right align-middle">
+          <span className="inline-block w-[24px] text-center align-middle">
             <img
               src={url}
               alt={t.code}
@@ -188,7 +188,7 @@ function TeamCell({
       <span className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex">
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
-          <span className="inline-block w-[24px] text-right align-middle">
+          <span className="inline-block w-[24px] text-center align-middle">
             <img
               src={url}
               alt={t.code}
