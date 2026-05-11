@@ -175,11 +175,11 @@ function TeamCell({
         </span>
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
-          <span className="inline-flex w-[24px] flex-shrink-0 justify-end">
+          <span className="inline-block w-[24px] text-right align-middle">
             <img
               src={url}
               alt={t.code}
-              className="inline-block h-[16px] w-auto rounded-sm shadow-sm"
+              className="inline-block h-[16px] w-auto rounded-sm shadow-sm align-middle"
             />
           </span>
         )}
@@ -188,11 +188,11 @@ function TeamCell({
       <span className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex">
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
-          <span className="inline-flex w-[24px] flex-shrink-0 justify-end">
+          <span className="inline-block w-[24px] text-right align-middle">
             <img
               src={url}
               alt={t.code}
-              className="inline-block h-[16px] w-auto rounded-sm shadow-sm"
+              className="inline-block h-[16px] w-auto rounded-sm shadow-sm align-middle"
             />
           </span>
         )}
@@ -581,7 +581,7 @@ export function TipMatrix({
                   {/* Mobile-only Zápas (merged Domácí + Hosté) */}
                   <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[145px] sticky left-[50px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
-                      <div className="flex items-baseline gap-1.5">
+                      <div className="flex items-center gap-1.5">
                         {home && (() => {
                           const url = flagUrl(home.code);
                           return url ? (
@@ -591,10 +591,10 @@ export function TipMatrix({
                         })()}
                         <span className="font-medium">{home?.code ?? "?"}</span>
                         {m.home_handicap != null && (
-                          <span className="text-[11px] text-neutral-500">{fmtHcp(m.home_handicap)}</span>
+                          <span className="text-neutral-500">{fmtHcp(m.home_handicap)}</span>
                         )}
                       </div>
-                      <div className="flex items-baseline gap-1.5">
+                      <div className="flex items-center gap-1.5">
                         {away && (() => {
                           const url = flagUrl(away.code);
                           return url ? (
@@ -604,7 +604,7 @@ export function TipMatrix({
                         })()}
                         <span className="font-medium">{away?.code ?? "?"}</span>
                         {m.home_handicap != null && (
-                          <span className="text-[11px] text-neutral-500">{fmtHcp(-m.home_handicap)}</span>
+                          <span className="text-neutral-500">{fmtHcp(-m.home_handicap)}</span>
                         )}
                       </div>
                     </div>
