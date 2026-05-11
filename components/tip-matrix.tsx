@@ -167,6 +167,12 @@ function TeamCell({
     <>
       {/* MOBILE: flag (vertically centered) + stacked code/hcp on right */}
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap md:hidden">
+        <span className="inline-flex flex-col items-center leading-tight">
+          <span>{t.code}</span>
+          {v !== null && (
+            <span className="text-[11px] text-neutral-500">{sign}</span>
+          )}
+        </span>
         {url && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -175,12 +181,6 @@ function TeamCell({
             className="inline-block h-[16px] w-auto rounded-sm shadow-sm"
           />
         )}
-        <span className="inline-flex flex-col leading-tight">
-          <span>{t.code}</span>
-          {v !== null && (
-            <span className="text-[11px] text-neutral-500">{sign}</span>
-          )}
-        </span>
       </span>
       {/* DESKTOP: flag + full name + (hcp) inline */}
       <span className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex">
