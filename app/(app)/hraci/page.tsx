@@ -17,7 +17,7 @@ function statusOf(p: { is_approved: boolean; is_admin?: boolean; is_rejected?: b
 }
 
 const STATUS_CLS: Record<Status, string> = {
-  Nevyřízený: "bg-yellow-100 text-yellow-800",
+  Nevyřízený: "bg-neutral-300 text-neutral-700",
   Neschválen: "bg-neutral-100 text-neutral-600",
   Tipující: "bg-emerald-100 text-emerald-800",
   Admin: "bg-amber-100 text-amber-800",
@@ -332,7 +332,7 @@ export default async function HraciPage() {
             </thead>
             <tbody>
               {admins.map((p: any) =>
-                renderRow(p, { showDelete: isAdmin, showZaplatil: false }),
+                renderRow(p, { showDelete: false, showZaplatil: false }),
               )}
             </tbody>
           </table>
