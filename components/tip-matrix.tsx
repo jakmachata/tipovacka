@@ -173,29 +173,29 @@ function TeamCell({
             <span className="text-[11px] text-neutral-500">{sign}</span>
           )}
         </span>
-        {url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <span className="inline-block w-[24px] text-center align-middle">
+        <span className="inline-block w-[24px] text-center align-middle">
+          {url && (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={url}
               alt={t.code}
               className="inline-block h-[16px] w-auto rounded-sm shadow-sm align-middle"
             />
-          </span>
-        )}
+          )}
+        </span>
       </span>
       {/* DESKTOP: flag + full name + (hcp) inline */}
       <span className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex">
-        {url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <span className="inline-block w-[24px] text-center align-middle">
+        <span className="inline-block w-[24px] text-center align-middle">
+          {url && (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={url}
               alt={t.code}
               className="inline-block h-[16px] w-auto rounded-sm shadow-sm align-middle"
             />
-          </span>
-        )}
+          )}
+        </span>
         <span>
           {t.name_cs}
           {v === null ? "" : ` (${sign})`}
