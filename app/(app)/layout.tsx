@@ -59,6 +59,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         .from("profiles")
         .select("id", { count: "exact", head: true })
         .eq("is_approved", false)
+        .eq("is_rejected", false)
         .not("email", "ilike", "%@tipovacka.local"),
     ]);
     pendingCount = pendingRes.count ?? 0;
