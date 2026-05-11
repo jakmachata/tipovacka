@@ -273,14 +273,14 @@ export function GuestHeader() {
                 </p>
               )}
               {mode === "login" && (
-                <p className="mt-2 text-[11px]">
+                <p className="mt-2 text-center text-[11px]">
                   <button
                   type="button"
                   onClick={() => {
                     setMode("forgot");
                     setErr("");
                   }}
-                  className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800 hover:bg-rose-200"
+                  className="text-neutral-600 hover:text-neutral-900 hover:underline"
                 >
                   Zapomenuté heslo
                 </button>
