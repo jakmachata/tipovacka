@@ -442,7 +442,7 @@ export function TipMatrix({
         */}
         <table
           className="text-xs border-separate border-spacing-0 table-fixed"
-          style={{ width: 50 + (teamColWidth < 160 ? teamColWidth * 2 - 35 : teamColWidth * 2) + 60 + players.length * 77 }}
+          style={{ width: 50 + (teamColWidth < 160 ? teamColWidth * 2 - 35 : teamColWidth * 2) + 75 + players.length * 77 }}
         >
           <colgroup>
             <col style={{ width: 50 }} />
@@ -451,20 +451,20 @@ export function TipMatrix({
             {/* Domácí/Hosté cols — viditelné jen na desktopu. Mobile má 0. */}
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
-            <col style={{ width: 60 }} />
+            <col style={{ width: 75 }} />
             {players.map((p) => (
               <col key={p.id} style={{ width: 77 }} />
             ))}
           </colgroup>
           <thead>
-            <tr>
-              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
+            <tr className="bg-neutral-900">
+              <th className={headerBase + " border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
               {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 md:invisible md:overflow-hidden bg-neutral-900 text-left sticky left-[50px] z-40"}>Zápas</th>
+              <th className={headerBase + " border-r-[1px] border-r-neutral-900 md:invisible md:overflow-hidden bg-neutral-900 text-left sticky left-[50px] z-40"}>Zápas</th>
               {/* Desktop-only Domácí/Hosté */}
-              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
-              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
-              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center sticky left-[160px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-transparent md:border-r-0"}>Výsledek</th>
+              <th className={headerBase + " border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
+              <th className={headerBase + " border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
+              <th className={headerBase + " border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center sticky left-[175px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-transparent md:border-r-0"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -617,7 +617,7 @@ export function TipMatrix({
                   <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center h-px sticky left-[160px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
+                  <td className={"px-2 py-2 text-center h-px sticky left-[175px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
                     {m.finalized ? (
                       <div className="relative h-full">
                         {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
