@@ -58,7 +58,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       supabase
         .from("profiles")
         .select("id", { count: "exact", head: true })
-        .eq("is_approved", false),
+        .eq("is_approved", false)
+        .not("email", "ilike", "%@tipovacka.local"),
     ]);
     pendingCount = pendingRes.count ?? 0;
     unapprovedCount = unapprovedRes.count ?? 0;
