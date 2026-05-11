@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 import { ColorPickerModal } from "@/components/color-picker-modal";
+import { setMyFavorites } from "@/lib/favorites-actions";
 import { notifyLateTip } from "@/lib/admin-notify";
 
 interface PlayerWithTotal extends Profile {
@@ -38,6 +39,7 @@ interface Props {
   scores: Score[];
   activeUsers?: ActiveUser[];
   pendingPicks?: PendingPick[];
+  myFavorites?: string[];
 }
 
 const HEADER_COLORS = [
@@ -245,6 +247,7 @@ export function TipMatrix({
   scores,
   activeUsers = [],
   pendingPicks = [],
+  myFavorites = [],
 }: Props) {
   const router = useRouter();
   // Ref na scrollovací wrapper (mobile sticky thead — wrapper má overflow-auto).
@@ -253,25 +256,14 @@ export function TipMatrix({
   const [editingTarget, setEditingTarget] = useState<
     { matchId: number; userId: string } | null
   >(null);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  // Načíst oblíbené z localStorage při mountu.
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("tipovacka:favorites");
-      if (raw) setFavorites(new Set(JSON.parse(raw)));
-    } catch {}
-  }, []);
+  const [favorites, setFavorites] = useState<Set<string>>(() => new Set(myFavorites));
   function toggleFavorite(id: string) {
     setFavorites((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
-      try {
-        localStorage.setItem(
-          "tipovacka:favorites",
-          JSON.stringify(Array.from(next)),
-        );
-      } catch {}
+      // Persist server-side (fire-and-forget; UI already updated optimistically above).
+      setMyFavorites(Array.from(next)).catch(() => {});
       return next;
     });
   }
