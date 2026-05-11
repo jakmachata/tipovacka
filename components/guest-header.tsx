@@ -31,7 +31,7 @@ function EyeIcon({ open }: { open: boolean }) {
 
 export function GuestHeader() {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -39,6 +39,7 @@ export function GuestHeader() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,6 +71,17 @@ export function GuestHeader() {
         return;
       }
       window.location.reload();
+    } else if (mode === "forgot") {
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/reset-password",
+      });
+      setBusy(false);
+      if (error) {
+        setErr(error.message);
+      } else {
+        setResetSent(true);
+      }
+      return;
     } else {
       // Validace shody hesel pro registraci.
       if (password !== password2) {
@@ -117,7 +129,28 @@ export function GuestHeader() {
       </button>
       {open && (
         <div className="absolute left-0 top-full z-[100] mt-1 w-72 rounded-lg border bg-white p-4 shadow-xl md:left-auto md:right-0">
-          {registerSuccess ? (
+          {resetSent ? (
+            <div className="space-y-3 text-sm">
+              <h3 className="font-semibold">Reset link odeslán ✅</h3>
+              <p className="text-neutral-600">
+                Pokud na adrese <strong>{email}</strong> existuje účet, dorazí ti e-mail s odkazem na nastavení nového hesla.
+              </p>
+              <p className="text-xs text-neutral-500">
+                Zkontroluj i spam, e-mail může chvíli trvat.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setResetSent(false);
+                  setMode("login");
+                  setEmail("");
+                }}
+                className="w-full rounded bg-black px-3 py-1.5 text-sm text-white"
+              >
+                Zavřít
+              </button>
+            </div>
+          ) : registerSuccess ? (
             <div className="space-y-3 text-sm">
               <h3 className="font-semibold">Skoro hotovo! ✅</h3>
               <p className="text-neutral-600">
@@ -185,7 +218,8 @@ export function GuestHeader() {
                   placeholder="email"
                   className="w-full rounded border px-2 py-1.5 text-base"
                 />
-                <div className="relative">
+                {mode !== "forgot" && (
+                  <div className="relative">
                   <input
                     type={showPw ? "text" : "password"}
                     value={password}
@@ -206,6 +240,7 @@ export function GuestHeader() {
                     <EyeIcon open={showPw} />
                   </button>
                 </div>
+                )}
                 {mode === "register" && (
                   <input
                     type={showPw ? "text" : "password"}
@@ -227,7 +262,9 @@ export function GuestHeader() {
                     ? "Zpracovávám…"
                     : mode === "login"
                       ? "Přihlásit"
-                      : "Vytvořit účet"}
+                      : mode === "forgot"
+                        ? "Odeslat reset link"
+                        : "Vytvořit účet"}
                 </button>
               </form>
               {mode === "register" && (
@@ -237,9 +274,16 @@ export function GuestHeader() {
               )}
               {mode === "login" && (
                 <p className="mt-2 text-[11px]">
-                  <span className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800">
-                    Zapomenuté heslo (zatím nefunkční - kontaktuj Kubu)
-                  </span>
+                  <button
+                  type="button"
+                  onClick={() => {
+                    setMode("forgot");
+                    setErr("");
+                  }}
+                  className="rounded bg-rose-100 px-1.5 py-0.5 text-rose-800 hover:bg-rose-200"
+                >
+                  Zapomenuté heslo
+                </button>
                 </p>
               )}
             </>
