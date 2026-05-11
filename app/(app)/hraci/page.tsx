@@ -8,14 +8,16 @@ import { DeleteAccountButton } from "@/components/delete-account-button";
 
 const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
-type Status = "Neschválen" | "Tipující" | "Admin";
+type Status = "Nevyřízený" | "Neschválen" | "Tipující" | "Admin";
 
-function statusOf(p: { is_approved: boolean; is_admin?: boolean }): Status {
+function statusOf(p: { is_approved: boolean; is_admin?: boolean; is_rejected?: boolean }): Status {
   if (p.is_admin) return "Admin";
-  return p.is_approved ? "Tipující" : "Neschválen";
+  if (p.is_approved) return "Tipující";
+  return p.is_rejected ? "Neschválen" : "Nevyřízený";
 }
 
 const STATUS_CLS: Record<Status, string> = {
+  Nevyřízený: "bg-yellow-100 text-yellow-800",
   Neschválen: "bg-neutral-100 text-neutral-600",
   Tipující: "bg-emerald-100 text-emerald-800",
   Admin: "bg-amber-100 text-amber-800",
@@ -167,16 +169,7 @@ export default async function HraciPage() {
     revalidatePath("/schedule");
   }
 
-  async function setRejected(formData: FormData) {
-    "use server";
-    const sb = await createClient();
-    const id = String(formData.get("id"));
-    const value = formData.get("value") === "true";
-    await sb.from("profiles").update({ is_rejected: value }).eq("id", id);
-    revalidatePath("/hraci");
-  }
-
-  function renderRow(p: any, opts: { showDelete: boolean; showZaplatil: boolean; showReject?: boolean; showUnreject?: boolean }) {
+  function renderRow(p: any, opts: { showDelete: boolean; showZaplatil: boolean }) {
     const s = statusOf(p);
     const isDummyEmail =
       typeof p.email === "string" &&
@@ -254,35 +247,15 @@ export default async function HraciPage() {
         </td>
         {opts.showDelete && (
           <td className="py-2 pr-2 text-right">
-            <div className="flex items-center justify-end gap-2">
-              {opts.showReject && p.id !== user!.id && (
-                <form action={setRejected}>
-                  <input type="hidden" name="id" value={p.id} />
-                  <input type="hidden" name="value" value="true" />
-                  <button type="submit" className="rounded border border-neutral-300 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100">
-                    Nevyřízený
-                  </button>
-                </form>
-              )}
-              {opts.showUnreject && p.id !== user!.id && (
-                <form action={setRejected}>
-                  <input type="hidden" name="id" value={p.id} />
-                  <input type="hidden" name="value" value="false" />
-                  <button type="submit" className="rounded border border-neutral-300 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100">
-                    Obnovit
-                  </button>
-                </form>
-              )}
-              {p.id !== user!.id && (
-                <DeleteAccountButton
-                  id={p.id}
-                  email={p.email ?? ""}
-                  displayName={p.display_name}
-                  isDummy={isDummyEmail}
-                  action={deleteAccount}
-                />
-              )}
-            </div>
+            {p.id !== user!.id && (
+              <DeleteAccountButton
+                id={p.id}
+                email={p.email ?? ""}
+                displayName={p.display_name}
+                isDummy={isDummyEmail}
+                action={deleteAccount}
+              />
+            )}
           </td>
         )}
       </tr>
@@ -337,7 +310,7 @@ export default async function HraciPage() {
             </thead>
             <tbody>
               {pendingPlayers.map((p: any) =>
-                renderRow(p, { showDelete: true, showZaplatil: true, showReject: true }),
+                renderRow(p, { showDelete: true, showZaplatil: true }),
               )}
             </tbody>
           </table>
@@ -384,7 +357,7 @@ export default async function HraciPage() {
             </thead>
             <tbody>
               {rejectedPlayers.map((p: any) =>
-                renderRow(p, { showDelete: true, showZaplatil: true, showUnreject: true }),
+                renderRow(p, { showDelete: true, showZaplatil: true }),
               )}
             </tbody>
           </table>
