@@ -464,7 +464,7 @@ export function TipMatrix({
               {/* Desktop-only Domácí/Hosté */}
               <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
               <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
-              <th className={headerBase + " bg-neutral-900 text-center w-[75px] sticky left-[195px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-neutral-500 md:border-r-0"}>Výsledek</th>
+              <th className={headerBase + " bg-neutral-900 text-center w-[60px] sticky left-[180px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-transparent md:border-r-0"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -617,7 +617,7 @@ export function TipMatrix({
                   <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center w-[75px] h-px sticky left-[195px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
+                  <td className={"px-2 py-2 text-center w-[60px] h-px sticky left-[180px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-transparent md:border-r-0 " + stripeBg}>
                     {m.finalized ? (
                       <div className="relative h-full">
                         {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
