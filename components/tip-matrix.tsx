@@ -460,7 +460,7 @@ export function TipMatrix({
             <tr>
               <th className={headerBase + " bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
               {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-              <th className={headerBase + " md:invisible md:overflow-hidden bg-neutral-900 text-left w-[145px] sticky left-[50px] z-40"}>Zápas</th>
+              <th className={headerBase + " md:invisible md:overflow-hidden bg-neutral-900 text-left w-[130px] sticky left-[50px] z-40"}>Zápas</th>
               {/* Desktop-only Domácí/Hosté */}
               <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
               <th className={headerBase + " invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
@@ -579,7 +579,7 @@ export function TipMatrix({
                     )}
                   </td>
                   {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[145px] sticky left-[50px] z-30 " + stripeBg}>
+                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[130px] sticky left-[50px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
                       <div className="flex items-center gap-1.5">
                         {home && (() => {
