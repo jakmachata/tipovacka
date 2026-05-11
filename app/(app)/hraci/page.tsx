@@ -97,6 +97,10 @@ export default async function HraciPage() {
   const unapprovedPlayers = (allProfiles ?? []).filter(
     (p: any) => !p.is_admin && !p.is_approved,
   );
+  // Split unapproved into pending (no admin decision yet) and rejected.
+  // "Nevyřízený" button moves pending → rejected; "Obnovit" reverses it.
+  const pendingPlayers = unapprovedPlayers.filter((p: any) => !p.is_rejected);
+  const rejectedPlayers = unapprovedPlayers.filter((p: any) => !!p.is_rejected);
   const admins = (allProfiles ?? []).filter((p: any) => p.is_admin);
 
   const profileMap = new Map(
@@ -163,7 +167,16 @@ export default async function HraciPage() {
     revalidatePath("/schedule");
   }
 
-  function renderRow(p: any, opts: { showDelete: boolean; showZaplatil: boolean }) {
+  async function setRejected(formData: FormData) {
+    "use server";
+    const sb = await createClient();
+    const id = String(formData.get("id"));
+    const value = formData.get("value") === "true";
+    await sb.from("profiles").update({ is_rejected: value }).eq("id", id);
+    revalidatePath("/hraci");
+  }
+
+  function renderRow(p: any, opts: { showDelete: boolean; showZaplatil: boolean; showReject?: boolean; showUnreject?: boolean }) {
     const s = statusOf(p);
     const isDummyEmail =
       typeof p.email === "string" &&
@@ -241,15 +254,35 @@ export default async function HraciPage() {
         </td>
         {opts.showDelete && (
           <td className="py-2 pr-2 text-right">
-            {p.id !== user!.id && (
-              <DeleteAccountButton
-                id={p.id}
-                email={p.email ?? ""}
-                displayName={p.display_name}
-                isDummy={isDummyEmail}
-                action={deleteAccount}
-              />
-            )}
+            <div className="flex items-center justify-end gap-2">
+              {opts.showReject && p.id !== user!.id && (
+                <form action={setRejected}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <input type="hidden" name="value" value="true" />
+                  <button type="submit" className="rounded border border-neutral-300 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100">
+                    Nevyřízený
+                  </button>
+                </form>
+              )}
+              {opts.showUnreject && p.id !== user!.id && (
+                <form action={setRejected}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <input type="hidden" name="value" value="false" />
+                  <button type="submit" className="rounded border border-neutral-300 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100">
+                    Obnovit
+                  </button>
+                </form>
+              )}
+              {p.id !== user!.id && (
+                <DeleteAccountButton
+                  id={p.id}
+                  email={p.email ?? ""}
+                  displayName={p.display_name}
+                  isDummy={isDummyEmail}
+                  action={deleteAccount}
+                />
+              )}
+            </div>
           </td>
         )}
       </tr>
@@ -286,7 +319,7 @@ export default async function HraciPage() {
         </tbody>
       </table>
 
-      {isAdmin && unapprovedPlayers.length > 0 && (
+      {isAdmin && pendingPlayers.length > 0 && (
         <>
           <h2 className="mb-3 mt-10 text-lg font-semibold text-neutral-700">
             Neschválení
@@ -303,8 +336,8 @@ export default async function HraciPage() {
               </tr>
             </thead>
             <tbody>
-              {unapprovedPlayers.map((p: any) =>
-                renderRow(p, { showDelete: true, showZaplatil: true }),
+              {pendingPlayers.map((p: any) =>
+                renderRow(p, { showDelete: true, showZaplatil: true, showReject: true }),
               )}
             </tbody>
           </table>
@@ -327,6 +360,31 @@ export default async function HraciPage() {
             <tbody>
               {admins.map((p: any) =>
                 renderRow(p, { showDelete: isAdmin, showZaplatil: false }),
+              )}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {isAdmin && rejectedPlayers.length > 0 && (
+        <>
+          <h2 className="mb-3 mt-10 text-lg font-semibold text-neutral-700">
+            Neschválené účty
+          </h2>
+          <table className="text-sm">
+            <thead className="border-b text-left text-neutral-500">
+              <tr>
+                <EmailTh />
+                <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
+                <th className="pr-4" style={{ width: "130px" }}>Status</th>
+                <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>
+                <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
+                <th className="py-2 pr-2 text-right">Smazat</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rejectedPlayers.map((p: any) =>
+                renderRow(p, { showDelete: true, showZaplatil: true, showUnreject: true }),
               )}
             </tbody>
           </table>
