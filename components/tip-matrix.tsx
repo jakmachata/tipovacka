@@ -247,6 +247,9 @@ export function TipMatrix({
   pendingPicks = [],
 }: Props) {
   const router = useRouter();
+  // Ref na scrollovací wrapper (mobile sticky thead — wrapper má overflow-auto).
+  // Použijeme ho pro zachování scroll pozice po router.refresh() po uložení tipu.
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [editingTarget, setEditingTarget] = useState<
     { matchId: number; userId: string } | null
   >(null);
@@ -435,7 +438,7 @@ export function TipMatrix({
         </div>
       </div>
       <div className="h-[50px]" />
-      <div className="-mx-4 h-[calc(100dvh-154px)] overflow-auto md:h-auto md:overflow-visible md:px-4">
+      <div ref={wrapperRef} className="-mx-4 h-[calc(100dvh-154px)] overflow-auto md:h-auto md:overflow-visible md:px-4">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -834,8 +837,21 @@ export function TipMatrix({
           teamMap={teamMap}
           onClose={() => setEditingTarget(null)}
           onSaved={() => {
+            // Zachovat scroll pozici — router.refresh() někdy způsobí, že prohlížeč
+            // resetuje scroll na 0,0 (zvlášť na iOS Safari po zavření modálu).
+            const sx = window.scrollX;
+            const sy = window.scrollY;
+            const wx = wrapperRef.current?.scrollLeft ?? 0;
+            const wy = wrapperRef.current?.scrollTop ?? 0;
             setEditingTarget(null);
             router.refresh();
+            requestAnimationFrame(() => {
+              window.scrollTo(sx, sy);
+              if (wrapperRef.current) {
+                wrapperRef.current.scrollLeft = wx;
+                wrapperRef.current.scrollTop = wy;
+              }
+            });
           }}
         />
       )}
