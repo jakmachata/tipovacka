@@ -60,6 +60,16 @@ export default async function SchedulePage() {
   // Pořadí sloupců: přihlášený první (pokud je hráč), ostatní podle bodů (sestupně),
   // pak abecedně. Host (no user) = jen seřazení podle bodů.
   const myId = user?.id ?? null;
+  // Oblíbení tipéři (sync across devices přes profiles.favorites).
+  let myFavorites: string[] = [];
+  if (myId) {
+    const { data: meRow } = await supabase
+      .from("profiles")
+      .select("favorites")
+      .eq("id", myId)
+      .maybeSingle();
+    myFavorites = ((meRow as any)?.favorites as string[] | null) ?? [];
+  }
   const players = ((profilesRes.data ?? []) as Profile[])
     .map((p) => ({ ...p, total: totals.get(p.id) ?? 0 }))
     .sort((a, b) => {
@@ -89,6 +99,7 @@ export default async function SchedulePage() {
       scores={scoresRes.data ?? []}
       activeUsers={activeUsers}
       pendingPicks={pendingRes.data ?? []}
+      myFavorites={myFavorites}
     />
   );
 }
