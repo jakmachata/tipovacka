@@ -577,12 +577,12 @@ export function TipMatrix({
                   {/* Mobile-only Zápas (merged Domácí + Hosté) */}
                   <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[145px] sticky left-[50px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex w-full items-center gap-1.5">
                         {home && (() => {
                           const url = flagUrl(home.code);
                           return url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={url} alt={home.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" />
+                            <img src={url} alt={home.code} className="ml-auto order-3 inline-block h-[14px] w-auto rounded-sm shadow-sm" />
                           ) : null;
                         })()}
                         <span className="font-medium">{home?.code ?? "?"}</span>
@@ -590,12 +590,12 @@ export function TipMatrix({
                           <span className="text-[11px] text-neutral-500">{fmtHcp(m.home_handicap)}</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex w-full items-center gap-1.5">
                         {away && (() => {
                           const url = flagUrl(away.code);
                           return url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={url} alt={away.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" />
+                            <img src={url} alt={away.code} className="ml-auto order-3 inline-block h-[14px] w-auto rounded-sm shadow-sm" />
                           ) : null;
                         })()}
                         <span className="font-medium">{away?.code ?? "?"}</span>
