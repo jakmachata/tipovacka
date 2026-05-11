@@ -3,17 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 
 // Po veřejném schedule je status binární. Mezistav „Netipující" zmizel.
-export type Status = "Neschválen" | "Tipující" | "Admin";
+export type Status = "Nevyřízený" | "Neschválen" | "Tipující" | "Admin";
 
-const ORDER: Status[] = ["Neschválen", "Tipující", "Admin"];
+const ORDER: Status[] = ["Nevyřízený", "Neschválen", "Tipující", "Admin"];
 
 const STATUS_CLS: Record<Status, string> = {
+  Nevyřízený: "bg-yellow-100 text-yellow-800",
   Neschválen: "bg-neutral-100 text-neutral-600",
   Tipující: "bg-emerald-100 text-emerald-800",
   Admin: "bg-amber-100 text-amber-800",
 };
 
 const STATUS_EMOJI: Record<Status, string> = {
+  Nevyřízený: "⏳",
   Neschválen: "❌",
   Tipující: "✅",
   Admin: "👑",
