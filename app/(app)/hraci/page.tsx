@@ -100,7 +100,7 @@ export default async function HraciPage() {
     (p: any) => !p.is_admin && !p.is_approved,
   );
   // Split unapproved into pending (no admin decision yet) and rejected.
-  // "Nevyřízený" button moves pending → rejected; "Obnovit" reverses it.
+  // Status "Nevyřízený" = pending decision; status "Neschválen" = rejected (moves to Neschválené účty).
   const pendingPlayers = unapprovedPlayers.filter((p: any) => !p.is_rejected);
   const rejectedPlayers = unapprovedPlayers.filter((p: any) => !!p.is_rejected);
   const admins = (allProfiles ?? []).filter((p: any) => p.is_admin);
