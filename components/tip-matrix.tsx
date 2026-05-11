@@ -1096,7 +1096,7 @@ function TipModal({
                 value={hs}
                 onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
                 autoFocus
               />
@@ -1113,7 +1113,7 @@ function TipModal({
                 value={as_}
                 onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
             </div>
@@ -1136,7 +1136,7 @@ function TipModal({
                 value={h1}
                 onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
               <span className="text-3xl">:</span>
@@ -1152,7 +1152,7 @@ function TipModal({
                 value={a1}
                 onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
             </div>
