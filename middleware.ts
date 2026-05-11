@@ -29,9 +29,11 @@ export async function middleware(request: NextRequest) {
     path === "/login" ||
     path === "/register" ||
     path === "/pending" ||
+    path === "/reset-password" ||
     path.startsWith("/login/") ||
     path.startsWith("/register/") ||
-    path.startsWith("/pending/");
+    path.startsWith("/pending/") ||
+    path.startsWith("/reset-password/");
   // Veřejně přístupné cesty bez přihlášení (kromě auth tras a Next.js internals).
   const isGuestAllowed =
     path === "/" ||
