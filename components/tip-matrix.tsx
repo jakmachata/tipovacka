@@ -442,29 +442,29 @@ export function TipMatrix({
         */}
         <table
           className="text-xs border-separate border-spacing-0 table-fixed"
-          style={{ width: 50 + (teamColWidth < 160 ? teamColWidth * 2 - 15 : teamColWidth * 2) + 75 + players.length * 77 }}
+          style={{ width: 50 + (teamColWidth < 160 ? teamColWidth * 2 - 35 : teamColWidth * 2) + 60 + players.length * 77 }}
         >
           <colgroup>
             <col style={{ width: 50 }} />
             {/* Zápas col — viditelný jen na mobilu (=teamColWidth*2). Desktop má 0. */}
-            <col style={{ width: teamColWidth < 160 ? teamColWidth * 2 - 15 : 0 }} />
+            <col style={{ width: teamColWidth < 160 ? teamColWidth * 2 - 35 : 0 }} />
             {/* Domácí/Hosté cols — viditelné jen na desktopu. Mobile má 0. */}
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
             <col style={{ width: teamColWidth < 160 ? 0 : teamColWidth }} />
-            <col style={{ width: 75 }} />
+            <col style={{ width: 60 }} />
             {players.map((p) => (
               <col key={p.id} style={{ width: 77 }} />
             ))}
           </colgroup>
           <thead>
             <tr>
-              <th className={headerBase + " border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
+              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center w-[50px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
               {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-              <th className={headerBase + " border-r-[1px] border-r-neutral-900 md:invisible md:overflow-hidden bg-neutral-900 text-left w-[110px] sticky left-[50px] z-40"}>Zápas</th>
+              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 md:invisible md:overflow-hidden bg-neutral-900 text-left sticky left-[50px] z-40"}>Zápas</th>
               {/* Desktop-only Domácí/Hosté */}
-              <th className={headerBase + " border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
-              <th className={headerBase + " border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
-              <th className={headerBase + " border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center w-[60px] sticky left-[160px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-transparent md:border-r-0"}>Výsledek</th>
+              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
+              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
+              <th className={headerBase + " -mr-px border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center sticky left-[160px] md:left-auto z-40 md:z-10 border-r-[3px] border-r-double border-r-transparent md:border-r-0"}>Výsledek</th>
               {players.map((p) => {
                 const isMineHeader = p.id === myUserId;
                 const hasCustom = !!p.bg_color;
@@ -579,7 +579,7 @@ export function TipMatrix({
                     )}
                   </td>
                   {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium w-[110px] sticky left-[50px] z-30 " + stripeBg}>
+                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium sticky left-[50px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
                       <div className="flex items-center gap-1.5">
                         {home && (() => {
@@ -617,7 +617,7 @@ export function TipMatrix({
                   <td className={"invisible overflow-hidden md:visible md:overflow-visible px-2 py-2 whitespace-nowrap font-medium md:w-[160px] " + stripeBg}>
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
-                  <td className={"px-2 py-2 text-center w-[60px] h-px sticky left-[160px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
+                  <td className={"px-2 py-2 text-center h-px sticky left-[160px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
                     {m.finalized ? (
                       <div className="relative h-full">
                         {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
@@ -1096,7 +1096,7 @@ function TipModal({
                 value={hs}
                 onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
                 autoFocus
               />
@@ -1113,7 +1113,7 @@ function TipModal({
                 value={as_}
                 onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
             </div>
@@ -1136,7 +1136,7 @@ function TipModal({
                 value={h1}
                 onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
               <span className="text-3xl">:</span>
@@ -1152,7 +1152,7 @@ function TipModal({
                 value={a1}
                 onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className="h-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
             </div>
