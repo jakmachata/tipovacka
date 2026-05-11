@@ -1084,11 +1084,11 @@ function TipModal({
                 value={hs}
                 onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
                 autoFocus
               />
-              <span className="text-xl">:</span>
+              <span className="text-3xl">:</span>
               <input
                 ref={asRef}
                 type="text"
@@ -1101,7 +1101,7 @@ function TipModal({
                 value={as_}
                 onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
             </div>
@@ -1124,10 +1124,10 @@ function TipModal({
                 value={h1}
                 onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
-              <span className="text-xl">:</span>
+              <span className="text-3xl">:</span>
               <input
                 ref={a1Ref}
                 type="text"
@@ -1140,7 +1140,7 @@ function TipModal({
                 value={a1}
                 onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-xl"
+                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
                 placeholder=""
               />
             </div>
