@@ -432,11 +432,6 @@ export default async function HraciPage() {
                           {formatPraguePretty(m.starts_at)}
                         </span>
                       )}
-                      {stageLabel && (
-                        <span className="mr-2 rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">
-                          {stageLabel}
-                        </span>
-                      )}
                       {matchLabel}
                       {m?.is_czech && (
                         <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-[11px] text-red-700">
