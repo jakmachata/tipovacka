@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { formatPraguePretty } from "@/lib/tz";
-import { STAGE_LABEL, type Match, type Team } from "@/lib/types";
+import { type Match, type Team } from "@/lib/types";
 import { StatusMenu } from "@/components/status-menu";
 import { setStatus } from "./actions";
 import { DeleteAccountButton } from "@/components/delete-account-button";
@@ -377,7 +377,7 @@ export default async function HraciPage() {
               <th className="pr-3">Akce</th>
               <th className="pr-3">Zápas</th>
               <th className="pr-3">60'</th>
-              <th className="pr-3">1. třetina</th>
+              <th className="pr-3">1 tř.</th>
               <th className="pr-3">Změnil</th>
             </tr>
           </thead>
@@ -396,8 +396,7 @@ export default async function HraciPage() {
                 const matchLabel = m
                   ? `${home?.name_cs ?? m.home_code} vs ${away?.name_cs ?? m.away_code}`
                   : `#${r.match_id}`;
-                const stageLabel = m && m.stage !== "group" ? STAGE_LABEL[m.stage] : "";
-                const tip60 =
+                  const tip60 =
                   r.home_score == null || r.away_score == null
                     ? "-"
                     : `${r.home_score}:${r.away_score}`;
