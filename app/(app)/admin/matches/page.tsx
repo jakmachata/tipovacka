@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { SaveMatchButton } from "@/components/save-match-button";
 import { STAGE_LABEL, type Match, type Team } from "@/lib/types";
 import { TimePicker } from "@/components/time-picker";
 import { pragueLocalToUTC, pragueParts, snap5 } from "@/lib/tz";
@@ -55,6 +56,7 @@ export default async function AdminMatchesPage() {
 
     const update: Record<string, unknown> = {
       home_handicap: num("home_handicap"),
+      tag: ((formData.get("tag") as string | null) ?? "").trim() || null,
       home_score,
       away_score,
       home_score_p1: num("home_score_p1"),
@@ -197,14 +199,25 @@ export default async function AdminMatchesPage() {
                 </div>
 
                 <div className="flex flex-col items-center text-xs">
-                  <span className="text-neutral-500">Skóre 60′</span>
+                  <label className="flex items-center gap-1 text-neutral-500">
+                Tag
+                <input
+                  name="tag"
+                  type="text"
+                  maxLength={6}
+                  defaultValue={m.tag ?? ""}
+                  placeholder="ČF / SF / …"
+                  className="w-16 rounded border px-2 py-1 text-center"
+                />
+              </label>
+              <span className="text-neutral-500">Skóre 60′</span>
                   <div className="mt-1 flex items-center gap-1">
                     <input
                       name="home_score"
                       type="number"
                       min={0}
                       defaultValue={m.home_score ?? ""}
-                      className="w-12 rounded border px-2 py-1 text-center"
+                      className="w-[78px] rounded border px-2 py-1 text-center"
                     />
                     <span>:</span>
                     <input
@@ -212,7 +225,7 @@ export default async function AdminMatchesPage() {
                       type="number"
                       min={0}
                       defaultValue={m.away_score ?? ""}
-                      className="w-12 rounded border px-2 py-1 text-center"
+                      className="w-[78px] rounded border px-2 py-1 text-center"
                     />
                   </div>
                 </div>
@@ -225,7 +238,7 @@ export default async function AdminMatchesPage() {
                       type="number"
                       min={0}
                       defaultValue={m.home_score_p1 ?? ""}
-                      className="w-12 rounded border px-2 py-1 text-center"
+                      className="w-[78px] rounded border px-2 py-1 text-center"
                     />
                     <span>:</span>
                     <input
@@ -233,14 +246,12 @@ export default async function AdminMatchesPage() {
                       type="number"
                       min={0}
                       defaultValue={m.away_score_p1 ?? ""}
-                      className="w-12 rounded border px-2 py-1 text-center"
+                      className="w-[78px] rounded border px-2 py-1 text-center"
                     />
                   </div>
                 </div>
 
-                <button className="rounded bg-neutral-900 px-3 py-1.5 text-xs text-white hover:bg-neutral-800">
-                  Uložit
-                </button>
+                <SaveMatchButton />
               </div>
 
               {m.finalized && (
