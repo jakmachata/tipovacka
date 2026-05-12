@@ -238,17 +238,17 @@ export default async function AdminMatchesPage() {
                   </div>
                 </div>
 
+                <div className="flex items-center gap-2">
                 <SaveMatchButton />
+                {m.finalized && (
+                  <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                    finalizováno
+                  </span>
+                )}
+              </div>
               </div>
 
               <div className="mt-2 flex items-center justify-between gap-3">
-                <div className="min-w-[120px]">
-                  {m.finalized && (
-                    <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
-                    finalizováno
-                  </span>
-                  )}
-                </div>
                 <div className="flex items-center gap-3 text-neutral-500">
                 <label className="flex items-center gap-1">
                   Tag
@@ -257,7 +257,6 @@ export default async function AdminMatchesPage() {
                     type="text"
                     maxLength={6}
                     defaultValue={m.tag ?? ""}
-                    placeholder="ČF / SF / …"
                     className="w-16 rounded border px-2 py-1 text-center"
                   />
                 </label>
@@ -274,7 +273,7 @@ export default async function AdminMatchesPage() {
                   />
                 </label>
               </div>
-                <div className="min-w-[120px] flex justify-end">
+                <div>
                   {m.finalized && (
                     <button
                     formAction={clearResult}
