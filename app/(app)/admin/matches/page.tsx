@@ -352,14 +352,14 @@ export default async function AdminMatchesPage({ searchParams }: { searchParams:
                 <form action={swapGameNo}>
                   <input type="hidden" name="idA" value={m.id} />
                   <input type="hidden" name="idB" value={arr[idx - 1].id} />
-                  <button type="submit" title="Posunout nahoru" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↑</button>
+                  <button type="submit" title="Posunout nahoru" className="rounded border px-2.5 py-1 text-base leading-none hover:bg-neutral-50">↑</button>
                 </form>
               )}
               {idx < arr.length - 1 && (
                 <form action={swapGameNo}>
                   <input type="hidden" name="idA" value={m.id} />
                   <input type="hidden" name="idB" value={arr[idx + 1].id} />
-                  <button type="submit" title="Posunout dolů" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↓</button>
+                  <button type="submit" title="Posunout dolů" className="rounded border px-2.5 py-1 text-base leading-none hover:bg-neutral-50">↓</button>
                 </form>
               )}
               <form action={deleteMatch}>
