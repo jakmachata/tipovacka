@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { STAGE_LABEL, STAGE_LABEL_SHORT, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
+import { type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 import { ColorPickerModal } from "@/components/color-picker-modal";
 import { setMyFavorites } from "@/lib/favorites-actions";
 import { notifyLateTip } from "@/lib/admin-notify";
@@ -565,7 +565,6 @@ export function TipMatrix({
               // CZE zápas má vlastní červené pozadí, jinak střídání bílá / velmi světlá žlutá.
               // Single solid bg per řádek; alternace odstraněna kvůli iter56 (vizuální linky v highlightnutých sloupcích).
               const stripeBg = m.is_czech ? "bg-red-50" : "bg-white";
-              const stageLabel = m.stage !== "group" ? STAGE_LABEL[m.stage] : null;
               rows.push(
                 <tr
                   key={m.id}
@@ -575,10 +574,9 @@ export function TipMatrix({
                   <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[50px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
                     <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
-                    {stageLabel && (
+                    {m.tag && (
                       <div className="mt-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
-                        <span className="md:hidden">{STAGE_LABEL_SHORT[m.stage]}</span>
-                        <span className="hidden md:inline">{stageLabel}</span>
+                        {m.tag}
                       </div>
                     )}
                   </td>
