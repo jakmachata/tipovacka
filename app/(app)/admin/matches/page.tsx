@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { SaveMatchButton } from "@/components/save-match-button";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { STAGE_LABEL, type Match, type Team } from "@/lib/types";
 import { TimePicker } from "@/components/time-picker";
 import { pragueLocalToUTC, pragueParts, snap5 } from "@/lib/tz";
@@ -32,7 +33,7 @@ function TeamFlag({ code }: { code: string }) {
 export default async function AdminMatchesPage() {
   const supabase = await createClient();
   const [{ data: matches }, { data: teams }] = await Promise.all([
-    supabase.from("matches").select("*").order("starts_at"),
+    supabase.from("matches").select("*").order("game_no"),
     supabase.from("teams").select("*"),
   ]);
   const teamMap = new Map((teams ?? []).map((t) => [t.code, t as Team]));
@@ -107,12 +108,67 @@ export default async function AdminMatchesPage() {
     revalidatePath("/leaderboard");
   }
 
+  async function addMatch() {
+    "use server";
+    const sb = await createClient();
+    const { data: maxRow } = await sb
+      .from("matches")
+      .select("game_no")
+      .order("game_no", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const nextGameNo = (maxRow?.game_no ?? 0) + 1;
+    const tomorrow = new Date();
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    tomorrow.setUTCHours(16, 0, 0, 0);
+    await sb.from("matches").insert({
+      game_no: nextGameNo,
+      starts_at: tomorrow.toISOString(),
+      home_code: "CZE",
+      away_code: "FIN",
+      stage: "group",
+    });
+    revalidatePath("/admin/matches");
+    revalidatePath("/");
+  }
+
+  async function deleteMatch(formData: FormData) {
+    "use server";
+    const sb = await createClient();
+    const id = Number(formData.get("id"));
+    await sb.from("matches").delete().eq("id", id);
+    revalidatePath("/admin/matches");
+    revalidatePath("/");
+    revalidatePath("/leaderboard");
+  }
+
+  async function swapGameNo(formData: FormData) {
+    "use server";
+    const sb = await createClient();
+    const idA = Number(formData.get("idA"));
+    const idB = Number(formData.get("idB"));
+    const { data: a } = await sb.from("matches").select("game_no").eq("id", idA).maybeSingle();
+    const { data: b } = await sb.from("matches").select("game_no").eq("id", idB).maybeSingle();
+    if (!a || !b) return;
+    // Swap via temp negative to avoid unique conflict
+    await sb.from("matches").update({ game_no: -Math.abs(a.game_no) - 1000000 }).eq("id", idA);
+    await sb.from("matches").update({ game_no: a.game_no }).eq("id", idB);
+    await sb.from("matches").update({ game_no: b.game_no }).eq("id", idA);
+    revalidatePath("/admin/matches");
+    revalidatePath("/");
+  }
+
   return (
     <main>
       <h1 className="mb-4 text-xl font-semibold">Zápasy & výsledky</h1>
+        <form action={addMatch} className="mb-3">
+          <button type="submit" className="rounded border border-neutral-300 bg-white px-3 py-1.5 text-sm hover:bg-neutral-50">
+            + Přidat zápas
+          </button>
+        </form>
 
       <div className="space-y-2">
-        {(matches ?? []).map((mx) => {
+        {(matches ?? []).map((mx, idx, arr) => {
           const m = mx as Match;
           const home = teamMap.get(m.home_code);
           const away = teamMap.get(m.away_code);
@@ -166,7 +222,7 @@ export default async function AdminMatchesPage() {
                     min={-9.5}
                     max={9.5}
                     defaultValue={m.home_handicap ?? ""}
-                    className="w-10 rounded border px-2 py-1 text-center"
+                    className="w-12 rounded border px-2 py-1 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder="±x.5"
                   />
                   <button
@@ -238,13 +294,35 @@ export default async function AdminMatchesPage() {
                   </div>
                 </div>
 
+                <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                <SaveMatchButton />
-                {m.finalized && (
-                  <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
-                    finalizováno
-                  </span>
-                )}
+                  <SaveMatchButton />
+                  {m.finalized && (
+                    <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                      finalizováno
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1">
+                  {idx > 0 && (
+                    <form action={swapGameNo}>
+                      <input type="hidden" name="idA" value={m.id} />
+                      <input type="hidden" name="idB" value={arr[idx - 1].id} />
+                      <button type="submit" title="Posunout nahoru" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↑</button>
+                    </form>
+                  )}
+                  {idx < arr.length - 1 && (
+                    <form action={swapGameNo}>
+                      <input type="hidden" name="idA" value={m.id} />
+                      <input type="hidden" name="idB" value={arr[idx + 1].id} />
+                      <button type="submit" title="Posunout dolů" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↓</button>
+                    </form>
+                  )}
+                  <form action={deleteMatch}>
+                    <input type="hidden" name="id" value={m.id} />
+                    <ConfirmDeleteButton />
+                  </form>
+                </div>
               </div>
               </div>
 
@@ -268,8 +346,10 @@ export default async function AdminMatchesPage() {
                     min={0}
                     max={99}
                     defaultValue={m.hcp_override_points ?? ""}
-                    placeholder="–"
-                    className="w-12 rounded border px-2 py-1 text-center"
+                    className={
+                      "w-12 rounded border px-2 py-1 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none " +
+                      (m.tag && m.hcp_override_points == null ? "border-red-500 ring-1 ring-red-500" : "")
+                    }
                   />
                 </label>
               </div>
