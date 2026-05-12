@@ -51,6 +51,7 @@ export interface Match {
   home_handicap: number | null;
   stage: MatchStage;
   tag: string | null;
+  hcp_override_points: number | null;
   is_czech: boolean;
   home_score: number | null;
   away_score: number | null;
