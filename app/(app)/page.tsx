@@ -30,7 +30,7 @@ export default async function SchedulePage() {
     activeRes,
     pendingRes,
   ] = await Promise.all([
-    supabase.from("matches").select("*").order("starts_at"),
+    supabase.from("matches").select("*").not("starts_at", "is", null).order("starts_at"),
     supabase.from("teams").select("*"),
     supabase
       .from("profiles")
