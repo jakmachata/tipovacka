@@ -425,14 +425,22 @@ export function TipMatrix({
             })()}
           </div>
           {isAdmin && (
-            <label className="flex flex-shrink-0 items-center gap-2 pl-2 text-xs text-neutral-600">
-              <input
-                type="checkbox"
-                checked={hidePast}
-                onChange={(e) => setHidePast(e.target.checked)}
-              />
-              Skrýt odehrané
-            </label>
+            <>
+              <a
+                href="/admin/schedule-new"
+                className="flex flex-shrink-0 items-center gap-1 rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-50"
+              >
+                Rozpis a výsledky
+              </a>
+              <label className="flex flex-shrink-0 items-center gap-2 pl-2 text-xs text-neutral-600">
+                <input
+                  type="checkbox"
+                  checked={hidePast}
+                  onChange={(e) => setHidePast(e.target.checked)}
+                />
+                Skrýt odehrané
+              </label>
+            </>
           )}
         </div>
       </div>
