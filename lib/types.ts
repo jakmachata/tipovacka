@@ -12,6 +12,16 @@ export const STAGE_LABEL: Record<MatchStage, string> = {
   final: "Finále",
 };
 
+// Krátké zkratky pro mobile — vejdou se do úzkého sloupce.
+export const STAGE_LABEL_SHORT: Record<MatchStage, string> = {
+  group: "",
+  prelim: "PK",
+  quarter: "ČF",
+  semi: "SF",
+  bronze: "Br.",
+  final: "F",
+};
+
 export interface Profile {
   id: string;
   display_name: string;
