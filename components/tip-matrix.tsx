@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { STAGE_LABEL, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
+import { STAGE_LABEL, STAGE_LABEL_SHORT, type Match, type Pick, type Profile, type Team, type Score } from "@/lib/types";
 import { ColorPickerModal } from "@/components/color-picker-modal";
 import { setMyFavorites } from "@/lib/favorites-actions";
 import { notifyLateTip } from "@/lib/admin-notify";
@@ -434,7 +434,7 @@ export function TipMatrix({
         </div>
       </div>
       <div className="h-[50px]" />
-      <div ref={wrapperRef} className="-mx-4 h-[calc(100dvh-154px)] overflow-auto md:h-auto md:overflow-visible md:px-4">
+      <div ref={wrapperRef} className="-mx-4 h-[calc(100dvh-154px)] overflow-auto pb-[25px] md:h-auto md:overflow-visible md:px-4 md:pb-0">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
@@ -574,7 +574,8 @@ export function TipMatrix({
                     <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                     {stageLabel && (
                       <div className="mt-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-800">
-                        {stageLabel}
+                        <span className="md:hidden">{STAGE_LABEL_SHORT[m.stage]}</span>
+                        <span className="hidden md:inline">{stageLabel}</span>
                       </div>
                     )}
                   </td>
@@ -1089,14 +1090,23 @@ function TipModal({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                maxLength={1}
+                maxLength={2}
                 autoComplete="off"
                 data-1p-ignore="true"
                 data-lpignore="true"
                 value={hs}
                 onChange={(e) => handleDigit(e.target.value, setHs, asRef)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setHs(String(Math.min(99, (parseInt(hs || "0", 10) || 0) + 1)));
+                  } else if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setHs(String(Math.max(0, (parseInt(hs || "0", 10) || 0) - 1)));
+                  }
+                }}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className={"h-[60px] w-[60px] rounded border px-2 text-center " + (hs.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
                 autoFocus
               />
@@ -1106,14 +1116,23 @@ function TipModal({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                maxLength={1}
+                maxLength={2}
                 autoComplete="off"
                 data-1p-ignore="true"
                 data-lpignore="true"
                 value={as_}
                 onChange={(e) => handleDigit(e.target.value, setAs, h1Ref)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setAs(String(Math.min(99, (parseInt(as_ || "0", 10) || 0) + 1)));
+                  } else if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setAs(String(Math.max(0, (parseInt(as_ || "0", 10) || 0) - 1)));
+                  }
+                }}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className={"h-[60px] w-[60px] rounded border px-2 text-center " + (as_.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
               />
             </div>
@@ -1129,14 +1148,23 @@ function TipModal({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                maxLength={1}
+                maxLength={2}
                 autoComplete="off"
                 data-1p-ignore="true"
                 data-lpignore="true"
                 value={h1}
                 onChange={(e) => handleDigit(e.target.value, setH1, a1Ref)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setH1(String(Math.min(99, (parseInt(h1 || "0", 10) || 0) + 1)));
+                  } else if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setH1(String(Math.max(0, (parseInt(h1 || "0", 10) || 0) - 1)));
+                  }
+                }}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className={"h-[60px] w-[60px] rounded border px-2 text-center " + (h1.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
               />
               <span className="text-3xl">:</span>
@@ -1145,14 +1173,23 @@ function TipModal({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                maxLength={1}
+                maxLength={2}
                 autoComplete="off"
                 data-1p-ignore="true"
                 data-lpignore="true"
                 value={a1}
                 onChange={(e) => handleDigit(e.target.value, setA1, saveBtnRef)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setA1(String(Math.min(99, (parseInt(a1 || "0", 10) || 0) + 1)));
+                  } else if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setA1(String(Math.max(0, (parseInt(a1 || "0", 10) || 0) - 1)));
+                  }
+                }}
                 onFocus={(e) => e.currentTarget.select()}
-                className="h-[60px] w-[60px] rounded border px-2 text-center text-3xl"
+                className={"h-[60px] w-[60px] rounded border px-2 text-center " + (a1.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
               />
             </div>
