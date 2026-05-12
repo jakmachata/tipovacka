@@ -12,14 +12,14 @@ export function ConfirmDeleteButton() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          className="rounded bg-red-600 px-2.5 py-1 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
         >
           {pending ? "Mažu…" : "Smazat zápas?"}
         </button>
         <button
           type="button"
           onClick={() => setArmed(false)}
-          className="rounded border px-2 py-1 text-xs hover:bg-neutral-50"
+          className="rounded border px-2.5 py-1 text-sm hover:bg-neutral-50"
         >
           Zpět
         </button>
@@ -32,7 +32,7 @@ export function ConfirmDeleteButton() {
       type="button"
       onClick={() => setArmed(true)}
       title="Smazat zápas"
-      className="rounded border px-2 py-1 text-xs hover:bg-red-50 hover:border-red-300"
+      className="rounded border px-2.5 py-1 text-base leading-none hover:bg-red-50 hover:border-red-300"
     >
       🗑
     </button>
