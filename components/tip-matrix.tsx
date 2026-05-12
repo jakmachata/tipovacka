@@ -916,7 +916,7 @@ function TipModal({
     setter: (v: string) => void,
     nextRef: React.RefObject<HTMLElement | null>,
   ) {
-    const d = val.replace(/\D/g, "").slice(0, 1);
+    const d = val.replace(/\D/g, "").slice(0, 2);
     setter(d);
     if (d.length === 1 && nextRef.current) {
       nextRef.current.focus({ preventScroll: true });
@@ -1105,7 +1105,10 @@ function TipModal({
                     setHs(String(Math.max(0, (parseInt(hs || "0", 10) || 0) - 1)));
                   }
                 }}
-                onFocus={(e) => e.currentTarget.select()}
+                onFocus={(e) => {
+                  const v = e.currentTarget.value;
+                  e.currentTarget.setSelectionRange(v.length, v.length);
+                }}
                 className={"h-[60px] w-[60px] rounded border px-2 text-center " + (hs.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
                 autoFocus
@@ -1131,7 +1134,10 @@ function TipModal({
                     setAs(String(Math.max(0, (parseInt(as_ || "0", 10) || 0) - 1)));
                   }
                 }}
-                onFocus={(e) => e.currentTarget.select()}
+                onFocus={(e) => {
+                  const v = e.currentTarget.value;
+                  e.currentTarget.setSelectionRange(v.length, v.length);
+                }}
                 className={"h-[60px] w-[60px] rounded border px-2 text-center " + (as_.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
               />
@@ -1163,7 +1169,10 @@ function TipModal({
                     setH1(String(Math.max(0, (parseInt(h1 || "0", 10) || 0) - 1)));
                   }
                 }}
-                onFocus={(e) => e.currentTarget.select()}
+                onFocus={(e) => {
+                  const v = e.currentTarget.value;
+                  e.currentTarget.setSelectionRange(v.length, v.length);
+                }}
                 className={"h-[60px] w-[60px] rounded border px-2 text-center " + (h1.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
               />
@@ -1188,7 +1197,10 @@ function TipModal({
                     setA1(String(Math.max(0, (parseInt(a1 || "0", 10) || 0) - 1)));
                   }
                 }}
-                onFocus={(e) => e.currentTarget.select()}
+                onFocus={(e) => {
+                  const v = e.currentTarget.value;
+                  e.currentTarget.setSelectionRange(v.length, v.length);
+                }}
                 className={"h-[60px] w-[60px] rounded border px-2 text-center " + (a1.length > 1 ? "text-xl" : "text-3xl")}
                 placeholder=""
               />
