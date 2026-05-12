@@ -74,6 +74,14 @@ export default async function HraciPage() {
     .eq("id", user!.id)
     .single();
   const isAdmin = !!meProfile?.is_admin;
+  let pendingCount = 0;
+  if (isAdmin) {
+    const { count } = await supabase
+      .from("pending_picks")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending");
+    pendingCount = count ?? 0;
+  }
 
   const { data: allProfiles } = await supabase
     .from("profiles")
@@ -272,7 +280,30 @@ export default async function HraciPage() {
 
   return (
     <main>
-      <h1 className="mb-4 text-xl font-semibold">Hráči a aktivita</h1>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">Hráči a aktivita</h1>
+        {isAdmin && (
+          <a
+            href="/admin/pending"
+            className={
+              "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs " +
+              (pendingCount > 0
+                ? "border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100"
+                : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50")
+            }
+          >
+            Pozdní tipy
+            <span
+              className={
+                "inline-flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-semibold " +
+                (pendingCount > 0 ? "bg-rose-600 text-white" : "bg-neutral-200 text-neutral-700")
+              }
+            >
+              {pendingCount}
+            </span>
+          </a>
+        )}
+      </div>
 
       <table className="text-sm">
         <thead className="border-b text-left text-neutral-500">
