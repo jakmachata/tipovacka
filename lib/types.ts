@@ -50,6 +50,7 @@ export interface Match {
   away_code: string;
   home_handicap: number | null;
   stage: MatchStage;
+  tag: string | null;
   is_czech: boolean;
   home_score: number | null;
   away_score: number | null;
