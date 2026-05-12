@@ -68,20 +68,6 @@ export function AdminMenu({ displayName, isAdmin, pendingCount = 0, bold = true 
             Zápasy & výsledky
           </Link>
           <Link
-            href="/admin/schedule-new"
-            onClick={() => setOpen(false)}
-            className={linkBase + " " + (isActive("/admin/schedule-new") ? linkActive : linkIdle)}
-          >
-            Nový schedule (beta)
-          </Link>
-          <Link
-            href="/admin/trophies"
-            onClick={() => setOpen(false)}
-            className={linkBase + " " + (isActive("/admin/trophies") ? linkActive : linkIdle)}
-          >
-            Trophy edit
-          </Link>
-          <Link
             href="/admin/pending"
             onClick={() => setOpen(false)}
             className={
