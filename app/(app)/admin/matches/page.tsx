@@ -184,27 +184,7 @@ export default async function AdminMatchesPage({ searchParams }: { searchParams:
           const { date: dateStr, time: timeStr } = m.starts_at ? pragueParts(m.starts_at) : { date: "", time: "" };
           const isCzech = m.is_czech;
           return (
-            <div key={m.id + "_wrap"}>
-            <div className="mt-3 flex items-center justify-end gap-1">
-              {idx > 0 && (
-                <form action={swapGameNo}>
-                  <input type="hidden" name="idA" value={m.id} />
-                  <input type="hidden" name="idB" value={arr[idx - 1].id} />
-                  <button type="submit" title="Posunout nahoru" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↑</button>
-                </form>
-              )}
-              {idx < arr.length - 1 && (
-                <form action={swapGameNo}>
-                  <input type="hidden" name="idA" value={m.id} />
-                  <input type="hidden" name="idB" value={arr[idx + 1].id} />
-                  <button type="submit" title="Posunout dolů" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↓</button>
-                </form>
-              )}
-              <form action={deleteMatch}>
-                <input type="hidden" name="id" value={m.id} />
-                <ConfirmDeleteButton />
-              </form>
-            </div>
+            <div key={m.id + "_wrap"} className="flex items-start gap-2 flex-wrap">
             <form
               action={saveMatch}
               className={
@@ -367,6 +347,26 @@ export default async function AdminMatchesPage({ searchParams }: { searchParams:
                 </div>
               </div>
             </form>
+            <div className="flex flex-col items-center gap-1 rounded border bg-white p-2">
+              {idx > 0 && (
+                <form action={swapGameNo}>
+                  <input type="hidden" name="idA" value={m.id} />
+                  <input type="hidden" name="idB" value={arr[idx - 1].id} />
+                  <button type="submit" title="Posunout nahoru" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↑</button>
+                </form>
+              )}
+              {idx < arr.length - 1 && (
+                <form action={swapGameNo}>
+                  <input type="hidden" name="idA" value={m.id} />
+                  <input type="hidden" name="idB" value={arr[idx + 1].id} />
+                  <button type="submit" title="Posunout dolů" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↓</button>
+                </form>
+              )}
+              <form action={deleteMatch}>
+                <input type="hidden" name="id" value={m.id} />
+                <ConfirmDeleteButton />
+              </form>
+            </div>
           </div>
             );
         })}
