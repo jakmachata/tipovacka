@@ -384,20 +384,16 @@ export default async function ScheduleNewPage({
                 </div>
                 </details>
                 <div className="flex flex-row items-center gap-1 rounded-md border bg-white p-1.5">
-                  {idx > 0 && (
-                    <form action={swapGameNo}>
-                      <input type="hidden" name="idA" value={m.id} />
-                      <input type="hidden" name="idB" value={arr[idx - 1].id} />
-                      <button type="submit" title="Posunout nahoru" className="rounded border px-2.5 py-1 text-base leading-none hover:bg-neutral-50">↑</button>
-                    </form>
-                  )}
-                  {idx < arr.length - 1 && (
-                    <form action={swapGameNo}>
-                      <input type="hidden" name="idA" value={m.id} />
-                      <input type="hidden" name="idB" value={arr[idx + 1].id} />
-                      <button type="submit" title="Posunout dolů" className="rounded border px-2.5 py-1 text-base leading-none hover:bg-neutral-50">↓</button>
-                    </form>
-                  )}
+                  <form action={swapGameNo} className={idx === 0 ? "invisible pointer-events-none" : ""} aria-hidden={idx === 0}>
+                    <input type="hidden" name="idA" value={m.id} />
+                    <input type="hidden" name="idB" value={idx > 0 ? arr[idx - 1].id : m.id} />
+                    <button type="submit" tabIndex={idx === 0 ? -1 : 0} title="Posunout nahoru" className="rounded border px-2.5 py-1 text-base leading-none hover:bg-neutral-50">↑</button>
+                  </form>
+                  <form action={swapGameNo} className={idx === arr.length - 1 ? "invisible pointer-events-none" : ""} aria-hidden={idx === arr.length - 1}>
+                    <input type="hidden" name="idA" value={m.id} />
+                    <input type="hidden" name="idB" value={idx < arr.length - 1 ? arr[idx + 1].id : m.id} />
+                    <button type="submit" tabIndex={idx === arr.length - 1 ? -1 : 0} title="Posunout dolů" className="rounded border px-2.5 py-1 text-base leading-none hover:bg-neutral-50">↓</button>
+                  </form>
                   <form action={deleteMatch}>
                     <input type="hidden" name="id" value={m.id} />
                     <ConfirmDeleteButton />
