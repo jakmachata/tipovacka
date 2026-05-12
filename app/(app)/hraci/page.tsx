@@ -280,9 +280,8 @@ export default async function HraciPage() {
 
   return (
     <main>
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Hráči a aktivita</h1>
-        {isAdmin && (
+      {isAdmin && (
+        <div className="mb-2">
           <a
             href="/admin/pending"
             className={
@@ -302,8 +301,9 @@ export default async function HraciPage() {
               {pendingCount}
             </span>
           </a>
-        )}
-      </div>
+        </div>
+      )}
+      <h1 className="mb-4 text-xl font-semibold">Hráči a aktivita</h1>
 
       <table className="text-sm">
         <thead className="border-b text-left text-neutral-500">
