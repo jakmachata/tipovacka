@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SaveMatchButton } from "@/components/save-match-button";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
@@ -30,7 +31,9 @@ function TeamFlag({ code }: { code: string }) {
   );
 }
 
-export default async function AdminMatchesPage() {
+export default async function AdminMatchesPage({ searchParams }: { searchParams: Promise<{ added?: string }> }) {
+  const sp = await searchParams;
+  const justAdded = sp?.added === "1";
   const supabase = await createClient();
   const [{ data: matches }, { data: teams }] = await Promise.all([
     supabase.from("matches").select("*").order("game_no"),
@@ -123,13 +126,14 @@ export default async function AdminMatchesPage() {
     tomorrow.setUTCHours(16, 0, 0, 0);
     await sb.from("matches").insert({
       game_no: nextGameNo,
-      starts_at: tomorrow.toISOString(),
-      home_code: "CZE",
-      away_code: "FIN",
+      starts_at: null,
+      home_code: null,
+      away_code: null,
       stage: "group",
     });
     revalidatePath("/admin/matches");
     revalidatePath("/");
+    redirect("/admin/matches?added=1");
   }
 
   async function deleteMatch(formData: FormData) {
@@ -161,6 +165,11 @@ export default async function AdminMatchesPage() {
   return (
     <main>
       <h1 className="mb-4 text-xl font-semibold">Zápasy & výsledky</h1>
+        {justAdded && (
+          <div className="mb-3 rounded border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+            ✓ Zápas přidán — vyplň údaje a ulož.
+          </div>
+        )}
         <form action={addMatch} className="mb-3">
           <button type="submit" className="rounded border border-neutral-300 bg-white px-3 py-1.5 text-sm hover:bg-neutral-50">
             + Přidat zápas
@@ -172,11 +181,31 @@ export default async function AdminMatchesPage() {
           const m = mx as Match;
           const home = teamMap.get(m.home_code);
           const away = teamMap.get(m.away_code);
-          const { date: dateStr, time: timeStr } = pragueParts(m.starts_at);
+          const { date: dateStr, time: timeStr } = m.starts_at ? pragueParts(m.starts_at) : { date: "", time: "" };
           const isCzech = m.is_czech;
           return (
+            <div key={m.id + "_wrap"}>
+            <div className="mt-3 flex items-center justify-end gap-1">
+              {idx > 0 && (
+                <form action={swapGameNo}>
+                  <input type="hidden" name="idA" value={m.id} />
+                  <input type="hidden" name="idB" value={arr[idx - 1].id} />
+                  <button type="submit" title="Posunout nahoru" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↑</button>
+                </form>
+              )}
+              {idx < arr.length - 1 && (
+                <form action={swapGameNo}>
+                  <input type="hidden" name="idA" value={m.id} />
+                  <input type="hidden" name="idB" value={arr[idx + 1].id} />
+                  <button type="submit" title="Posunout dolů" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↓</button>
+                </form>
+              )}
+              <form action={deleteMatch}>
+                <input type="hidden" name="id" value={m.id} />
+                <ConfirmDeleteButton />
+              </form>
+            </div>
             <form
-              key={m.id}
               action={saveMatch}
               className={
                 "w-[610px] max-w-full rounded border p-3 text-sm " +
@@ -187,12 +216,13 @@ export default async function AdminMatchesPage() {
 
               <header className="mb-2 flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-1.5 font-medium">
-                  <TeamFlag code={m.home_code} />
+                  {m.home_code && <TeamFlag code={m.home_code} />}
                   <select
                     name="home_code"
-                    defaultValue={m.home_code}
+                    defaultValue={m.home_code ?? ""}
                     className="rounded border px-1.5 py-0.5 text-sm"
                   >
+                    <option value="">—</option>
                     {(teams ?? []).map((t) => (
                       <option key={t.code} value={t.code}>
                         {t.name_cs}
@@ -200,12 +230,13 @@ export default async function AdminMatchesPage() {
                     ))}
                   </select>
                   <span className="text-neutral-400">vs</span>
-                  <TeamFlag code={m.away_code} />
+                  {m.away_code && <TeamFlag code={m.away_code} />}
                   <select
                     name="away_code"
-                    defaultValue={m.away_code}
+                    defaultValue={m.away_code ?? ""}
                     className="rounded border px-1.5 py-0.5 text-sm"
                   >
+                    <option value="">—</option>
                     {(teams ?? []).map((t) => (
                       <option key={t.code} value={t.code}>
                         {t.name_cs}
@@ -294,36 +325,7 @@ export default async function AdminMatchesPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <SaveMatchButton />
-                  {m.finalized && (
-                    <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
-                      finalizováno
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  {idx > 0 && (
-                    <form action={swapGameNo}>
-                      <input type="hidden" name="idA" value={m.id} />
-                      <input type="hidden" name="idB" value={arr[idx - 1].id} />
-                      <button type="submit" title="Posunout nahoru" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↑</button>
-                    </form>
-                  )}
-                  {idx < arr.length - 1 && (
-                    <form action={swapGameNo}>
-                      <input type="hidden" name="idA" value={m.id} />
-                      <input type="hidden" name="idB" value={arr[idx + 1].id} />
-                      <button type="submit" title="Posunout dolů" className="rounded border px-2 py-1 text-xs hover:bg-neutral-50">↓</button>
-                    </form>
-                  )}
-                  <form action={deleteMatch}>
-                    <input type="hidden" name="id" value={m.id} />
-                    <ConfirmDeleteButton />
-                  </form>
-                </div>
-              </div>
+                <SaveMatchButton />
               </div>
 
               <div className="mt-2 flex items-center justify-between gap-3">
@@ -365,7 +367,8 @@ export default async function AdminMatchesPage() {
                 </div>
               </div>
             </form>
-          );
+          </div>
+            );
         })}
       </div>
     </main>
