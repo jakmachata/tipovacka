@@ -250,7 +250,7 @@ export default async function ScheduleNewPage({
                 </summary>
 
                 <div className="border-t bg-white px-3 py-3">
-                  <form action={saveMatch} className="grid grid-cols-[110px_85px_140px_100px_1fr] items-end gap-2">
+                  <form action={saveMatch} className="grid grid-cols-[110px_70px_140px_100px_1fr] items-end gap-2">
                     <input type="hidden" name="id" value={m.id} />
                     {/* Row 1: Datum, Čas, Domácí, Handicap, Hosté */}
                     <label className="flex flex-col text-xs text-neutral-600">
@@ -264,7 +264,9 @@ export default async function ScheduleNewPage({
                     </label>
                     <label className="flex flex-col text-xs text-neutral-600">
                       Čas
-                      <TimePicker name="starts_time" defaultValue={dt.time} />
+                      <div className="w-full [&>button]:w-full">
+                        <TimePicker name="starts_time" defaultValue={dt.time} />
+                      </div>
                     </label>
                     <label className="flex flex-col text-xs text-neutral-600">
                       Domácí
