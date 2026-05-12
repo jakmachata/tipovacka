@@ -320,7 +320,7 @@ export default async function ScheduleNewPage({
                         className="rounded border px-2 py-1 text-center text-sm"
                       />
                     </label>
-                    <label className="flex flex-col text-xs text-neutral-600">
+                    <label className="flex flex-col items-center text-xs text-neutral-600">
                       Hcp body
                       <input
                         name="hcp_override_points"
@@ -329,12 +329,12 @@ export default async function ScheduleNewPage({
                         max={99}
                         defaultValue={m.hcp_override_points ?? ""}
                         className={
-                          "rounded border px-2 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none " +
+                          "w-10 rounded border px-1 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none " +
                           (tagMissingHcp ? "border-red-500 ring-1 ring-red-500" : "")
                         }
                       />
                     </label>
-                    <label className="flex flex-col text-xs text-neutral-600">
+                    <label className="flex flex-col items-center text-xs text-neutral-600">
                       Skóre 60′
                       <div className="mt-0.5 flex items-center justify-center gap-1">
                         <input
@@ -342,7 +342,7 @@ export default async function ScheduleNewPage({
                           type="number"
                           min={0}
                           defaultValue={m.home_score ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         />
                         <span>:</span>
                         <input
@@ -350,12 +350,12 @@ export default async function ScheduleNewPage({
                           type="number"
                           min={0}
                           defaultValue={m.away_score ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         />
                       </div>
                     </label>
                     <div />
-                    <label className="flex flex-col text-xs text-neutral-600">
+                    <label className="flex flex-col items-center text-xs text-neutral-600">
                       1. třetina
                       <div className="mt-0.5 flex items-center justify-center gap-1">
                         <input
@@ -363,7 +363,7 @@ export default async function ScheduleNewPage({
                           type="number"
                           min={0}
                           defaultValue={m.home_score_p1 ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         />
                         <span>:</span>
                         <input
@@ -371,7 +371,7 @@ export default async function ScheduleNewPage({
                           type="number"
                           min={0}
                           defaultValue={m.away_score_p1 ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         />
                       </div>
                     </label>
@@ -383,7 +383,7 @@ export default async function ScheduleNewPage({
 
                 </div>
                 </details>
-                <div className="flex flex-col items-center gap-1 rounded-md border bg-white p-1.5">
+                <div className="flex flex-row items-center gap-1 rounded-md border bg-white p-1.5">
                   {idx > 0 && (
                     <form action={swapGameNo}>
                       <input type="hidden" name="idA" value={m.id} />
