@@ -250,7 +250,7 @@ export default async function ScheduleNewPage({
                 </summary>
 
                 <div className="border-t bg-white px-3 py-3">
-                  <form action={saveMatch} className="grid grid-cols-[110px_85px_140px_60px_140px_auto] items-end gap-2">
+                  <form action={saveMatch} className="grid grid-cols-[110px_85px_140px_100px_1fr] items-end gap-2">
                     <input type="hidden" name="id" value={m.id} />
                     {/* Row 1: Datum, Čas, Domácí, Handicap, Hosté */}
                     <label className="flex flex-col text-xs text-neutral-600">
@@ -308,8 +308,7 @@ export default async function ScheduleNewPage({
                         ))}
                       </select>
                     </label>
-                    <div />
-                    {/* Row 2: Tag, Hcp body, Skóre (under Domácí), —, 1. třetina (under Hosté), Uložit */}
+                    {/* Row 2: Tag, Hcp body, Skóre (under Domácí), 1. třetina (under Handicap), Uložit (under Hosté) */}
                     <label className="flex flex-col text-xs text-neutral-600">
                       Tag
                       <input
@@ -317,10 +316,10 @@ export default async function ScheduleNewPage({
                         type="text"
                         maxLength={6}
                         defaultValue={m.tag ?? ""}
-                        className="rounded border px-2 py-1 text-center text-sm"
+                        className="w-full rounded border px-2 py-1 text-center text-sm"
                       />
                     </label>
-                    <label className="flex flex-col items-center text-xs text-neutral-600">
+                    <label className="flex flex-col text-xs text-neutral-600">
                       Hcp body
                       <input
                         name="hcp_override_points"
@@ -329,14 +328,14 @@ export default async function ScheduleNewPage({
                         max={99}
                         defaultValue={m.hcp_override_points ?? ""}
                         className={
-                          "w-10 rounded border px-1 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none " +
+                          "w-full rounded border px-1 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none " +
                           (tagMissingHcp ? "border-red-500 ring-1 ring-red-500" : "")
                         }
                       />
                     </label>
-                    <label className="flex flex-col items-center text-xs text-neutral-600">
+                    <label className="flex flex-col text-xs text-neutral-600">
                       Skóre 60′
-                      <div className="mt-0.5 flex items-center justify-center gap-1">
+                      <div className="mt-0.5 flex items-center gap-1">
                         <input
                           name="home_score"
                           type="number"
@@ -354,10 +353,9 @@ export default async function ScheduleNewPage({
                         />
                       </div>
                     </label>
-                    <div />
-                    <label className="flex flex-col items-center text-xs text-neutral-600">
+                    <label className="flex flex-col text-xs text-neutral-600">
                       1. třetina
-                      <div className="mt-0.5 flex items-center justify-center gap-1">
+                      <div className="mt-0.5 flex items-center gap-1">
                         <input
                           name="home_score_p1"
                           type="number"
@@ -375,7 +373,7 @@ export default async function ScheduleNewPage({
                         />
                       </div>
                     </label>
-                    <div className="flex items-end justify-end">
+                    <div className="flex items-end">
                       <SaveMatchButton />
                     </div>
                   </form>
