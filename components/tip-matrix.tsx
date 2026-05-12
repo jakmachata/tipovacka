@@ -217,9 +217,12 @@ function hcpSideCode(
     if (pickDiff < 0) return match.away_code;
     return null;
   }
-  // S handicapem: musí odpovídat SQL scoring (0002_scoring.sql) — pick_diff alone.
-  if (pickDiff > 0) return match.home_code;
-  if (pickDiff < 0) return match.away_code;
+  // S handicapem: rozhoduje efektivní rozdíl pickDiff + hcp.
+  // Příklad: hcp = +3.5, tip 2:5 → effDiff = -3 + 3.5 = +0.5 → home pokrývá handicap.
+  const effDiff = pickDiff + hcp;
+  if (effDiff > 0) return match.home_code;
+  if (effDiff < 0) return match.away_code;
+  // Tie po handicapu (nemůže nastat při půl-gólovém hcp).
   return hcp >= 0 ? match.home_code : match.away_code;
 }
 
