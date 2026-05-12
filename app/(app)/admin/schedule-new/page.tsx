@@ -147,7 +147,7 @@ export default async function ScheduleNewPage({
   return (
     <main className="mx-auto max-w-3xl px-4 py-4">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Nový schedule <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">beta</span></h1>
+        <h1 className="text-xl font-semibold">Rozpis a výsledky</h1>
         <form action={addMatch}>
           <button
             type="submit"
