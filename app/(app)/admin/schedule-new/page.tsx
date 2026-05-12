@@ -204,17 +204,29 @@ export default async function ScheduleNewPage({
                 }
               >
                 <summary className="flex cursor-pointer items-center gap-3 px-3 py-2 text-sm select-none">
-                  <span className="w-8 text-right font-mono text-xs text-neutral-500">#{m.game_no}</span>
-                  <span className="w-24 text-xs text-neutral-600 tabular-nums">
+                  <span className="w-20 shrink-0 text-xs text-neutral-600 tabular-nums">
                     {dt.date ? `${dt.date.slice(8, 10)}.${dt.date.slice(5, 7)}.` : "—"}{" "}
                     {dt.time || ""}
                   </span>
-                  <span className="flex-1 flex items-center gap-2 min-w-0">
-                    <TeamFlag code={m.home_code ?? ""} />
+                  <span className="flex w-[220px] shrink-0 items-center gap-2">
+                    <span className="inline-flex w-6 shrink-0 justify-center">
+                      <TeamFlag code={m.home_code ?? ""} />
+                    </span>
                     <span className="truncate font-medium">{home?.name_cs ?? (m.home_code ?? "—")}</span>
                     {m.home_handicap != null && (
-                      <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-700">
+                      <span className="ml-auto rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-700">
                         {m.home_handicap > 0 ? `+${m.home_handicap}` : m.home_handicap}
+                      </span>
+                    )}
+                  </span>
+                  <span className="flex w-[220px] shrink-0 items-center gap-2">
+                    <span className="inline-flex w-6 shrink-0 justify-center">
+                      <TeamFlag code={m.away_code ?? ""} />
+                    </span>
+                    <span className="truncate font-medium">{away?.name_cs ?? (m.away_code ?? "—")}</span>
+                    {m.home_handicap != null && (
+                      <span className="ml-auto rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-700">
+                        {-m.home_handicap > 0 ? `+${-m.home_handicap}` : -m.home_handicap}
                       </span>
                     )}
                   </span>
@@ -223,14 +235,10 @@ export default async function ScheduleNewPage({
                       ? `${m.home_score} : ${m.away_score}`
                       : "— : —"}
                   </span>
-                  <span className="flex-1 flex items-center justify-end gap-2 min-w-0">
-                    <span className="truncate text-right font-medium">{away?.name_cs ?? (m.away_code ?? "—")}</span>
-                    <TeamFlag code={m.away_code ?? ""} />
-                  </span>
                   {m.tag && (
                     <span
                       className={
-                        "rounded px-1.5 py-0.5 text-[11px] font-medium " +
+                        "ml-auto rounded px-1.5 py-0.5 text-[11px] font-medium " +
                         (tagMissingHcp ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800")
                       }
                       title={tagMissingHcp ? "Chybí počet bodů (Hcp body)" : ""}
@@ -238,139 +246,131 @@ export default async function ScheduleNewPage({
                       {m.tag}
                     </span>
                   )}
-                  <span className="ml-2 text-xs text-neutral-400 transition-transform group-open:rotate-180">▾</span>
                 </summary>
 
                 <div className="border-t bg-white px-3 py-3">
-                  <form action={saveMatch} className="space-y-3">
+                  <form action={saveMatch} className="flex flex-wrap items-end gap-2">
                     <input type="hidden" name="id" value={m.id} />
-
-                    <div className="flex flex-wrap items-end gap-3">
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Datum
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Datum
+                      <input
+                        name="starts_date"
+                        type="date"
+                        defaultValue={dt.date}
+                        className="rounded border px-2 py-1 text-sm"
+                      />
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Čas
+                      <TimePicker name="starts_time" defaultValue={dt.time} />
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Domácí
+                      <select
+                        name="home_code"
+                        defaultValue={m.home_code ?? ""}
+                        className="rounded border px-2 py-1 text-sm"
+                      >
+                        <option value="">—</option>
+                        {(teams ?? []).map((t) => (
+                          <option key={(t as Team).code} value={(t as Team).code}>
+                            {(t as Team).name_cs}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Hosté
+                      <select
+                        name="away_code"
+                        defaultValue={m.away_code ?? ""}
+                        className="rounded border px-2 py-1 text-sm"
+                      >
+                        <option value="">—</option>
+                        {(teams ?? []).map((t) => (
+                          <option key={(t as Team).code} value={(t as Team).code}>
+                            {(t as Team).name_cs}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Handicap
+                      <input
+                        name="home_handicap"
+                        type="number"
+                        step={1}
+                        min={-9.5}
+                        max={9.5}
+                        defaultValue={m.home_handicap ?? ""}
+                        className="w-14 rounded border px-2 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      />
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Skóre 60′
+                      <div className="mt-0.5 flex items-center gap-1">
                         <input
-                          name="starts_date"
-                          type="date"
-                          defaultValue={dt.date}
-                          className="rounded border px-2 py-1 text-sm"
-                        />
-                      </label>
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Čas
-                        <TimePicker name="starts_time" defaultValue={dt.time} />
-                      </label>
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Domácí
-                        <select
-                          name="home_code"
-                          defaultValue={m.home_code ?? ""}
-                          className="rounded border px-2 py-1 text-sm"
-                        >
-                          <option value="">—</option>
-                          {(teams ?? []).map((t) => (
-                            <option key={(t as Team).code} value={(t as Team).code}>
-                              {(t as Team).name_cs}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Hcp domácí
-                        <input
-                          name="home_handicap"
-                          type="number"
-                          step={1}
-                          min={-9.5}
-                          max={9.5}
-                          defaultValue={m.home_handicap ?? ""}
-                          className="w-16 rounded border px-2 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
-                      </label>
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Hosté
-                        <select
-                          name="away_code"
-                          defaultValue={m.away_code ?? ""}
-                          className="rounded border px-2 py-1 text-sm"
-                        >
-                          <option value="">—</option>
-                          {(teams ?? []).map((t) => (
-                            <option key={(t as Team).code} value={(t as Team).code}>
-                              {(t as Team).name_cs}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-
-                    <div className="flex flex-wrap items-end gap-3">
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Skóre 60′
-                        <div className="mt-0.5 flex items-center gap-1">
-                          <input
-                            name="home_score"
-                            type="number"
-                            min={0}
-                            defaultValue={m.home_score ?? ""}
-                            className="w-14 rounded border px-2 py-1 text-center text-sm"
-                          />
-                          <span>:</span>
-                          <input
-                            name="away_score"
-                            type="number"
-                            min={0}
-                            defaultValue={m.away_score ?? ""}
-                            className="w-14 rounded border px-2 py-1 text-center text-sm"
-                          />
-                        </div>
-                      </label>
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        1. třetina
-                        <div className="mt-0.5 flex items-center gap-1">
-                          <input
-                            name="home_score_p1"
-                            type="number"
-                            min={0}
-                            defaultValue={m.home_score_p1 ?? ""}
-                            className="w-14 rounded border px-2 py-1 text-center text-sm"
-                          />
-                          <span>:</span>
-                          <input
-                            name="away_score_p1"
-                            type="number"
-                            min={0}
-                            defaultValue={m.away_score_p1 ?? ""}
-                            className="w-14 rounded border px-2 py-1 text-center text-sm"
-                          />
-                        </div>
-                      </label>
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Tag
-                        <input
-                          name="tag"
-                          type="text"
-                          maxLength={6}
-                          defaultValue={m.tag ?? ""}
-                          className="w-20 rounded border px-2 py-1 text-center text-sm"
-                        />
-                      </label>
-                      <label className="flex flex-col text-xs text-neutral-600">
-                        Hcp body
-                        <input
-                          name="hcp_override_points"
+                          name="home_score"
                           type="number"
                           min={0}
-                          max={99}
-                          defaultValue={m.hcp_override_points ?? ""}
-                          className={
-                            "w-14 rounded border px-2 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none " +
-                            (tagMissingHcp ? "border-red-500 ring-1 ring-red-500" : "")
-                          }
+                          defaultValue={m.home_score ?? ""}
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
                         />
-                      </label>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t">
+                        <span>:</span>
+                        <input
+                          name="away_score"
+                          type="number"
+                          min={0}
+                          defaultValue={m.away_score ?? ""}
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
+                        />
+                      </div>
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      1. třetina
+                      <div className="mt-0.5 flex items-center gap-1">
+                        <input
+                          name="home_score_p1"
+                          type="number"
+                          min={0}
+                          defaultValue={m.home_score_p1 ?? ""}
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
+                        />
+                        <span>:</span>
+                        <input
+                          name="away_score_p1"
+                          type="number"
+                          min={0}
+                          defaultValue={m.away_score_p1 ?? ""}
+                          className="w-10 rounded border px-1.5 py-1 text-center text-sm"
+                        />
+                      </div>
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Tag
+                      <input
+                        name="tag"
+                        type="text"
+                        maxLength={6}
+                        defaultValue={m.tag ?? ""}
+                        className="w-16 rounded border px-2 py-1 text-center text-sm"
+                      />
+                    </label>
+                    <label className="flex flex-col text-xs text-neutral-600">
+                      Hcp body
+                      <input
+                        name="hcp_override_points"
+                        type="number"
+                        min={0}
+                        max={99}
+                        defaultValue={m.hcp_override_points ?? ""}
+                        className={
+                          "w-12 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none " +
+                          (tagMissingHcp ? "border-red-500 ring-1 ring-red-500" : "")
+                        }
+                      />
+                    </label>
+                    <div className="flex items-end">
                       <SaveMatchButton />
                     </div>
                   </form>
