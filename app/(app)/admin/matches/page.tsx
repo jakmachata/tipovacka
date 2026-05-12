@@ -166,7 +166,7 @@ export default async function AdminMatchesPage() {
                     min={-9.5}
                     max={9.5}
                     defaultValue={m.home_handicap ?? ""}
-                    className="w-20 rounded border px-2 py-1 text-center"
+                    className="w-10 rounded border px-2 py-1 text-center"
                     placeholder="±x.5"
                   />
                   <button
@@ -179,7 +179,7 @@ export default async function AdminMatchesPage() {
                 </span>
               </header>
 
-              <div className="flex flex-wrap items-end gap-3">
+              <div className="flex flex-wrap items-end gap-1">
                 <div className="flex flex-col items-start text-xs">
                   <span className="text-neutral-500">Datum & čas</span>
                   <div className="mt-1 flex items-center gap-1">
@@ -197,32 +197,7 @@ export default async function AdminMatchesPage() {
                 </div>
 
                 <div className="flex flex-col items-center text-xs">
-                  <div className="flex items-center gap-3 text-neutral-500">
-                <label className="flex items-center gap-1">
-                  Tag
-                  <input
-                    name="tag"
-                    type="text"
-                    maxLength={6}
-                    defaultValue={m.tag ?? ""}
-                    placeholder="ČF / SF / …"
-                    className="w-16 rounded border px-2 py-1 text-center"
-                  />
-                </label>
-                <label className="flex items-center gap-1">
-                  Hcp body
-                  <input
-                    name="hcp_override_points"
-                    type="number"
-                    min={0}
-                    max={99}
-                    defaultValue={m.hcp_override_points ?? ""}
-                    placeholder="–"
-                    className="w-12 rounded border px-2 py-1 text-center"
-                  />
-                </label>
-              </div>
-              <span className="text-neutral-500">Skóre 60′</span>
+                <span className="text-neutral-500">Skóre 60′</span>
                   <div className="mt-1 flex items-center gap-1">
                     <input
                       name="home_score"
@@ -266,19 +241,50 @@ export default async function AdminMatchesPage() {
                 <SaveMatchButton />
               </div>
 
-              {m.finalized && (
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <div className="min-w-[120px]">
+                  {m.finalized && (
+                    <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
                     finalizováno
                   </span>
-                  <button
+                  )}
+                </div>
+                <div className="flex items-center gap-3 text-neutral-500">
+                <label className="flex items-center gap-1">
+                  Tag
+                  <input
+                    name="tag"
+                    type="text"
+                    maxLength={6}
+                    defaultValue={m.tag ?? ""}
+                    placeholder="ČF / SF / …"
+                    className="w-16 rounded border px-2 py-1 text-center"
+                  />
+                </label>
+                <label className="flex items-center gap-1">
+                  Hcp body
+                  <input
+                    name="hcp_override_points"
+                    type="number"
+                    min={0}
+                    max={99}
+                    defaultValue={m.hcp_override_points ?? ""}
+                    placeholder="–"
+                    className="w-12 rounded border px-2 py-1 text-center"
+                  />
+                </label>
+              </div>
+                <div className="min-w-[120px] flex justify-end">
+                  {m.finalized && (
+                    <button
                     formAction={clearResult}
                     className="rounded border border-rose-300 bg-white px-2 py-1 text-xs text-rose-700 hover:bg-rose-50"
                   >
                     Smazat výsledek
                   </button>
+                  )}
                 </div>
-              )}
+              </div>
             </form>
           );
         })}
