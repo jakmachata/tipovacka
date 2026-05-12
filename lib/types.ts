@@ -45,14 +45,14 @@ export interface Team {
 export interface Match {
   id: number;
   game_no: number;
-  starts_at: string;
-  home_code: string;
-  away_code: string;
+  starts_at: string | null;
+  home_code: string | null;
+  away_code: string | null;
   home_handicap: number | null;
   stage: MatchStage;
   tag: string | null;
   hcp_override_points: number | null;
-  is_czech: boolean;
+  is_czech: boolean | null;
   home_score: number | null;
   away_score: number | null;
   home_score_p1: number | null;
