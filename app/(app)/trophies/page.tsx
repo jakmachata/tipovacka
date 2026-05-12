@@ -23,6 +23,12 @@ function dir(points: number | null, ideal: number | null): string {
 
 export default async function TrophiesPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase.from("profiles").select("is_admin").eq("id", user.id).maybeSingle();
+    isAdmin = !!profile?.is_admin;
+  }
   const { data: trophies } = await supabase
     .from("trophies")
     .select("*")
@@ -33,7 +39,14 @@ export default async function TrophiesPage() {
 
   return (
     <main>
-      <h1 className="mb-2 text-2xl font-bold">Trophy room</h1>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Trophy room</h1>
+        {isAdmin && (
+          <a href="/admin/trophies" className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-50">
+            Upravit
+          </a>
+        )}
+      </div>
       <p className="mb-2 text-sm text-neutral-600">
         ...aneb historie naší letité tipovačky...
       </p>
