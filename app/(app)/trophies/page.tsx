@@ -39,14 +39,14 @@ export default async function TrophiesPage() {
 
   return (
     <main>
-      <div className="mb-2 flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Trophy room</h1>
-        {isAdmin && (
-          <a href="/admin/trophies" className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-50">
+      {isAdmin && (
+        <div className="mb-2">
+          <a href="/admin/trophies" className="inline-flex items-center rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-50">
             Upravit
           </a>
-        )}
-      </div>
+        </div>
+      )}
+      <h1 className="mb-2 text-2xl font-bold">Trophy room</h1>
       <p className="mb-2 text-sm text-neutral-600">
         ...aneb historie naší letité tipovačky...
       </p>
