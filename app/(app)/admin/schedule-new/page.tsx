@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SaveMatchButton } from "@/components/save-match-button";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import { AdminScoreQuad } from "@/components/admin-score-quad";
 import { type Match, type Team } from "@/lib/types";
 import { TimePicker } from "@/components/time-picker";
 import { pragueLocalToUTC, pragueParts, snap5 } from "@/lib/tz";
@@ -89,6 +90,7 @@ export default async function ScheduleNewPage({
       update.starts_at = null;
     }
     await sb.from("matches").update(update).eq("id", id);
+    await sb.rpc("score_match", { p_match_id: id });
     revalidatePath("/admin/schedule-new");
     revalidatePath("/admin/matches");
     revalidatePath("/");
@@ -335,46 +337,12 @@ export default async function ScheduleNewPage({
                         }
                       />
                     </label>
-                    <label className="flex w-fit flex-col items-center text-xs text-neutral-600">
-                      Skóre 60′
-                      <div className="mt-0.5 flex items-center gap-1">
-                        <input
-                          name="home_score"
-                          type="number"
-                          min={0}
-                          defaultValue={m.home_score ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
-                        <span>:</span>
-                        <input
-                          name="away_score"
-                          type="number"
-                          min={0}
-                          defaultValue={m.away_score ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
-                      </div>
-                    </label>
-                    <label className="flex w-fit flex-col items-center text-xs text-neutral-600">
-                      1. třetina
-                      <div className="mt-0.5 flex items-center gap-1">
-                        <input
-                          name="home_score_p1"
-                          type="number"
-                          min={0}
-                          defaultValue={m.home_score_p1 ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
-                        <span>:</span>
-                        <input
-                          name="away_score_p1"
-                          type="number"
-                          min={0}
-                          defaultValue={m.away_score_p1 ?? ""}
-                          className="w-10 rounded border px-1.5 py-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
-                      </div>
-                    </label>
+                    <AdminScoreQuad
+                      homeDefault={m.home_score}
+                      awayDefault={m.away_score}
+                      homeP1Default={m.home_score_p1}
+                      awayP1Default={m.away_score_p1}
+                    />
                     <div className="flex items-end">
                       <SaveMatchButton />
                     </div>
