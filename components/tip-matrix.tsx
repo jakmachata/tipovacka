@@ -629,7 +629,7 @@ export function TipMatrix({
                   </td>
                   <td className={"px-2 py-2 text-center h-px sticky left-[175px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
                     {(m.finalized || m.home_score_p1 != null) ? (
-                      <div className="relative h-full">
+                      <div className="relative h-full min-h-[60px]">
                         {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
                         <div
                           className="absolute left-0 right-0 text-center text-lg font-semibold"
@@ -713,7 +713,7 @@ export function TipMatrix({
                           </div>
                           {isAdmin && score && (
                             <div className="text-center text-[10px] font-medium text-neutral-600">
-                              +{score.total_points}
+                              {score.total_points > 0 ? `+${score.total_points}` : "-"}
                             </div>
                           )}
                         </div>
