@@ -639,7 +639,7 @@ export function TipMatrix({
                         </div>
                         {/* Výsledek po 1. třetině — bottom zarovnaný s tip row 3 bottom; stejná velikost jako result */}
                         <div
-                          className="absolute left-0 right-0 bottom-0 text-center text-sm text-neutral-400"
+                          className={"absolute left-0 right-0 text-center text-sm text-neutral-400 " + (isAdmin ? "bottom-[16px]" : "bottom-0")}
                           style={{ lineHeight: "18px" }}
                         >
                           {m.home_score_p1 != null ? `(${m.home_score_p1}:${m.away_score_p1})` : ""}
