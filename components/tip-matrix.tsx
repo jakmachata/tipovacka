@@ -628,7 +628,7 @@ export function TipMatrix({
                     <TeamCell t={away} hcp={m.home_handicap} isHome={false} />
                   </td>
                   <td className={"px-2 py-2 text-center h-px sticky left-[175px] md:static z-30 md:z-auto border-r-[3px] border-r-double border-r-neutral-300 md:border-r-0 " + stripeBg}>
-                    {m.finalized ? (
+                    {(m.finalized || m.home_score_p1 != null) ? (
                       <div className="relative h-full">
                         {/* Výsledek po 60 min — vertikálně centrovaný v gapu mezi tip row 1 a row 2 */}
                         <div
@@ -669,7 +669,7 @@ export function TipMatrix({
                       const sideCode = hcpSideCode(pick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
                       const sideHcp = hcpSideValue(pick, m);
-                      content = m.finalized ? (
+                      content = (m.finalized || m.home_score_p1 != null) ? (
                         // Vyhodnocený tip — 3 řádky: fulltime tip / vlajka (grayscale když HCP špatně) / 1. třetina tip
                         <div className="flex flex-col gap-y-1 leading-tight">
                           <div className="text-center text-sm font-medium">
