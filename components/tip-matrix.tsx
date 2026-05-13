@@ -711,6 +711,11 @@ export function TipMatrix({
                               </span>
                             ) : null}
                           </div>
+                          {isAdmin && score && (
+                            <div className="text-center text-[10px] font-medium text-neutral-600">
+                              +{score.total_points}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         // Nevyhodnocený tip — kompaktní layout: 60(20) / vlajka / CODE+hcp
