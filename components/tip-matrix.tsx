@@ -676,13 +676,13 @@ export function TipMatrix({
                             <span
                               className={
                                 score
-                                  ? score.exact_points > 0
+                                  ? (m.finalized ? score.exact_points > 0 : score.p1_points > 0)
                                     ? "text-fuchsia-600 font-bold"
                                     : "text-[#595959]"
                                   : ""
                               }
                             >
-                              {pick.home_score}:{pick.away_score}
+                              {m.finalized ? `${pick.home_score}:${pick.away_score}` : `${pick.home_score_p1 ?? "-"}:${pick.away_score_p1 ?? "-"}`}
                             </span>
                           </div>
                           <div className="flex items-center justify-center gap-1 text-xs">
@@ -693,13 +693,13 @@ export function TipMatrix({
                                 alt={sideCode ?? ""}
                                 className={
                                   "h-[17px] w-auto rounded-sm shadow-sm" +
-                                  (score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
+                                  (m.finalized && score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
                                 }
                               />
                             )}
                           </div>
                           <div className="text-center text-xs">
-                            {pick.home_score_p1 != null ? (
+                            {m.finalized && pick.home_score_p1 != null ? (
                               <span
                                 className={
                                   score && score.p1_points > 0
