@@ -74,6 +74,17 @@ export default async function HraciPage() {
     .eq("id", user!.id)
     .single();
   const isAdmin = !!meProfile?.is_admin;
+  let userMetrics: Record<string, { hcp_distance: number | null; margin_err: number | null; goals_err: number | null }> = {};
+  if (isAdmin) {
+    const { data: metricsData } = await supabase.from("user_tip_metrics").select("*");
+    for (const m of metricsData ?? []) {
+      userMetrics[m.user_id] = {
+        hcp_distance: m.avg_hcp_distance,
+        margin_err: m.avg_margin_error,
+        goals_err: m.avg_goals_error,
+      };
+    }
+  }
   let pendingCount = 0;
   if (isAdmin) {
     const { count } = await supabase
@@ -184,6 +195,17 @@ export default async function HraciPage() {
       p.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX);
     return (
       <tr key={p.id} className="border-b">
+        {isAdmin && (() => {
+          const um = userMetrics[p.id];
+          const fmt = (v: number | null | undefined) => v == null ? "–" : v.toFixed(2);
+          return (
+            <>
+              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.hcp_distance)}</td>
+              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.margin_err)}</td>
+              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.goals_err)}</td>
+            </>
+          );
+        })()}
         {isAdmin && (
           <td
             className="w-[240px] max-w-[240px] truncate py-2 text-xs text-neutral-600 md:w-[210px] md:max-w-[210px]"
@@ -308,7 +330,14 @@ export default async function HraciPage() {
       <table className="text-sm">
         <thead className="border-b text-left text-neutral-500">
           <tr>
-            {isAdmin && <EmailTh />}
+            {isAdmin && (
+              <>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <EmailTh />
+              </>
+            )}
             <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
             {isAdmin && <th className="pr-4" style={{ width: "130px" }}>Status</th>}
             {isAdmin && <th className="pr-4" style={{ width: "90px" }}>Zaplatil</th>}
