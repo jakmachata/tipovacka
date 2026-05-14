@@ -469,6 +469,12 @@ export default async function HraciPage() {
                   : "-";
                 const isAdminOverride =
                   r.changed_by !== null && r.changed_by !== r.user_id;
+                const matchStarted = m
+                  ? new Date(m.starts_at).getTime() <= Date.now()
+                  : false;
+                const canSeeTip = isAdmin || r.user_id === user!.id || matchStarted;
+                const tip60Display = canSeeTip ? tip60 : "🔒";
+                const tipP1Display = canSeeTip ? tipP1 : "🔒";
                 return (
                   <tr key={r.id} className="border-b">
                     <td className="whitespace-nowrap py-2 pr-3 text-neutral-600">
@@ -499,8 +505,8 @@ export default async function HraciPage() {
                         </span>
                       )}
                     </td>
-                    <td className="pr-3 tabular-nums">{tip60}</td>
-                    <td className="pr-3 tabular-nums text-neutral-500">{tipP1}</td>
+                    <td className="pr-3 tabular-nums">{tip60Display}</td>
+                    <td className="pr-3 tabular-nums text-neutral-500">{tipP1Display}</td>
                     <td className="pr-3 text-neutral-600">
                       {changedByName}
                       {isAdminOverride && (
