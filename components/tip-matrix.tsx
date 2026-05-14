@@ -116,7 +116,7 @@ const TEAM_ISO2: Record<string, string> = {
   CAN: "ca", USA: "us", FIN: "fi", SWE: "se", CZE: "cz",
   SUI: "ch", GER: "de", SVK: "sk", LAT: "lv", DEN: "dk",
   FRA: "fr", ITA: "it", AUT: "at", NOR: "no", KAZ: "kz",
-  HUN: "hu", SLO: "si", POL: "pl", BLR: "by",
+  HUN: "hu", SLO: "si", POL: "pl", BLR: "by", GBR: "gb",
 };
 
 function flagUrl(code: string): string | null {
