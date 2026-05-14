@@ -666,7 +666,7 @@ export function TipMatrix({
 
                     let content: React.ReactNode;
                     if (!visible) {
-                      content = <span className="text-neutral-400">🔒</span>;
+                      content = pick ? <span className="text-neutral-400">🔒</span> : null;
                     } else if (pick) {
                       const sideCode = hcpSideCode(pick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
