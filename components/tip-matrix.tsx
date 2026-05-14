@@ -233,8 +233,10 @@ function hcpSideValue(
   const hcp = match.home_handicap;
   if (hcp == null) return null;
   const pickDiff = pick.home_score - pick.away_score;
+  // Stejná logika jako v hcpSideCode (a SQL score_match): rozhoduje EFEKTIVNÍ rozdíl (pickDiff + hcp).
+  const effDiff = pickDiff + hcp;
   const sideHome =
-    pickDiff > 0 || (pickDiff === 0 && hcp >= 0);
+    effDiff > 0 || (effDiff === 0 && hcp >= 0);
   const v = sideHome ? hcp : -hcp;
   return v > 0 ? `+${v}` : `${v}`;
 }
