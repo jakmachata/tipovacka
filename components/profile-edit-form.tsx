@@ -233,24 +233,6 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
             <strong>Pohled vpřed</strong> – od dnešního rána dál (skryje minulé).
           </p>
         </label>
-
-        <label className="mt-4 flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={emailPref}
-            onChange={(e) => setEmailPref(e.target.checked)}
-            className="mt-1"
-          />
-          <span>
-            <span className="block">E-mail upozornění před začátkem zápasu</span>
-            <span className="block text-[11px] leading-snug text-neutral-500">
-              Pošle ti upozornění ~30 min před prvním buly daného dne.{" "}
-              <span className="rounded bg-rose-100 px-1 text-rose-800">
-                Zatím nefunkční.
-              </span>
-            </span>
-          </span>
-        </label>
       </section>
       )}
 
