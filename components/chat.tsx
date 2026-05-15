@@ -44,20 +44,23 @@ const URL_REGEX = /(https?:\/\/[^\s]+)/g;
 
 // Fallback name palette for users without bg_color/text_color set.
 // Stable per user_id via simple hash.
+// Mirrors tip-matrix HEADER_COLORS so chat usernames match the column color.
 const FALLBACK_COLORS: Array<{ bg: string; fg: string }> = [
-  { bg: "#e11d48", fg: "#ffffff" },
-  { bg: "#ea580c", fg: "#ffffff" },
-  { bg: "#d97706", fg: "#ffffff" },
-  { bg: "#65a30d", fg: "#ffffff" },
-  { bg: "#16a34a", fg: "#ffffff" },
-  { bg: "#0d9488", fg: "#ffffff" },
-  { bg: "#0891b2", fg: "#ffffff" },
-  { bg: "#0284c7", fg: "#ffffff" },
-  { bg: "#2563eb", fg: "#ffffff" },
-  { bg: "#7c3aed", fg: "#ffffff" },
-  { bg: "#9333ea", fg: "#ffffff" },
-  { bg: "#c026d3", fg: "#ffffff" },
-  { bg: "#db2777", fg: "#ffffff" },
+  { bg: "#e11d48", fg: "#ffffff" }, // rose-600
+  { bg: "#ea580c", fg: "#ffffff" }, // orange-600
+  { bg: "#d97706", fg: "#ffffff" }, // amber-600
+  { bg: "#ca8a04", fg: "#ffffff" }, // yellow-600
+  { bg: "#65a30d", fg: "#ffffff" }, // lime-600
+  { bg: "#16a34a", fg: "#ffffff" }, // green-600
+  { bg: "#059669", fg: "#ffffff" }, // emerald-600
+  { bg: "#0d9488", fg: "#ffffff" }, // teal-600
+  { bg: "#0891b2", fg: "#ffffff" }, // cyan-600
+  { bg: "#0284c7", fg: "#ffffff" }, // sky-600
+  { bg: "#2563eb", fg: "#ffffff" }, // blue-600
+  { bg: "#4f46e5", fg: "#ffffff" }, // indigo-600
+  { bg: "#7c3aed", fg: "#ffffff" }, // violet-600
+  { bg: "#c026d3", fg: "#ffffff" }, // fuchsia-600
+  { bg: "#db2777", fg: "#ffffff" }, // pink-600
 ];
 
 function fallbackColor(id: string): { bg: string; fg: string } {
