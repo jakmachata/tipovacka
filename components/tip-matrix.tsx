@@ -458,7 +458,7 @@ export function TipMatrix({
       </div>
       <div className={noTopSpacer ? "h-[6px]" : "h-[50px]"} />
       <div ref={wrapperRef} className="-mx-4 h-[calc(100dvh-154px)] overflow-auto pb-[25px] md:h-auto md:overflow-visible md:px-4 md:pb-0">
-        {chatSlot && <div className="px-4 md:px-0">{chatSlot}</div>}
+        {chatSlot && <div className="px-4 pt-4 md:px-0 md:pt-0">{chatSlot}</div>}
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
