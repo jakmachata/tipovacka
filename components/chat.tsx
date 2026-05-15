@@ -129,7 +129,9 @@ export function Chat({
   const [sending, setSending] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [scrollHidden, setScrollHidden] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pickerWrapRef = useRef<HTMLDivElement>(null);
 
@@ -205,6 +207,35 @@ export function Chat({
     }
   }, [messages, collapsed, hydrated, lastSeenId]);
 
+  // Hide chat once user scrolls (wrapper on mobile, window on desktop) — chat is meant
+  // for at-rest reading; scroll-to-table should not be obscured by chat.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let scrollTarget: HTMLElement | Window | null = window;
+    let el: HTMLElement | null = rootRef.current;
+    while (el && el !== document.body) {
+      const cs = window.getComputedStyle(el);
+      if (cs.overflowY === "auto" || cs.overflowY === "scroll") {
+        scrollTarget = el;
+        break;
+      }
+      el = el.parentElement;
+    }
+    const getTop = () =>
+      scrollTarget instanceof Window
+        ? scrollTarget.scrollY
+        : (scrollTarget as HTMLElement).scrollTop;
+    const onScroll = () => {
+      const top = getTop();
+      setScrollHidden(top > 10);
+    };
+    scrollTarget.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => {
+      scrollTarget?.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   // Close emoji picker on outside click.
   useEffect(() => {
     if (!pickerOpen) return;
@@ -261,7 +292,12 @@ export function Chat({
   };
 
   return (
-    <div className="mb-1 mt-3 rounded-md border bg-white">
+    <div
+      ref={rootRef}
+      className={`rounded-md border bg-white ${
+        scrollHidden ? "invisible h-0 overflow-hidden m-0 border-0 p-0" : "mb-1 mt-3"
+      }`}
+    >
       <button
         type="button"
         onClick={toggleCollapsed}
