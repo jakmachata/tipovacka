@@ -454,7 +454,7 @@ export function TipMatrix({
           )}
         </div>
       </div>
-      <div className="h-[50px]" />
+      <div className="h-5" />
       <div ref={wrapperRef} className="-mx-4 h-[calc(100dvh-154px)] overflow-auto pb-[25px] md:h-auto md:overflow-visible md:px-4 md:pb-0">
         {chatSlot && <div className="px-4 md:px-0">{chatSlot}</div>}
         {/*
