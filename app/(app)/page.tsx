@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { TipMatrix } from "@/components/tip-matrix";
 import type { Profile } from "@/lib/types";
 
@@ -50,6 +50,19 @@ export default async function SchedulePage() {
     supabase.from("pending_picks").select("*").eq("status", "pending"),
   ]);
 
+  // Pickovaná políčka pro každého hráče — pro non-admin viewers načteme přes
+  // service client, aby viděli zámeček u políček, kde jiný hráč již tipoval
+  // (RLS jinak skrývá cizí picks). Voláme jen pokud nejsi admin (admin už má
+  // celé picksRes přes RLS).
+  let pickExistence: Array<{ user_id: string; match_id: number }> = [];
+  if (!isAdmin) {
+    const adminSb = createServiceClient();
+    const { data: existenceData } = await adminSb
+      .from("picks")
+      .select("user_id, match_id");
+    pickExistence = (existenceData ?? []) as Array<{ user_id: string; match_id: number }>;
+  }
+
   const totals = new Map(
     (leaderboardRes.data ?? []).map((r: { user_id: string; total: number }) => [
       r.user_id,
@@ -100,6 +113,7 @@ export default async function SchedulePage() {
       activeUsers={activeUsers}
       pendingPicks={pendingRes.data ?? []}
       myFavorites={myFavorites}
+      pickExistence={pickExistence}
     />
   );
 }
