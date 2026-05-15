@@ -269,7 +269,7 @@ export function Chat({
       >
         <span className="flex items-center gap-2">
           <span className="text-xs text-neutral-500">
-            {collapsed ? "rozbalit ▾" : "sbalit ▴"}
+            {collapsed ? "ukázat ▾" : "schovat ▴"}
           </span>
           <span>Chat 💬</span>
           {collapsed && unread > 0 && (
