@@ -17,6 +17,7 @@ interface ActiveUser {
   id: string;
   display_name: string;
   last_seen_at: string | null;
+  is_admin?: boolean;
 }
 
 interface PendingPick {
@@ -413,7 +414,7 @@ export function TipMatrix({
               // Self override: já vidím sám sebe vždy jako online (jsem na stránce).
               const meEntry =
                 me && !activeUsers.some((u) => u.id === myUserId)
-                  ? [{ id: me.id, display_name: me.display_name, last_seen_at: null }]
+                  ? [{ id: me.id, display_name: me.display_name, last_seen_at: null, is_admin: me.is_admin }]
                   : [];
               const list = [...meEntry, ...activeUsers];
               if (list.length === 0) {
@@ -422,7 +423,7 @@ export function TipMatrix({
               return list.map((u) => (
                 <span
                   key={u.id}
-                  className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800"
+                  className={"inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs " + (u.is_admin ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800")}
                   title={u.last_seen_at ?? ""}
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
