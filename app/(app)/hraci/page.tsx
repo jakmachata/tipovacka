@@ -428,7 +428,7 @@ export default async function HraciPage() {
       <p className="mb-3 text-xs text-neutral-500">
         Posledních 50 změn tipů (vytvoření, úpravy, smazání).
       </p>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto mb-10">
         <table className="text-sm">
           <thead className="border-b text-left text-neutral-500">
             <tr>
@@ -522,6 +522,39 @@ export default async function HraciPage() {
           </tbody>
         </table>
       </div>
+
+      {!isAdmin && (() => {
+        const publicAdmins = admins.filter(
+          (a: any) =>
+            typeof a.email === "string" &&
+            a.email.length > 0 &&
+            !a.email.toLowerCase().endsWith(DUMMY_EMAIL_SUFFIX),
+        );
+        if (publicAdmins.length === 0) return null;
+        return (
+          <>
+            <h2 className="mb-2 mt-10 text-lg font-semibold text-amber-800">
+              Adminy
+            </h2>
+            <p className="mb-3 text-xs text-neutral-500">
+              Účty adminů s ověřeným emailem (kontrola, že admin si nepomáhá tipy přes vedlejší účet).
+            </p>
+            <table className="text-sm">
+              <thead className="border-b text-left text-neutral-500">
+                <tr>
+                  <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
+                  <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
+                </tr>
+              </thead>
+              <tbody>
+                {publicAdmins.map((p: any) =>
+                  renderRow(p, { showDelete: false, showZaplatil: false }),
+                )}
+              </tbody>
+            </table>
+          </>
+        );
+      })()}
     </main>
   );
 }
