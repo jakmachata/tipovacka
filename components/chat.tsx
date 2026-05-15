@@ -268,6 +268,9 @@ export function Chat({
         className="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-sm font-medium hover:bg-neutral-50"
       >
         <span className="flex items-center gap-2">
+          <span className="text-xs text-neutral-500">
+            {collapsed ? "▾" : "▴"}
+          </span>
           <span>Chat 💬</span>
           {collapsed && unread > 0 && (
             <span className="inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
@@ -275,9 +278,7 @@ export function Chat({
             </span>
           )}
         </span>
-        <span className="text-xs text-neutral-500">
-          {collapsed ? "rozbalit ▾" : "sbalit ▴"}
-        </span>
+        <span></span>
       </button>
       {!collapsed && (
         <div className="border-t">
