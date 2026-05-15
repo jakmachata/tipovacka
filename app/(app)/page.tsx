@@ -134,17 +134,17 @@ export default async function SchedulePage() {
     };
   }
 
+  const chatSlot = user ? (
+    <Chat
+      initialMessages={(chatMessagesRes?.data ?? []) as ChatMessage[]}
+      profiles={chatProfileMap}
+      currentUserId={myId}
+      canPost={canChat}
+    />
+  ) : undefined;
+
   return (
-    <>
-      {user && (
-        <Chat
-          initialMessages={(chatMessagesRes?.data ?? []) as ChatMessage[]}
-          profiles={chatProfileMap}
-          currentUserId={myId}
-          canPost={canChat}
-        />
-      )}
-      <TipMatrix
+    <TipMatrix
       myUserId={myId}
       isAdmin={isAdmin}
       matches={matchesRes.data ?? []}
@@ -157,7 +157,7 @@ export default async function SchedulePage() {
       myFavorites={myFavorites}
       pickExistence={pickExistence}
       noTopSpacer={!!user}
+      chatSlot={chatSlot}
     />
-    </>
   );
 }
