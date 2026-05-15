@@ -268,8 +268,9 @@ export function Chat({
         className="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-sm font-medium hover:bg-neutral-50"
       >
         <span className="flex items-center gap-2">
-          <span className="text-xs text-neutral-500">
-            {collapsed ? "ukázat ▾" : "schovat ▴"}
+          <span className="flex items-center gap-1 text-xs text-neutral-500">
+            <span className="text-xl leading-none">{collapsed ? "▾" : "▴"}</span>
+            <span>{collapsed ? "ukázat" : "schovat"}</span>
           </span>
           <span>Chat 💬</span>
           {collapsed && unread > 0 && (
@@ -350,7 +351,7 @@ export function Chat({
                 style={{ fontSize: "16px" }}
                 disabled={sending}
               />
-              <div ref={pickerWrapRef} className="relative shrink-0">
+              <div ref={pickerWrapRef} className="relative hidden shrink-0 md:block">
                 <button
                   type="button"
                   onClick={() => setPickerOpen((p) => !p)}
