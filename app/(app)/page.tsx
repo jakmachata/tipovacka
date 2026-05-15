@@ -1,5 +1,6 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { TipMatrix } from "@/components/tip-matrix";
+import { Chat, type ChatMessage, type ChatProfileInfo } from "@/components/chat";
 import type { Profile } from "@/lib/types";
 
 export default async function SchedulePage() {
@@ -10,13 +11,15 @@ export default async function SchedulePage() {
 
   // Pro hosta isAdmin=false, myUserId=null. Pro přihlášeného načteme profil.
   let isAdmin = false;
+  let canChat = false;
   if (user) {
     const { data: meProfile } = await supabase
       .from("profiles")
-      .select("is_admin")
+      .select("is_admin, is_approved, is_rejected")
       .eq("id", user.id)
       .single();
     isAdmin = !!meProfile?.is_admin;
+    canChat = isAdmin || (!!meProfile?.is_approved && !meProfile?.is_rejected);
   }
 
   const threeMinAgo = new Date(Date.now() - 3 * 60 * 1000).toISOString();
@@ -29,6 +32,8 @@ export default async function SchedulePage() {
     leaderboardRes,
     activeRes,
     pendingRes,
+    chatMessagesRes,
+    chatProfilesRes,
   ] = await Promise.all([
     supabase.from("matches").select("*").not("starts_at", "is", null).order("starts_at"),
     supabase.from("teams").select("*"),
@@ -48,6 +53,18 @@ export default async function SchedulePage() {
       .gte("last_seen_at", threeMinAgo)
       .order("last_seen_at", { ascending: false }),
     supabase.from("pending_picks").select("*").eq("status", "pending"),
+    user
+      ? supabase
+          .from("chat_messages")
+          .select("id, user_id, content, created_at")
+          .order("created_at", { ascending: true })
+          .limit(100)
+      : Promise.resolve({ data: [] as ChatMessage[] }),
+    user
+      ? supabase
+          .from("profiles")
+          .select("id, display_name, is_admin")
+      : Promise.resolve({ data: [] as Array<{ id: string; display_name: string; is_admin: boolean }> }),
   ]);
 
   // Pickovaná políčka pro každého hráče — pro non-admin viewers načteme přes
@@ -101,8 +118,29 @@ export default async function SchedulePage() {
     last_seen_at: string | null;
   }>;
 
+  const chatProfileMap: Record<string, ChatProfileInfo> = {};
+  for (const p of (chatProfilesRes?.data ?? []) as Array<{
+    id: string;
+    display_name: string;
+    is_admin: boolean | null;
+  }>) {
+    chatProfileMap[p.id] = {
+      display_name: p.display_name,
+      is_admin: !!p.is_admin,
+    };
+  }
+
   return (
-    <TipMatrix
+    <>
+      {user && (
+        <Chat
+          initialMessages={(chatMessagesRes?.data ?? []) as ChatMessage[]}
+          profiles={chatProfileMap}
+          currentUserId={myId}
+          canPost={canChat}
+        />
+      )}
+      <TipMatrix
       myUserId={myId}
       isAdmin={isAdmin}
       matches={matchesRes.data ?? []}
@@ -115,5 +153,6 @@ export default async function SchedulePage() {
       myFavorites={myFavorites}
       pickExistence={pickExistence}
     />
+    </>
   );
 }
