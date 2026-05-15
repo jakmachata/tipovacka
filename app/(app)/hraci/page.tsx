@@ -537,7 +537,7 @@ export default async function HraciPage() {
               Adminy
             </h2>
             <p className="mb-3 text-xs text-neutral-500">
-              Účty adminů s ověřeným emailem (kontrola, že admin si nepomáhá tipy přes vedlejší účet).
+              Účty adminů s ověřeným emailem (kontrola, že admin si nepomáhá nakukováním na tipy ostatních).
             </p>
             <table className="text-sm">
               <thead className="border-b text-left text-neutral-500">
