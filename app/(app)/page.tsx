@@ -156,7 +156,6 @@ export default async function SchedulePage() {
       pendingPicks={pendingRes.data ?? []}
       myFavorites={myFavorites}
       pickExistence={pickExistence}
-      noTopSpacer={!!user}
       chatSlot={chatSlot}
     />
   );
