@@ -40,6 +40,7 @@ interface Props {
   activeUsers?: ActiveUser[];
   pendingPicks?: PendingPick[];
   myFavorites?: string[];
+  pickExistence?: Array<{ user_id: string; match_id: number }>;
 }
 
 const HEADER_COLORS = [
@@ -257,6 +258,7 @@ export function TipMatrix({
   activeUsers = [],
   pendingPicks = [],
   myFavorites = [],
+  pickExistence = [],
 }: Props) {
   const router = useRouter();
   // Ref na scrollovací wrapper (mobile sticky thead — wrapper má overflow-auto).
@@ -345,6 +347,9 @@ export function TipMatrix({
   const scoreMap = new Map(scores.map((s) => [k(s.user_id, s.match_id), s]));
   const pendingMap = new Map(
     pendingPicks.map((p) => [k(p.user_id, p.match_id), p]),
+  );
+  const pickExistsSet = new Set(
+    pickExistence.map((p) => k(p.user_id, p.match_id)),
   );
 
   const editingMatch =
@@ -666,7 +671,8 @@ export function TipMatrix({
 
                     let content: React.ReactNode;
                     if (!visible) {
-                      content = pick ? <span className="text-neutral-400">🔒</span> : null;
+                      const hasPick = !!pick || pickExistsSet.has(k(p.id, m.id));
+                      content = hasPick ? <span className="text-neutral-400">🔒</span> : null;
                     } else if (pick) {
                       const sideCode = hcpSideCode(pick, m);
                       const sideFlag = sideCode ? flagUrl(sideCode) : null;
