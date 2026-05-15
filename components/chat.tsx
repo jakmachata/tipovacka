@@ -42,6 +42,30 @@ const MAX_LEN = 500;
 
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
 
+// Fallback name palette for users without bg_color/text_color set.
+// Stable per user_id via simple hash.
+const FALLBACK_COLORS: Array<{ bg: string; fg: string }> = [
+  { bg: "#e11d48", fg: "#ffffff" },
+  { bg: "#ea580c", fg: "#ffffff" },
+  { bg: "#d97706", fg: "#ffffff" },
+  { bg: "#65a30d", fg: "#ffffff" },
+  { bg: "#16a34a", fg: "#ffffff" },
+  { bg: "#0d9488", fg: "#ffffff" },
+  { bg: "#0891b2", fg: "#ffffff" },
+  { bg: "#0284c7", fg: "#ffffff" },
+  { bg: "#2563eb", fg: "#ffffff" },
+  { bg: "#7c3aed", fg: "#ffffff" },
+  { bg: "#9333ea", fg: "#ffffff" },
+  { bg: "#c026d3", fg: "#ffffff" },
+  { bg: "#db2777", fg: "#ffffff" },
+];
+
+function fallbackColor(id: string): { bg: string; fg: string } {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return FALLBACK_COLORS[h % FALLBACK_COLORS.length];
+}
+
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
   const now = new Date();
@@ -234,7 +258,7 @@ export function Chat({
   };
 
   return (
-    <div className="mb-1 mt-3 rounded-md border bg-white">
+    <div className="mb-[-40px] mt-3 rounded-md border bg-white">
       <button
         type="button"
         onClick={toggleCollapsed}
@@ -266,9 +290,20 @@ export function Chat({
               messages.map((m) => {
                 const p = profiles[m.user_id];
                 const name = p?.display_name ?? "?";
-                const nameCls = p?.is_admin
+                // Admins → amber text, no bg. Players → custom bg/text_color from profile
+                // if set, otherwise stable fallback from FALLBACK_COLORS.
+                const isAdmin = !!p?.is_admin;
+                const hasCustomColors = !!(p?.bg_color || p?.text_color);
+                const fb = !isAdmin && !hasCustomColors ? fallbackColor(m.user_id) : null;
+                const nameBg = p?.bg_color ?? fb?.bg ?? undefined;
+                const nameFg = p?.text_color ?? fb?.fg ?? undefined;
+                const nameStyle: React.CSSProperties | undefined =
+                  isAdmin
+                    ? undefined
+                    : { backgroundColor: nameBg, color: nameFg };
+                const nameCls = isAdmin
                   ? "text-amber-700"
-                  : "text-neutral-700";
+                  : (nameBg ? "px-1.5" : "text-neutral-700");
                 return (
                   <div
                     key={m.id}
@@ -281,17 +316,8 @@ export function Chat({
                       {formatTimestamp(m.created_at)}
                     </span>
                     <span
-                      className={`shrink-0 rounded font-medium ${
-                        p?.bg_color ? "px-1.5" : ""
-                      } ${p?.bg_color || p?.text_color ? "" : nameCls}`}
-                      style={
-                        p?.bg_color || p?.text_color
-                          ? {
-                              backgroundColor: p?.bg_color ?? undefined,
-                              color: p?.text_color ?? undefined,
-                            }
-                          : undefined
-                      }
+                      className={`shrink-0 rounded font-medium ${nameCls}`}
+                      style={nameStyle}
                       title={new Date(m.created_at).toLocaleString("cs-CZ")}
                     >
                       {name}:
@@ -316,7 +342,8 @@ export function Chat({
                 onChange={(e) => setDraft(e.target.value)}
                 placeholder="Napiš zprávu…"
                 maxLength={MAX_LEN}
-                className="min-w-0 flex-1 rounded border bg-white px-2 py-1 text-[16px] md:text-sm focus:outline-none focus:ring-1 focus:ring-sky-300"
+                className="min-w-0 flex-1 rounded border bg-white px-2 py-1 text-base md:text-sm focus:outline-none focus:ring-1 focus:ring-sky-300"
+                style={{ fontSize: "16px" }}
                 disabled={sending}
               />
               <div ref={pickerWrapRef} className="relative shrink-0">
