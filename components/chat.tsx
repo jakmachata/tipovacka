@@ -1,8 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import { sendChatMessage } from "@/app/(app)/chat-actions";
+
+// Emoji picker — heavy client-only widget, lazy load.
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
+  ssr: false,
+  loading: () => (
+    <div className="rounded-md border bg-white px-2 py-1 text-xs text-neutral-500">
+      Načítám emoji…
+    </div>
+  ),
+});
 
 export interface ChatMessage {
   id: number;
@@ -29,20 +40,27 @@ const MAX_LEN = 500;
 
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
 
-function formatRelative(iso: string): string {
-  const diffSec = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
-  if (diffSec < 30) return "teď";
-  if (diffSec < 60) return `${diffSec}s`;
-  const diffMin = Math.round(diffSec / 60);
-  if (diffMin < 60) return `${diffMin} m`;
-  const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `${diffHr} h`;
-  const diffDay = Math.round(diffHr / 24);
-  if (diffDay < 7) return `${diffDay} d`;
-  return new Date(iso).toLocaleDateString("cs-CZ", {
-    day: "numeric",
-    month: "numeric",
-  });
+function formatTimestamp(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const time = `${hh}:${mm}`;
+  const sameDay =
+    d.getDate() === now.getDate() &&
+    d.getMonth() === now.getMonth() &&
+    d.getFullYear() === now.getFullYear();
+  if (sameDay) return time;
+  // Yesterday
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    d.getDate() === yesterday.getDate() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getFullYear() === yesterday.getFullYear();
+  if (isYesterday) return `vč ${time}`;
+  // Older — show D.M. + time
+  return `${d.getDate()}.${d.getMonth() + 1}. ${time}`;
 }
 
 function renderContent(text: string): React.ReactNode[] {
@@ -84,7 +102,10 @@ export function Chat({
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pickerWrapRef = useRef<HTMLDivElement>(null);
 
   // Read localStorage after mount (avoid SSR mismatch).
   useEffect(() => {
@@ -133,6 +154,18 @@ export function Chat({
     }
   }, [messages, collapsed, hydrated, lastSeenId]);
 
+  // Close emoji picker on outside click.
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (pickerWrapRef.current && !pickerWrapRef.current.contains(e.target as Node)) {
+        setPickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [pickerOpen]);
+
   const unread = hydrated
     ? messages.filter((m) => m.id > lastSeenId).length
     : 0;
@@ -156,14 +189,29 @@ export function Chat({
       const fd = new FormData();
       fd.set("content", text);
       const res = await sendChatMessage(fd);
-      if (res?.ok) setDraft("");
+      if (res?.ok) {
+        setDraft("");
+        if (res.message) {
+          // Optimistic append — realtime may also deliver, we dedup by id.
+          const msg = res.message as ChatMessage;
+          setMessages((prev) =>
+            prev.some((p) => p.id === msg.id) ? prev : [...prev, msg],
+          );
+        }
+      }
     } finally {
       setSending(false);
     }
   };
 
+  const onEmojiPick = (emoji: string) => {
+    setDraft((d) => d + emoji);
+    setPickerOpen(false);
+    inputRef.current?.focus();
+  };
+
   return (
-    <div className="mb-3 rounded-md border bg-white">
+    <div className="mb-3 mt-10 rounded-md border bg-white">
       <button
         type="button"
         onClick={toggleCollapsed}
@@ -210,10 +258,10 @@ export function Chat({
                       {renderContent(m.content)}
                     </span>
                     <span
-                      className="shrink-0 text-[10px] text-neutral-400"
+                      className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
                       title={new Date(m.created_at).toLocaleString("cs-CZ")}
                     >
-                      {formatRelative(m.created_at)}
+                      {formatTimestamp(m.created_at)}
                     </span>
                   </div>
                 );
@@ -223,17 +271,41 @@ export function Chat({
           {canPost ? (
             <form
               onSubmit={handleSubmit}
-              className="flex items-center gap-2 border-t bg-neutral-50 p-2"
+              className="relative flex items-center gap-2 border-t bg-neutral-50 p-2"
             >
               <input
+                ref={inputRef}
                 type="text"
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                placeholder="Napiš zprávu... (URL a 😊 vítány)"
+                placeholder="Napiš zprávu…"
                 maxLength={MAX_LEN}
                 className="min-w-0 flex-1 rounded border bg-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-sky-300"
                 disabled={sending}
               />
+              <div ref={pickerWrapRef} className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen((p) => !p)}
+                  className="rounded border bg-white px-2 py-1 text-base hover:bg-neutral-100"
+                  aria-label="Přidat emoji"
+                  title="Přidat emoji"
+                >
+                  😊
+                </button>
+                {pickerOpen && (
+                  <div className="absolute bottom-full right-0 z-50 mb-2">
+                    <EmojiPicker
+                      onEmojiClick={(e) => onEmojiPick(e.emoji)}
+                      width={300}
+                      height={350}
+                      lazyLoadEmojis
+                      previewConfig={{ showPreview: false }}
+                      searchPlaceholder="Hledat emoji…"
+                    />
+                  </div>
+                )}
+              </div>
               <button
                 type="submit"
                 disabled={sending || !draft.trim()}
