@@ -25,6 +25,8 @@ export interface ChatMessage {
 export interface ChatProfileInfo {
   display_name: string;
   is_admin?: boolean;
+  bg_color?: string | null;
+  text_color?: string | null;
 }
 
 interface Props {
@@ -279,7 +281,17 @@ export function Chat({
                       {formatTimestamp(m.created_at)}
                     </span>
                     <span
-                      className={`shrink-0 font-medium ${nameCls}`}
+                      className={`shrink-0 rounded font-medium ${
+                        p?.bg_color ? "px-1.5" : ""
+                      } ${p?.bg_color || p?.text_color ? "" : nameCls}`}
+                      style={
+                        p?.bg_color || p?.text_color
+                          ? {
+                              backgroundColor: p?.bg_color ?? undefined,
+                              color: p?.text_color ?? undefined,
+                            }
+                          : undefined
+                      }
                       title={new Date(m.created_at).toLocaleString("cs-CZ")}
                     >
                       {name}:
