@@ -63,8 +63,8 @@ export default async function SchedulePage() {
     user
       ? supabase
           .from("profiles")
-          .select("id, display_name, is_admin")
-      : Promise.resolve({ data: [] as Array<{ id: string; display_name: string; is_admin: boolean }> }),
+          .select("id, display_name, is_admin, bg_color, text_color")
+      : Promise.resolve({ data: [] as Array<{ id: string; display_name: string; is_admin: boolean; bg_color: string | null; text_color: string | null }> }),
   ]);
 
   // Pickovaná políčka pro každého hráče — pro non-admin viewers načteme přes
@@ -123,10 +123,14 @@ export default async function SchedulePage() {
     id: string;
     display_name: string;
     is_admin: boolean | null;
+    bg_color: string | null;
+    text_color: string | null;
   }>) {
     chatProfileMap[p.id] = {
       display_name: p.display_name,
       is_admin: !!p.is_admin,
+      bg_color: p.bg_color,
+      text_color: p.text_color,
     };
   }
 
