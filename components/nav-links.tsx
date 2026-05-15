@@ -39,7 +39,7 @@ export function NavLinks({
 
   // Hráči link: pokud je admin a má neschválené účty, svítí růžovou + pulse + badge.
   const hraciCls = (() => {
-    if (isAdmin && unapprovedCount > 0) {
+    if (isAdmin && (unapprovedCount > 0 || pendingCount > 0)) {
       return baseCls + " " +
         (active("/hraci")
           ? "bg-rose-100 text-rose-800 ring-1 ring-rose-300 " + activeMark
@@ -91,6 +91,11 @@ export function NavLinks({
         {isAdmin && unapprovedCount > 0 && (
           <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
             {unapprovedCount}
+          </span>
+        )}
+        {isAdmin && pendingCount > 0 && (
+          <span className="ml-1 inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white" title="Pozdní tipy">
+            {pendingCount}
           </span>
         )}
       </Link>
