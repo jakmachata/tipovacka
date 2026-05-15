@@ -258,7 +258,7 @@ export function Chat({
   };
 
   return (
-    <div className="mb-[-40px] mt-3 rounded-md border bg-white">
+    <div className="mb-1 mt-3 rounded-md border bg-white">
       <button
         type="button"
         onClick={toggleCollapsed}
