@@ -42,6 +42,7 @@ interface Props {
   pendingPicks?: PendingPick[];
   myFavorites?: string[];
   pickExistence?: Array<{ user_id: string; match_id: number }>;
+  noTopSpacer?: boolean;
 }
 
 const HEADER_COLORS = [
@@ -260,6 +261,7 @@ export function TipMatrix({
   pendingPicks = [],
   myFavorites = [],
   pickExistence = [],
+  noTopSpacer = false,
 }: Props) {
   const router = useRouter();
   // Ref na scrollovací wrapper (mobile sticky thead — wrapper má overflow-auto).
@@ -452,7 +454,7 @@ export function TipMatrix({
           )}
         </div>
       </div>
-      <div className="h-[50px]" />
+      <div className={noTopSpacer ? "h-[6px]" : "h-[50px]"} />
       <div ref={wrapperRef} className="-mx-4 h-[calc(100dvh-154px)] overflow-auto pb-[25px] md:h-auto md:overflow-visible md:px-4 md:pb-0">
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
