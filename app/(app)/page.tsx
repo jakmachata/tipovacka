@@ -43,7 +43,7 @@ export default async function SchedulePage() {
     supabase.from("leaderboard").select("*"),
     supabase
       .from("profiles")
-      .select("id, display_name, last_seen_at")
+      .select("id, display_name, last_seen_at, is_admin")
       .eq("is_approved", true)
       .gte("last_seen_at", threeMinAgo)
       .order("last_seen_at", { ascending: false }),
