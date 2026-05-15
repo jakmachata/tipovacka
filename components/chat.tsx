@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import { sendChatMessage } from "@/app/(app)/chat-actions";
@@ -51,7 +51,6 @@ function formatTimestamp(iso: string): string {
     d.getMonth() === now.getMonth() &&
     d.getFullYear() === now.getFullYear();
   if (sameDay) return time;
-  // Yesterday
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
   const isYesterday =
@@ -59,12 +58,10 @@ function formatTimestamp(iso: string): string {
     d.getMonth() === yesterday.getMonth() &&
     d.getFullYear() === yesterday.getFullYear();
   if (isYesterday) return `vč ${time}`;
-  // Older — show D.M. + time
   return `${d.getDate()}.${d.getMonth() + 1}. ${time}`;
 }
 
 function renderContent(text: string): React.ReactNode[] {
-  // Auto-linkify http(s) URLs. Plain text otherwise; emoji rendered natively.
   const parts: React.ReactNode[] = [];
   let lastIdx = 0;
   let match: RegExpExecArray | null;
@@ -115,30 +112,55 @@ export function Chat({
     setHydrated(true);
   }, []);
 
-  // Realtime: subscribe to INSERTs on chat_messages.
+  // Realtime: explicitly attach the user's JWT to the realtime client, then
+  // subscribe to INSERTs on chat_messages. Without setAuth, RLS-protected
+  // postgres_changes broadcasts may not reach other authenticated clients.
   useEffect(() => {
     const supabase = createClient();
-    const channel = supabase
-      .channel("public:chat_messages")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "chat_messages" },
-        (payload) => {
-          const m = payload.new as ChatMessage;
-          setMessages((prev) => {
-            if (prev.some((p) => p.id === m.id)) return prev;
-            return [...prev, m];
-          });
-        },
-      )
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          await supabase.realtime.setAuth(session.access_token);
+        }
+      } catch {
+        // Continue even if setAuth fails — guest will just miss broadcasts.
+      }
+      if (cancelled) return;
+      channel = supabase
+        .channel("chat-room")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "chat_messages" },
+          (payload) => {
+            const m = payload.new as ChatMessage;
+            setMessages((prev) => {
+              if (prev.some((p) => p.id === m.id)) return prev;
+              return [...prev, m];
+            });
+          },
+        )
+        .subscribe();
+    })();
+
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) {
+        const supabase2 = createClient();
+        supabase2.removeChannel(channel);
+      }
     };
   }, []);
 
-  // Auto-scroll on new message while expanded.
-  useEffect(() => {
+  // Auto-scroll to bottom whenever messages change (and on initial mount).
+  // useLayoutEffect runs before paint so the user never sees the top scroll
+  // position briefly before jumping to the bottom.
+  useLayoutEffect(() => {
     if (!collapsed && listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
@@ -192,7 +214,6 @@ export function Chat({
       if (res?.ok) {
         setDraft("");
         if (res.message) {
-          // Optimistic append — realtime may also deliver, we dedup by id.
           const msg = res.message as ChatMessage;
           setMessages((prev) =>
             prev.some((p) => p.id === msg.id) ? prev : [...prev, msg],
@@ -247,7 +268,16 @@ export function Chat({
                   ? "text-amber-700"
                   : "text-neutral-700";
                 return (
-                  <div key={m.id} className="mb-1 flex flex-wrap items-baseline gap-x-1.5 leading-snug">
+                  <div
+                    key={m.id}
+                    className="mb-1 flex flex-wrap items-baseline gap-x-1.5 leading-snug"
+                  >
+                    <span
+                      className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
+                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
+                    >
+                      {formatTimestamp(m.created_at)}
+                    </span>
                     <span
                       className={`shrink-0 font-medium ${nameCls}`}
                       title={new Date(m.created_at).toLocaleString("cs-CZ")}
@@ -256,12 +286,6 @@ export function Chat({
                     </span>
                     <span className="min-w-0 flex-1 break-words text-neutral-800">
                       {renderContent(m.content)}
-                    </span>
-                    <span
-                      className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
-                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
-                    >
-                      {formatTimestamp(m.created_at)}
                     </span>
                   </div>
                 );
