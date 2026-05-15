@@ -232,7 +232,7 @@ export function Chat({
   };
 
   return (
-    <div className="mb-3 mt-10 rounded-md border bg-white">
+    <div className="mb-1 mt-3 rounded-md border bg-white">
       <button
         type="button"
         onClick={toggleCollapsed}
@@ -304,7 +304,7 @@ export function Chat({
                 onChange={(e) => setDraft(e.target.value)}
                 placeholder="Napiš zprávu…"
                 maxLength={MAX_LEN}
-                className="min-w-0 flex-1 rounded border bg-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-sky-300"
+                className="min-w-0 flex-1 rounded border bg-white px-2 py-1 text-[16px] md:text-sm focus:outline-none focus:ring-1 focus:ring-sky-300"
                 disabled={sending}
               />
               <div ref={pickerWrapRef} className="relative shrink-0">
