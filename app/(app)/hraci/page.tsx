@@ -5,6 +5,7 @@ import { type Match, type Team } from "@/lib/types";
 import { StatusMenu } from "@/components/status-menu";
 import { setStatus } from "./actions";
 import { DeleteAccountButton } from "@/components/delete-account-button";
+import { SortableTh } from "@/components/sortable-th";
 
 const DUMMY_EMAIL_SUFFIX = "@tipovacka.local";
 
@@ -63,7 +64,14 @@ function relativeFromNow(iso: string | null | undefined): string {
   return formatPraguePretty(iso);
 }
 
-export default async function HraciPage() {
+export default async function HraciPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sortBy?: string; order?: string }>;
+}) {
+  const sp = await searchParams;
+  const sortBy = sp.sortBy ?? null;
+  const sortOrder = sp.order === "desc" ? "desc" : "asc";
   const supabase = await createClient();
   const {
     data: { user },
@@ -112,9 +120,23 @@ export default async function HraciPage() {
     supabase.from("teams").select("*"),
   ]);
 
-  const approvedPlayers = (allProfiles ?? []).filter(
+  let approvedPlayers = (allProfiles ?? []).filter(
     (p: any) => !p.is_admin && p.is_approved,
   );
+  if (isAdmin && sortBy && ["spread", "naskok", "goly"].includes(sortBy)) {
+    const fieldKey =
+      sortBy === "spread" ? "hcp_distance"
+        : sortBy === "naskok" ? "margin_err"
+        : "goals_err";
+    approvedPlayers = approvedPlayers.slice().sort((a: any, b: any) => {
+      const va = userMetrics[a.id]?.[fieldKey] ?? null;
+      const vb = userMetrics[b.id]?.[fieldKey] ?? null;
+      if (va === null && vb === null) return 0;
+      if (va === null) return 1;
+      if (vb === null) return -1;
+      return sortOrder === "asc" ? va - vb : vb - va;
+    });
+  }
   const unapprovedPlayers = (allProfiles ?? []).filter(
     (p: any) => !p.is_admin && !p.is_approved,
   );
@@ -303,7 +325,7 @@ export default async function HraciPage() {
   return (
     <main>
       {isAdmin && (
-        <div className="mb-2">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           <a
             href="/admin/pending"
             className={
@@ -323,6 +345,12 @@ export default async function HraciPage() {
               {pendingCount}
             </span>
           </a>
+          <a
+            href="/admin/podobnost"
+            className="inline-flex items-center gap-1.5 rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-50"
+          >
+            Podobnost tipérů
+          </a>
         </div>
       )}
       <h1 className="mb-4 text-xl font-semibold">Hráči a aktivita</h1>
@@ -332,9 +360,9 @@ export default async function HraciPage() {
           <tr>
             {isAdmin && (
               <>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <SortableTh field="spread" label="Δ spread" title="Průměrná |pickDiff + hcp| napříč všemi tipy" />
+                <SortableTh field="naskok" label="Δ náskok" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy" />
+                <SortableTh field="goly" label="Δ góly" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy" />
                 <EmailTh />
               </>
             )}
