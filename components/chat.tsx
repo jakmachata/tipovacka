@@ -269,7 +269,7 @@ export function Chat({
       >
         <span className="flex items-center gap-2">
           <span className="flex items-center gap-1 text-xs text-neutral-500">
-            <span className="text-xl leading-none">{collapsed ? "▾" : "▴"}</span>
+            <span className="text-3xl leading-none">{collapsed ? "▾" : "▴"}</span>
             <span>{collapsed ? "ukázat" : "schovat"}</span>
           </span>
           <span>Chat 💬</span>
