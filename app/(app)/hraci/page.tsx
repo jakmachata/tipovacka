@@ -388,6 +388,9 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
@@ -411,11 +414,13 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
                 <th className="pr-4" style={{ width: "175px" }}>Naposledy viděn</th>
-                <th className="py-2 pr-2 text-right">Smazat</th>
               </tr>
             </thead>
             <tbody>
@@ -435,6 +440,9 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
