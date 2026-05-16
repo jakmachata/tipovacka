@@ -583,7 +583,7 @@ export function TipMatrix({
               // Striping ignoruje oddělení dní - natvrdo podle indexu zápasu (idx).
               // CZE zápas má vlastní červené pozadí, jinak střídání bílá / velmi světlá žlutá.
               // Single solid bg per řádek; alternace odstraněna kvůli iter56 (vizuální linky v highlightnutých sloupcích).
-              const stripeBg = m.is_czech ? "bg-red-50" : "bg-white";
+              const stripeBg = m.is_czech ? "bg-red-50" : (idx % 2 === 1 ? "bg-white md:bg-yellow-50" : "bg-white");
               rows.push(
                 <tr
                   key={m.id}
