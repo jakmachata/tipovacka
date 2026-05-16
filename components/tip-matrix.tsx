@@ -381,7 +381,9 @@ export function TipMatrix({
 
   let visibleMatches = matches;
   if (hidePast) {
-    visibleMatches = matches.filter((m) => !m.finalized);
+    visibleMatches = matches.filter(
+      (m) => !(m.finalized && new Date(m.starts_at).getTime() < todayStartMs),
+    );
   }
 
   return (
@@ -440,7 +442,7 @@ export function TipMatrix({
               onChange={(e) => setHidePast(e.target.checked)}
               className="h-4 w-4"
             />
-            Skrýt odehrané
+            Skrýt staré zápasy
           </label>
         )}
         {/*
