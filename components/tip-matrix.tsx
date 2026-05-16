@@ -442,14 +442,6 @@ export function TipMatrix({
               >
                 Rozpis a výsledky
               </a>
-              <label className="flex flex-shrink-0 items-center gap-2 pl-2 text-xs text-neutral-600">
-                <input
-                  type="checkbox"
-                  checked={hidePast}
-                  onChange={(e) => setHidePast(e.target.checked)}
-                />
-                Skrýt odehrané
-              </label>
             </>
           )}
         </div>
@@ -457,6 +449,15 @@ export function TipMatrix({
       <div className="h-5" />
       <div ref={wrapperRef} className="-mx-4 h-[calc(100dvh-154px)] overflow-auto pb-[25px] md:h-auto md:overflow-visible md:px-4 md:pb-0">
         {chatSlot && <div className="px-4 md:px-0">{chatSlot}</div>}
+        <label className="mb-1 flex w-fit items-center gap-2 px-4 py-1 text-xs text-neutral-600 md:px-0">
+          <input
+            type="checkbox"
+            checked={hidePast}
+            onChange={(e) => setHidePast(e.target.checked)}
+            className="h-4 w-4"
+          />
+          Skrýt odehrané
+        </label>
         {/*
           FIXNÍ šířky sloupců — bez explicitní šířky tabulky ji browser zmenšuje
           aby fitla do kontejneru, což rozbíjí table-layout: fixed (pozorováno).
