@@ -207,34 +207,6 @@ export function ProfileEditForm({ userId, userEmail, isAdmin = false, initial }:
         </button>
       </section>
       )}
-      {!isAdmin && (
-      <section className="rounded-lg border p-4">
-        <h2 className="mb-3 text-sm font-semibold text-neutral-700">
-          Nastavení tipovačky
-        </h2>
-        <label className="block text-sm">
-          <span className="block text-xs text-neutral-500">Zobrazit zápasy</span>
-          <select
-            value={filterMode}
-            onChange={(e) =>
-              setFilterMode(e.target.value as "all" | "near" | "future")
-            }
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
-          >
-            <option value="all">Všechny zápasy</option>
-            <option value="near">Nejbližší dny</option>
-            <option value="future">Pohled vpřed</option>
-          </select>
-          <p className="mt-1 text-[11px] leading-snug text-neutral-500">
-            <strong>Všechny zápasy</strong> – kompletní rozlosování turnaje.
-            <br />
-            <strong>Nejbližší dny</strong> – pouze včerejšek, dnešek a zítřek.
-            <br />
-            <strong>Pohled vpřed</strong> – od dnešního rána dál (skryje minulé).
-          </p>
-        </label>
-      </section>
-      )}
 
       <section className="rounded-lg border p-4">
         <h2 className="mb-3 text-sm font-semibold text-neutral-700">
