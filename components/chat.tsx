@@ -356,7 +356,7 @@ export function Chat({
                           <button
                             type="button"
                             onClick={() => startEdit(m)}
-                            className="rounded px-1 leading-none text-[22px] text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                            className="rounded px-1 leading-none text-[20px] text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
                             title="Upravit"
                           >
                             ✎
@@ -378,7 +378,7 @@ export function Chat({
                           <button
                             type="button"
                             onClick={() => onDelete(m)}
-                            className="rounded px-1 leading-none text-[22px] text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
+                            className="rounded px-1 leading-none text-[20px] text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
                             title="Smazat"
                           >
                             ✕
