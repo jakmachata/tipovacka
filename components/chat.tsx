@@ -293,7 +293,7 @@ export function Chat({
     const res = await editChatMessage(editingId, text);
     if (res?.ok && res.message) {
       const updated = res.message as ChatMessage;
-      setMessages((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+      setMessages((prev) => prev.map((p) => (p.id === updted.id ? updated : p)));
       cancelEdit();
     } else {
       alert("Úprava selhala: " + (res?.error ?? "?"));
@@ -362,6 +362,30 @@ export function Chat({
                     >
                       {name}:
                     </span>
+                    {(showEdit || showDelete) && !isEditing && (
+                      <span className="mr-1 inline-flex shrink-0 items-center gap-1">
+                        {showEdit && (
+                          <button
+                            type="button"
+                            onClick={() => startEdit(m)}
+                            className="rounded px-1 leading-none text-[22px] text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                            title="Upravit"
+                          >
+                            ✎
+                          </button>
+                        )}
+                        {showDelete && (
+                          <button
+                            type="button"
+                            onClick={() => onDelete(m)}
+                            className="rounded px-1 leading-none text-[22px] text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
+                            title="Smazat"
+                          >
+                            🗑
+                          </button>
+                        )}
+                      </span>
+                    )}
                     {isEditing ? (
                       <span className="flex min-w-0 flex-1 items-center gap-1">
                         <input
@@ -396,43 +420,17 @@ export function Chat({
                         </button>
                       </span>
                     ) : (
-                      <>
-                        {(showEdit || showDelete) && (
-                          <span className="mr-1 inline-flex shrink-0 items-center gap-1">
-                            {showEdit && (
-                              <button
-                                type="button"
-                                onClick={() => startEdit(m)}
-                                className="rounded px-1.5 py-0.5 text-[22px] leading-none text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
-                                title="Upravit"
-                              >
-                                ✎
-                              </button>
-                            )}
-                            {showDelete && (
-                              <button
-                                type="button"
-                                onClick={() => onDelete(m)}
-                                className="rounded px-1.5 py-0.5 text-[22px] leading-none text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
-                                title="Smazat"
-                              >
-                                🗑
-                              </button>
-                            )}
+                      <span className="min-w-0 flex-1 break-words text-neutral-800">
+                        {renderContent(m.content)}
+                        {m.edited_at && (
+                          <span
+                            className="ml-1 text-[10px] text-neutral-400"
+                            title={`Upraveno: ${new Date(m.edited_at).toLocaleString("cs-CZ")}`}
+                          >
+                            (upraveno)
                           </span>
-                                                <span className="min-w-0 flex-1 break-words text-neutral-800">
-                          {renderContent(m.content)}
-                          {m.edited_at && (
-                            <span
-                              className="ml-1 text-[10px] text-neutral-400"
-                              title={`Upraveno: ${new Date(m.edited_at).toLocaleString("cs-CZ")}`}
-                            >
-                              (upraveno)
-                            </span>
-                          )}
-                        </span>
                         )}
-                      </>
+                      </span>
                     )}
                   </div>
                 );
