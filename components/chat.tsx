@@ -3,7 +3,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
-import { sendChatMessage } from "@/app/(app)/chat-actions";
+import {
+  sendChatMessage,
+  deleteChatMessage,
+  editChatMessage,
+} from "@/app/(app)/chat-actions";
 
 // Emoji picker — heavy client-only widget, lazy load.
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
@@ -20,6 +24,7 @@ export interface ChatMessage {
   user_id: string;
   content: string;
   created_at: string;
+  edited_at: string | null;
 }
 
 export interface ChatProfileInfo {
@@ -34,40 +39,15 @@ interface Props {
   profiles: Record<string, ChatProfileInfo>;
   currentUserId: string | null;
   canPost: boolean;
+  isAdmin: boolean;
 }
 
 const STORAGE_COLLAPSED = "chat_collapsed";
 const STORAGE_LAST_SEEN = "chat_last_seen_id";
 const MAX_LEN = 500;
+const EDIT_WINDOW_MS = 10 * 60 * 1000;
 
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
-
-// Fallback name palette for users without bg_color/text_color set.
-// Stable per user_id via simple hash.
-// Mirrors tip-matrix HEADER_COLORS so chat usernames match the column color.
-const FALLBACK_COLORS: Array<{ bg: string; fg: string }> = [
-  { bg: "#e11d48", fg: "#ffffff" }, // rose-600
-  { bg: "#ea580c", fg: "#ffffff" }, // orange-600
-  { bg: "#d97706", fg: "#ffffff" }, // amber-600
-  { bg: "#ca8a04", fg: "#ffffff" }, // yellow-600
-  { bg: "#65a30d", fg: "#ffffff" }, // lime-600
-  { bg: "#16a34a", fg: "#ffffff" }, // green-600
-  { bg: "#059669", fg: "#ffffff" }, // emerald-600
-  { bg: "#0d9488", fg: "#ffffff" }, // teal-600
-  { bg: "#0891b2", fg: "#ffffff" }, // cyan-600
-  { bg: "#0284c7", fg: "#ffffff" }, // sky-600
-  { bg: "#2563eb", fg: "#ffffff" }, // blue-600
-  { bg: "#4f46e5", fg: "#ffffff" }, // indigo-600
-  { bg: "#7c3aed", fg: "#ffffff" }, // violet-600
-  { bg: "#c026d3", fg: "#ffffff" }, // fuchsia-600
-  { bg: "#db2777", fg: "#ffffff" }, // pink-600
-];
-
-function fallbackColor(id: string): { bg: string; fg: string } {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return FALLBACK_COLORS[h % FALLBACK_COLORS.length];
-}
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
@@ -96,9 +76,7 @@ function renderContent(text: string): React.ReactNode[] {
   let match: RegExpExecArray | null;
   const re = new RegExp(URL_REGEX);
   while ((match = re.exec(text)) !== null) {
-    if (match.index > lastIdx) {
-      parts.push(text.slice(lastIdx, match.index));
-    }
+    if (match.index > lastIdx) parts.push(text.slice(lastIdx, match.index));
     parts.push(
       <a
         key={match.index}
@@ -121,6 +99,7 @@ export function Chat({
   profiles,
   currentUserId,
   canPost,
+  isAdmin,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [collapsed, setCollapsed] = useState<boolean>(false);
@@ -129,11 +108,15 @@ export function Chat({
   const [sending, setSending] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editDraft, setEditDraft] = useState("");
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pickerWrapRef = useRef<HTMLDivElement>(null);
+  const editInputRef = useRef<HTMLInputElement>(null);
 
-  // Read localStorage after mount (avoid SSR mismatch).
+  // Hydrace z localStorage
   useEffect(() => {
     setCollapsed(localStorage.getItem(STORAGE_COLLAPSED) === "1");
     const raw = localStorage.getItem(STORAGE_LAST_SEEN);
@@ -141,9 +124,13 @@ export function Chat({
     setHydrated(true);
   }, []);
 
-  // Realtime: explicitly attach the user's JWT to the realtime client, then
-  // subscribe to INSERTs on chat_messages. Without setAuth, RLS-protected
-  // postgres_changes broadcasts may not reach other authenticated clients.
+  // Tick — refresh nowMs aby Upravit/Smazat zmizely po vyprseni 10 min okna
+  useEffect(() => {
+    const t = setInterval(() => setNowMs(Date.now()), 30 * 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Realtime: INSERT + UPDATE + DELETE
   useEffect(() => {
     const supabase = createClient();
     let channel: ReturnType<typeof supabase.channel> | null = null;
@@ -157,9 +144,7 @@ export function Chat({
         if (session?.access_token) {
           await supabase.realtime.setAuth(session.access_token);
         }
-      } catch {
-        // Continue even if setAuth fails — guest will just miss broadcasts.
-      }
+      } catch {}
       if (cancelled) return;
       channel = supabase
         .channel("chat-room")
@@ -168,10 +153,26 @@ export function Chat({
           { event: "INSERT", schema: "public", table: "chat_messages" },
           (payload) => {
             const m = payload.new as ChatMessage;
-            setMessages((prev) => {
-              if (prev.some((p) => p.id === m.id)) return prev;
-              return [...prev, m];
-            });
+            setMessages((prev) =>
+              prev.some((p) => p.id === m.id) ? prev : [...prev, m],
+            );
+          },
+        )
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "chat_messages" },
+          (payload) => {
+            const m = payload.new as ChatMessage;
+            setMessages((prev) => prev.map((p) => (p.id === m.id ? m : p)));
+          },
+        )
+        .on(
+          "postgres_changes",
+          { event: "DELETE", schema: "public", table: "chat_messages" },
+          (payload) => {
+            const old = payload.old as { id?: number };
+            if (!old?.id) return;
+            setMessages((prev) => prev.filter((p) => p.id !== old.id));
           },
         )
         .subscribe();
@@ -180,22 +181,20 @@ export function Chat({
     return () => {
       cancelled = true;
       if (channel) {
-        const supabase2 = createClient();
-        supabase2.removeChannel(channel);
+        const sb2 = createClient();
+        sb2.removeChannel(channel);
       }
     };
   }, []);
 
-  // Auto-scroll to bottom whenever messages change (and on initial mount).
-  // useLayoutEffect runs before paint so the user never sees the top scroll
-  // position briefly before jumping to the bottom.
+  // Auto-scroll na konec
   useLayoutEffect(() => {
     if (!collapsed && listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
   }, [messages, collapsed]);
 
-  // When expanded, mark all current as read.
+  // Mark as read
   useEffect(() => {
     if (!hydrated || collapsed) return;
     const maxId = messages.reduce((m, x) => (x.id > m ? x.id : m), 0);
@@ -205,7 +204,7 @@ export function Chat({
     }
   }, [messages, collapsed, hydrated, lastSeenId]);
 
-  // Close emoji picker on outside click.
+  // Close picker on outside click
   useEffect(() => {
     if (!pickerOpen) return;
     const onClick = (e: MouseEvent) => {
@@ -217,9 +216,15 @@ export function Chat({
     return () => document.removeEventListener("mousedown", onClick);
   }, [pickerOpen]);
 
-  const unread = hydrated
-    ? messages.filter((m) => m.id > lastSeenId).length
-    : 0;
+  // Focus na edit input
+  useEffect(() => {
+    if (editingId != null && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingId]);
+
+  const unread = hydrated ? messages.filter((m) => m.id > lastSeenId).length : 0;
 
   const toggleCollapsed = () => {
     setCollapsed((c) => {
@@ -260,18 +265,64 @@ export function Chat({
     inputRef.current?.focus();
   };
 
+  // Permission helpers
+  const canEditMsg = (m: ChatMessage) => {
+    if (!currentUserId) return false;
+    if (m.user_id !== currentUserId) return false;
+    return nowMs - new Date(m.created_at).getTime() < EDIT_WINDOW_MS;
+  };
+  const canDeleteMsg = (m: ChatMessage) => {
+    if (isAdmin) return true;
+    return canEditMsg(m);
+  };
+
+  const startEdit = (m: ChatMessage) => {
+    setEditingId(m.id);
+    setEditDraft(m.content);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditDraft("");
+  };
+
+  const saveEdit = async () => {
+    if (editingId == null) return;
+    const text = editDraft.trim();
+    if (!text) return cancelEdit();
+    const res = await editChatMessage(editingId, text);
+    if (res?.ok && res.message) {
+      const updated = res.message as ChatMessage;
+      setMessages((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+      cancelEdit();
+    } else {
+      alert("Úprava selhala: " + (res?.error ?? "?"));
+    }
+  };
+
+  const onDelete = async (m: ChatMessage) => {
+    if (!confirm("Smazat zprávu?")) return;
+    setMessages((prev) => prev.filter((p) => p.id !== m.id));
+    const res = await deleteChatMessage(m.id);
+    if (!res?.ok) {
+      setMessages((prev) =>
+        prev.some((p) => p.id === m.id)
+          ? prev
+          : [...prev, m].sort((a, b) => a.id - b.id),
+      );
+      alert("Smazání selhalo: " + (res?.error ?? "?"));
+    }
+  };
+
   return (
-    <div className="mb-1 mt-3 rounded-md border bg-white">
+    <div className="mb-3 mt-10 rounded-md border bg-white">
       <button
         type="button"
         onClick={toggleCollapsed}
         className="flex w-full items-center justify-between rounded-md px-3 py-1.5 text-sm font-medium hover:bg-neutral-50"
       >
         <span className="flex items-center gap-2">
-          <span className="flex items-center gap-1 text-xs text-neutral-500">
-            <span className="text-3xl leading-none">{collapsed ? "▾" : "▴"}</span>
-            <span>{collapsed ? "ukázat" : "schovat"}</span>
-          </span>
+          <span className="text-3xl leading-none">{collapsed ? "▾" : "▴"}</span>
           <span>Chat 💬</span>
           {collapsed && unread > 0 && (
             <span className="inline-flex items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
@@ -279,40 +330,25 @@ export function Chat({
             </span>
           )}
         </span>
-        <span></span>
+        <span className="text-xs text-neutral-500">{collapsed ? "ukázat" : "schovat"}</span>
       </button>
       {!collapsed && (
         <div className="border-t">
-          <div
-            ref={listRef}
-            className="h-[150px] overflow-y-auto px-3 py-2 text-sm"
-          >
+          <div ref={listRef} className="h-[150px] overflow-y-auto px-3 py-2 text-sm">
             {messages.length === 0 ? (
-              <div className="py-6 text-center text-neutral-400">
-                Žádné zprávy. Buď první!
-              </div>
+              <div className="py-6 text-center text-neutral-400">Žádné zprávy. Buď první!</div>
             ) : (
               messages.map((m) => {
                 const p = profiles[m.user_id];
                 const name = p?.display_name ?? "?";
-                // Admins → amber text, no bg. Players → custom bg/text_color from profile
-                // if set, otherwise stable fallback from FALLBACK_COLORS.
-                const isAdmin = !!p?.is_admin;
-                const hasCustomColors = !!(p?.bg_color || p?.text_color);
-                const fb = !isAdmin && !hasCustomColors ? fallbackColor(m.user_id) : null;
-                const nameBg = p?.bg_color ?? fb?.bg ?? undefined;
-                const nameFg = p?.text_color ?? fb?.fg ?? undefined;
-                const nameStyle: React.CSSProperties | undefined =
-                  isAdmin
-                    ? undefined
-                    : { backgroundColor: nameBg, color: nameFg };
-                const nameCls = isAdmin
-                  ? "text-amber-700"
-                  : (nameBg ? "px-1.5" : "text-neutral-700");
+                const nameCls = p?.is_admin ? "text-amber-700" : "text-neutral-700";
+                const isEditing = editingId === m.id;
+                const showEdit = canEditMsg(m);
+                const showDelete = canDeleteMsg(m);
                 return (
                   <div
                     key={m.id}
-                    className="mb-1 flex flex-wrap items-baseline gap-x-1.5 leading-snug"
+                    className="group mb-1 flex flex-wrap items-baseline gap-x-1.5 leading-snug"
                   >
                     <span
                       className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
@@ -321,15 +357,83 @@ export function Chat({
                       {formatTimestamp(m.created_at)}
                     </span>
                     <span
-                      className={`shrink-0 rounded font-medium ${nameCls}`}
-                      style={nameStyle}
+                      className={`shrink-0 font-medium ${nameCls}`}
                       title={new Date(m.created_at).toLocaleString("cs-CZ")}
                     >
                       {name}:
                     </span>
-                    <span className="min-w-0 flex-1 break-words text-neutral-800">
-                      {renderContent(m.content)}
-                    </span>
+                    {isEditing ? (
+                      <span className="flex min-w-0 flex-1 items-center gap-1">
+                        <input
+                          ref={editInputRef}
+                          value={editDraft}
+                          onChange={(e) => setEditDraft(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              saveEdit();
+                            } else if (e.key === "Escape") {
+                              cancelEdit();
+                            }
+                          }}
+                          maxLength={MAX_LEN}
+                          className="min-w-0 flex-1 rounded border bg-white px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-300"
+                          style={{ fontSize: "16px" }}
+                        />
+                        <button
+                          type="button"
+                          onClick={saveEdit}
+                          className="rounded bg-sky-600 px-1.5 py-0.5 text-[11px] font-medium text-white hover:bg-sky-700"
+                        >
+                          ✓
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="rounded bg-neutral-200 px-1.5 py-0.5 text-[11px] text-neutral-700 hover:bg-neutral-300"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ) : (
+                      <>
+                        <span className="min-w-0 flex-1 break-words text-neutral-800">
+                          {renderContent(m.content)}
+                          {m.edited_at && (
+                            <span
+                              className="ml-1 text-[10px] text-neutral-400"
+                              title={`Upraveno: ${new Date(m.edited_at).toLocaleString("cs-CZ")}`}
+                            >
+                              (upraveno)
+                            </span>
+                          )}
+                        </span>
+                        {(showEdit || showDelete) && (
+                          <span className="ml-1 inline-flex shrink-0 items-center gap-1 opacity-60 transition-opacity hover:opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                            {showEdit && (
+                              <button
+                                type="button"
+                                onClick={() => startEdit(m)}
+                                className="rounded px-1 py-0.5 text-[11px] text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                                title="Upravit"
+                              >
+                                ✎
+                              </button>
+                            )}
+                            {showDelete && (
+                              <button
+                                type="button"
+                                onClick={() => onDelete(m)}
+                                className="rounded px-1 py-0.5 text-[11px] text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
+                                title="Smazat"
+                              >
+                                🗑
+                              </button>
+                            )}
+                          </span>
+                        )}
+                      </>
+                    )}
                   </div>
                 );
               })
