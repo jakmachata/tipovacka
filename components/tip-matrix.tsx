@@ -187,7 +187,7 @@ function TeamCell({
             <img
               src={url}
               alt={t.code}
-              className="inline-block h-[16px] w-[16px] rounded-full shadow-sm align-middle"
+              className="inline-block h-[30px] w-[30px] rounded-full shadow-sm align-middle"
             />
           )}
         </span>
@@ -200,7 +200,7 @@ function TeamCell({
             <img
               src={url}
               alt={t.code}
-              className="inline-block h-[16px] w-[16px] rounded-full shadow-sm align-middle"
+              className="inline-block h-[30px] w-[30px] rounded-full shadow-sm align-middle"
             />
           )}
         </span>
