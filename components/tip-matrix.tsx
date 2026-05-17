@@ -124,7 +124,7 @@ const TEAM_ISO2: Record<string, string> = {
 
 function flagUrl(code: string): string | null {
   const iso = TEAM_ISO2[code];
-  return iso ? `https://flagcdn.com/w20/${iso}.png` : null;
+  return iso ? `https://flagcdn.com/w80/${iso}.png` : null;
 }
 
 function fmt(iso: string) {
