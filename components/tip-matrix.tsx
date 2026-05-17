@@ -692,7 +692,7 @@ export function TipMatrix({
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
                                 className={
-                                  "h-[17px] w-auto rounded-sm shadow-sm" +
+                                  "h-[16px] w-auto rounded-sm shadow-sm" +
                                   (m.finalized && score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
                                 }
                               />
@@ -734,7 +734,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[17px] w-auto rounded-sm shadow-sm"
+                                className="h-[16px] w-auto rounded-sm shadow-sm"
                               />
                             )}
                           </div>
@@ -767,7 +767,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[17px] w-auto rounded-sm shadow-sm"
+                                className="h-[16px] w-auto rounded-sm shadow-sm"
                               />
                             )}
                           </div>
