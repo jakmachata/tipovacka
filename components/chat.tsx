@@ -395,7 +395,7 @@ export function Chat({
                             className="rounded px-1 font-black leading-none text-[18px] text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                             title="Smazat"
                           >
-                            ✕
+                            ✖
                           </button>
                         )}
                       </span>
