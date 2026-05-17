@@ -56,7 +56,7 @@ export default async function SchedulePage() {
     user
       ? supabase
           .from("chat_messages")
-          .select("id, user_id, content, created_at")
+          .select("id, user_id, content, created_at, edited_at")
           .order("created_at", { ascending: true })
           .limit(100)
       : Promise.resolve({ data: [] as ChatMessage[] }),
@@ -140,6 +140,7 @@ export default async function SchedulePage() {
       profiles={chatProfileMap}
       currentUserId={myId}
       canPost={canChat}
+      isAdmin={isAdmin}
     />
   ) : undefined;
 
