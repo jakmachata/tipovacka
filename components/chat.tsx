@@ -47,6 +47,30 @@ const STORAGE_LAST_SEEN = "chat_last_seen_id";
 const MAX_LEN = 500;
 const EDIT_WINDOW_MS = 10 * 60 * 1000;
 
+const FALLBACK_COLORS: Array<{ bg: string; text: string }> = [
+  { bg: "#e11d48", text: "#ffffff" },
+  { bg: "#ea580c", text: "#ffffff" },
+  { bg: "#d97706", text: "#ffffff" },
+  { bg: "#ca8a04", text: "#ffffff" },
+  { bg: "#65a30d", text: "#ffffff" },
+  { bg: "#16a34a", text: "#ffffff" },
+  { bg: "#059669", text: "#ffffff" },
+  { bg: "#0d9488", text: "#ffffff" },
+  { bg: "#0891b2", text: "#ffffff" },
+  { bg: "#0284c7", text: "#ffffff" },
+  { bg: "#2563eb", text: "#ffffff" },
+  { bg: "#4f46e5", text: "#ffffff" },
+  { bg: "#7c3aed", text: "#ffffff" },
+  { bg: "#c026d3", text: "#ffffff" },
+  { bg: "#db2777", text: "#ffffff" },
+];
+
+function fallbackForUserId(id: string): { bg: string; text: string } {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return FALLBACK_COLORS[h % FALLBACK_COLORS.length];
+}
+
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
 
 function formatTimestamp(iso: string): string {
@@ -341,7 +365,9 @@ export function Chat({
               messages.map((m) => {
                 const p = profiles[m.user_id];
                 const name = p?.display_name ?? "?";
-                const nameCls = p?.is_admin ? "text-amber-700" : "text-neutral-700";
+                const fallback = fallbackForUserId(m.user_id);
+                const bgColor = p?.bg_color ?? fallback.bg;
+                const textColor = p?.text_color ?? fallback.text;
                 const isEditing = editingId === m.id;
                 const showEdit = canEditMsg(m);
                 const showDelete = canDeleteMsg(m);
@@ -356,7 +382,7 @@ export function Chat({
                           <button
                             type="button"
                             onClick={() => startEdit(m)}
-                            className="rounded px-1 leading-none text-[20px] text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                            className="rounded px-1 leading-none text-[18px] text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
                             title="Upravit"
                           >
                             ✎
@@ -366,7 +392,7 @@ export function Chat({
                           <button
                             type="button"
                             onClick={() => onDelete(m)}
-                            className="rounded px-1 leading-none text-[20px] text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                            className="rounded px-1 font-black leading-none text-[18px] text-rose-600 hover:bg-rose-50 hover:text-rose-700"
                             title="Smazat"
                           >
                             ✕
@@ -381,10 +407,11 @@ export function Chat({
                       {formatTimestamp(m.created_at)}
                     </span>
                     <span
-                      className={`shrink-0 font-medium ${nameCls}`}
+                      className="shrink-0 rounded px-1.5 font-medium"
+                      style={{ backgroundColor: bgColor, color: textColor }}
                       title={new Date(m.created_at).toLocaleString("cs-CZ")}
                     >
-                      {name}:
+                      {name}
                     </span>
                     {isEditing ? (
                       <span className="flex min-w-0 flex-1 items-center gap-1">
