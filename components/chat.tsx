@@ -398,7 +398,7 @@ export function Chat({
                     ) : (
                       <>
                         {(showEdit || showDelete) && (
-                          <span className="mr-1 inline-flex shrink-0 items-center gap-1 opacity-60 transition-opacity hover:opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                          <span className="mr-1 inline-flex shrink-0 items-center gap-1">
                             {showEdit && (
                               <button
                                 type="button"
