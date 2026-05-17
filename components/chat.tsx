@@ -350,18 +350,6 @@ export function Chat({
                     key={m.id}
                     className="group mb-1 flex flex-wrap items-baseline gap-x-1.5 leading-snug"
                   >
-                    <span
-                      className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
-                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
-                    >
-                      {formatTimestamp(m.created_at)}
-                    </span>
-                    <span
-                      className={`shrink-0 font-medium ${nameCls}`}
-                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
-                    >
-                      {name}:
-                    </span>
                     {(showEdit || showDelete) && !isEditing && (
                       <span className="mr-1 inline-flex shrink-0 items-center gap-1">
                         {showEdit && (
@@ -374,6 +362,18 @@ export function Chat({
                             ✎
                           </button>
                         )}
+                    <span
+                      className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
+                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
+                    >
+                      {formatTimestamp(m.created_at)}
+                    </span>
+                    <span
+                      className={`shrink-0 font-medium ${nameCls}`}
+                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
+                    >
+                      {name}:
+                    </span>
                         {showDelete && (
                           <button
                             type="button"
@@ -381,7 +381,7 @@ export function Chat({
                             className="rounded px-1 leading-none text-[22px] text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
                             title="Smazat"
                           >
-                            🗑
+                            ✕
                           </button>
                         )}
                       </span>
