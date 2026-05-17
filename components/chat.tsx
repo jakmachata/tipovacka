@@ -362,18 +362,6 @@ export function Chat({
                             ✎
                           </button>
                         )}
-                    <span
-                      className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
-                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
-                    >
-                      {formatTimestamp(m.created_at)}
-                    </span>
-                    <span
-                      className={`shrink-0 font-medium ${nameCls}`}
-                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
-                    >
-                      {name}:
-                    </span>
                         {showDelete && (
                           <button
                             type="button"
@@ -386,6 +374,18 @@ export function Chat({
                         )}
                       </span>
                     )}
+                    <span
+                      className="shrink-0 text-[10px] text-neutral-400 tabular-nums"
+                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
+                    >
+                      {formatTimestamp(m.created_at)}
+                    </span>
+                    <span
+                      className={`shrink-0 font-medium ${nameCls}`}
+                      title={new Date(m.created_at).toLocaleString("cs-CZ")}
+                    >
+                      {name}:
+                    </span>
                     {isEditing ? (
                       <span className="flex min-w-0 flex-1 items-center gap-1">
                         <input
