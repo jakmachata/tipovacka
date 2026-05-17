@@ -127,6 +127,11 @@ function flagUrl(code: string): string | null {
   return iso ? `https://flagcdn.com/w80/${iso}.png` : null;
 }
 
+function circleFlagUrl(code: string): string | null {
+  const iso = TEAM_ISO2[code];
+  return iso ? `https://hatscripts.github.io/circle-flags/flags/${iso}.svg` : null;
+}
+
 function fmt(iso: string) {
   return new Date(iso).toLocaleString("cs-CZ", {
     day: "numeric",
@@ -165,7 +170,7 @@ function TeamCell({
   if (!t) return <>?</>;
   const v = hcp == null ? null : isHome ? hcp : -hcp;
   const sign = v === null ? "" : v > 0 ? `+${v}` : `${v}`;
-  const url = flagUrl(t.code);
+  const url = circleFlagUrl(t.code);
   return (
     <>
       {/* MOBILE: flag (vertically centered) + stacked code/hcp on right */}
@@ -182,7 +187,7 @@ function TeamCell({
             <img
               src={url}
               alt={t.code}
-              className="inline-block h-[16px] w-auto rounded-sm shadow-sm align-middle"
+              className="inline-block h-[16px] w-[16px] rounded-full shadow-sm align-middle"
             />
           )}
         </span>
@@ -195,7 +200,7 @@ function TeamCell({
             <img
               src={url}
               alt={t.code}
-              className="inline-block h-[16px] w-auto rounded-sm shadow-sm align-middle"
+              className="inline-block h-[16px] w-[16px] rounded-full shadow-sm align-middle"
             />
           )}
         </span>
