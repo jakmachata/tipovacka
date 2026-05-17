@@ -397,7 +397,30 @@ export function Chat({
                       </span>
                     ) : (
                       <>
-                        <span className="min-w-0 flex-1 break-words text-neutral-800">
+                        {(showEdit || showDelete) && (
+                          <span className="mr-1 inline-flex shrink-0 items-center gap-1 opacity-60 transition-opacity hover:opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                            {showEdit && (
+                              <button
+                                type="button"
+                                onClick={() => startEdit(m)}
+                                className="rounded px-1.5 py-0.5 text-[22px] leading-none text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                                title="Upravit"
+                              >
+                                ✎
+                              </button>
+                            )}
+                            {showDelete && (
+                              <button
+                                type="button"
+                                onClick={() => onDelete(m)}
+                                className="rounded px-1.5 py-0.5 text-[22px] leading-none text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
+                                title="Smazat"
+                              >
+                                🗑
+                              </button>
+                            )}
+                          </span>
+                                                <span className="min-w-0 flex-1 break-words text-neutral-800">
                           {renderContent(m.content)}
                           {m.edited_at && (
                             <span
@@ -408,29 +431,6 @@ export function Chat({
                             </span>
                           )}
                         </span>
-                        {(showEdit || showDelete) && (
-                          <span className="ml-1 inline-flex shrink-0 items-center gap-1 opacity-60 transition-opacity hover:opacity-100 md:opacity-0 md:group-hover:opacity-100">
-                            {showEdit && (
-                              <button
-                                type="button"
-                                onClick={() => startEdit(m)}
-                                className="rounded px-1 py-0.5 text-[11px] text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
-                                title="Upravit"
-                              >
-                                ✎
-                              </button>
-                            )}
-                            {showDelete && (
-                              <button
-                                type="button"
-                                onClick={() => onDelete(m)}
-                                className="rounded px-1 py-0.5 text-[11px] text-neutral-500 hover:bg-neutral-100 hover:text-rose-700"
-                                title="Smazat"
-                              >
-                                🗑
-                              </button>
-                            )}
-                          </span>
                         )}
                       </>
                     )}
