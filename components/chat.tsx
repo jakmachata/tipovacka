@@ -293,7 +293,7 @@ export function Chat({
     const res = await editChatMessage(editingId, text);
     if (res?.ok && res.message) {
       const updated = res.message as ChatMessage;
-      setMessages((prev) => prev.map((p) => (p.id === updted.id ? updated : p)));
+      setMessages((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
       cancelEdit();
     } else {
       alert("Úprava selhala: " + (res?.error ?? "?"));
