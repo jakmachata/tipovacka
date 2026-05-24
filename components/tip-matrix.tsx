@@ -597,10 +597,10 @@ export function TipMatrix({
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
                       <div className="flex items-center gap-1.5">
                         {home && (() => {
-                          const url = flagUrl(home.code);
+                          const url = circleFlagUrl(home.code);
                           return url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <span className="inline-flex w-[22px] justify-end"><img src={url} alt={home.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" /></span>
+                            <span className="inline-flex w-[18px] justify-end"><img src={url} alt={home.code} className="inline-block h-[18px] w-[18px] rounded-full shadow-sm" /></span>
                           ) : null;
                         })()}
                         <span className="font-medium">{home?.code ?? "?"}</span>
@@ -610,10 +610,10 @@ export function TipMatrix({
                       </div>
                       <div className="flex items-center gap-1.5">
                         {away && (() => {
-                          const url = flagUrl(away.code);
+                          const url = circleFlagUrl(away.code);
                           return url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <span className="inline-flex w-[22px] justify-end"><img src={url} alt={away.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" /></span>
+                            <span className="inline-flex w-[18px] justify-end"><img src={url} alt={away.code} className="inline-block h-[18px] w-[18px] rounded-full shadow-sm" /></span>
                           ) : null;
                         })()}
                         <span className="font-medium">{away?.code ?? "?"}</span>
