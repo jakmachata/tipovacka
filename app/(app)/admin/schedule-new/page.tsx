@@ -6,6 +6,7 @@ import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { AdminScoreQuad } from "@/components/admin-score-quad";
 import { type Match, type Team } from "@/lib/types";
 import { TimePicker } from "@/components/time-picker";
+import { TimeInput } from "@/components/time-input";
 import { pragueLocalToUTC, pragueParts, snap5 } from "@/lib/tz";
 
 const TEAM_ISO2: Record<string, string> = {
@@ -271,7 +272,7 @@ export default async function ScheduleNewPage({
                     <label className="flex flex-col text-xs text-neutral-600">
                       Čas
                       <div className="w-full [&>div>button]:w-full">
-                        <input type="text" name="starts_time" defaultValue={dt.time} inputMode="numeric" pattern="\\d{2}:\\d{2}" maxLength={5} placeholder="HH:MM" className="w-[72px] rounded border px-2 py-1 text-sm" />
+                        <TimeInput name="starts_time" defaultValue={dt.time} className="w-[72px] rounded border px-2 py-1 text-sm" />
                       </div>
                     </label>
                     <label className="flex flex-col text-xs text-neutral-600">
