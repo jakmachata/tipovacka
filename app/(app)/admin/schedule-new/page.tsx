@@ -123,11 +123,8 @@ export default async function ScheduleNewPage({
     "use server";
     const sb = await createClient();
     const id = Number(formData.get("id"));
-    const { count: pickCount } = await sb
-      .from("picks")
-      .select("id", { count: "exact", head: true })
-      .eq("match_id", id);
-    if (pickCount && pickCount > 0) {
+    const { data: pickCount } = await sb.rpc("count_picks_for_match", { p_match_id: id });
+    if (typeof pickCount === "number" && pickCount > 0) {
       throw new Error(`Nelze smazat zápas — již na něj existuje ${pickCount} tip(y/ů). Nejdříve vymaž všechny tipy v /admin/history.`);
     }
     await sb.from("matches").delete().eq("id", id);
