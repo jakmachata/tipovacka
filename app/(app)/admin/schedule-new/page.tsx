@@ -16,7 +16,7 @@ const TEAM_ISO2: Record<string, string> = {
 };
 function flagUrl(code: string): string | null {
   const iso = TEAM_ISO2[code];
-  return iso ? `https://flagcdn.com/w20/${iso}.png` : null;
+  return iso ? `https://hatscripts.github.io/circle-flags/flags/${iso}.svg` : null;
 }
 
 function TeamFlag({ code }: { code: string }) {
@@ -27,7 +27,7 @@ function TeamFlag({ code }: { code: string }) {
     <img
       src={url}
       alt={code}
-      className="inline-block h-[15px] w-auto rounded-sm shadow-sm align-middle"
+      className="inline-block h-[20px] w-[20px] rounded-full shadow-sm align-middle"
     />
   );
 }
@@ -123,6 +123,13 @@ export default async function ScheduleNewPage({
     "use server";
     const sb = await createClient();
     const id = Number(formData.get("id"));
+    const { count: pickCount } = await sb
+      .from("picks")
+      .select("id", { count: "exact", head: true })
+      .eq("match_id", id);
+    if (pickCount && pickCount > 0) {
+      throw new Error(`Nelze smazat zápas — již na něj existuje ${pickCount} tip(y/ů). Nejdříve vymaž všechny tipy v /admin/history.`);
+    }
     await sb.from("matches").delete().eq("id", id);
     revalidatePath("/admin/schedule-new");
     revalidatePath("/admin/matches");
@@ -351,7 +358,7 @@ export default async function ScheduleNewPage({
 
                 </div>
                 </details>
-                <div className="flex flex-row items-center gap-1 rounded-md border bg-white p-1.5">
+                <div className="flex flex-col md:flex-row items-center gap-1 rounded-md border bg-white p-1.5">
                   <form action={swapGameNo} className={idx === 0 ? "invisible pointer-events-none" : ""} aria-hidden={idx === 0}>
                     <input type="hidden" name="idA" value={m.id} />
                     <input type="hidden" name="idB" value={idx > 0 ? arr[idx - 1].id : m.id} />
