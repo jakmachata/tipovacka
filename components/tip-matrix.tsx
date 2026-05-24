@@ -181,7 +181,7 @@ function TeamCell({
             <span className="text-[11px] text-neutral-500">{sign}</span>
           )}
         </span>
-        <span className="inline-block w-[24px] text-center align-middle">
+        <span className="inline-block w-[30px] text-center align-middle">
           {url && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
@@ -194,7 +194,7 @@ function TeamCell({
       </span>
       {/* DESKTOP: flag + full name + (hcp) inline */}
       <span className="hidden items-center gap-1.5 whitespace-nowrap md:inline-flex">
-        <span className="inline-block w-[24px] text-center align-middle">
+        <span className="inline-block w-[30px] text-center align-middle">
           {url && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
