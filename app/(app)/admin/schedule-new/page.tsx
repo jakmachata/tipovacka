@@ -271,7 +271,7 @@ export default async function ScheduleNewPage({
                     <label className="flex flex-col text-xs text-neutral-600">
                       Čas
                       <div className="w-full [&>div>button]:w-full">
-                        <TimePicker name="starts_time" defaultValue={dt.time} />
+                        <input type="text" name="starts_time" defaultValue={dt.time} inputMode="numeric" pattern="\\d{2}:\\d{2}" maxLength={5} placeholder="HH:MM" className="w-[72px] rounded border px-2 py-1 text-sm" />
                       </div>
                     </label>
                     <label className="flex flex-col text-xs text-neutral-600">
