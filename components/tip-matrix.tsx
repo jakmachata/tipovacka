@@ -124,7 +124,7 @@ const TEAM_ISO2: Record<string, string> = {
 
 function flagUrl(code: string): string | null {
   const iso = TEAM_ISO2[code];
-  return iso ? `https://hatscripts.github.io/circle-flags/flags/${iso}.svg` : null;
+  return iso ? `https://flagcdn.com/w80/${iso}.png` : null;
 }
 
 function circleFlagUrl(code: string): string | null {
@@ -600,7 +600,7 @@ export function TipMatrix({
                           const url = flagUrl(home.code);
                           return url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <span className="inline-flex w-[22px] justify-end"><img src={url} alt={home.code} className="inline-block h-[14px] w-[14px] rounded-full shadow-sm" /></span>
+                            <span className="inline-flex w-[22px] justify-end"><img src={url} alt={home.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" /></span>
                           ) : null;
                         })()}
                         <span className="font-medium">{home?.code ?? "?"}</span>
@@ -613,7 +613,7 @@ export function TipMatrix({
                           const url = flagUrl(away.code);
                           return url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <span className="inline-flex w-[22px] justify-end"><img src={url} alt={away.code} className="inline-block h-[14px] w-[14px] rounded-full shadow-sm" /></span>
+                            <span className="inline-flex w-[22px] justify-end"><img src={url} alt={away.code} className="inline-block h-[14px] w-auto rounded-sm shadow-sm" /></span>
                           ) : null;
                         })()}
                         <span className="font-medium">{away?.code ?? "?"}</span>
@@ -697,7 +697,7 @@ export function TipMatrix({
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
                                 className={
-                                  "h-[16px] w-[16px] rounded-full shadow-sm" +
+                                  "h-[16px] w-auto rounded-sm shadow-sm" +
                                   (m.finalized && score && score.hcp_points <= 0 ? " grayscale opacity-50" : "")
                                 }
                               />
@@ -739,7 +739,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[16px] w-[16px] rounded-full shadow-sm"
+                                className="h-[16px] w-auto rounded-sm shadow-sm"
                               />
                             )}
                           </div>
@@ -772,7 +772,7 @@ export function TipMatrix({
                               <img
                                 src={sideFlag}
                                 alt={sideCode ?? ""}
-                                className="h-[16px] w-[16px] rounded-full shadow-sm"
+                                className="h-[16px] w-auto rounded-sm shadow-sm"
                               />
                             )}
                           </div>
@@ -1069,7 +1069,7 @@ function TipModal({
                 <img
                   src={homeFlag}
                   alt={match.home_code}
-                  className="h-[20px] w-[20px] rounded-full shadow-sm"
+                  className="h-[20px] w-auto rounded-sm shadow-sm"
                 />
               )}
               {match.home_handicap != null && (
@@ -1086,7 +1086,7 @@ function TipModal({
                 <img
                   src={awayFlag}
                   alt={match.away_code}
-                  className="h-[20px] w-[20px] rounded-full shadow-sm"
+                  className="h-[20px] w-auto rounded-sm shadow-sm"
                 />
               )}
               {match.home_handicap != null && (
