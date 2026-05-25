@@ -20,7 +20,7 @@ export default function RulesPage() {
         <tbody>
           <tr><td className="pr-6">Skupina (zápas Česka)</td><td>3</td></tr>
           <tr><td className="pr-6">Skupina (ostatní)</td><td>1</td></tr>
-          <tr><td className="pr-6">Předkolo / čtvrtfinále</td><td>2</td></tr>
+          <tr><td className="pr-6">Čtvrtfinále</td><td>2</td></tr>
           <tr><td className="pr-6">Semifinále</td><td>3</td></tr>
           <tr><td className="pr-6">Bronz / finále</td><td>4</td></tr>
         </tbody>
