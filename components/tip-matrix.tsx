@@ -287,6 +287,17 @@ export function TipMatrix({
     });
   }
   const [hidePast, setHidePast] = useState(false);
+  // Persistence: load from localStorage on mount, save on change
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("natipovals.hidePast") === "1") setHidePast(true);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
+      localStorage.setItem("natipovals.hidePast", hidePast ? "1" : "0");
+    } catch {}
+  }, [hidePast]);
   const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
   // Team column width: mobile 80px, desktop 160px. Aktualizujeme přes resize listener.
   const [teamColWidth, setTeamColWidth] = useState(80);
