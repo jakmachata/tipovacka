@@ -34,9 +34,9 @@ export function SortableTh({ field, label, title }: Props) {
       onClick={onClick}
     >
       {label}
-      {isActive && (
-        <span className="ml-0.5">{currentOrder === "asc" ? "↑" : "↓"}</span>
-      )}
+      <span className={"ml-0.5 " + (isActive ? "" : "text-neutral-300")}>
+        {isActive ? (currentOrder === "asc" ? "↑" : "↓") : "⇅"}
+      </span>
     </th>
   );
 }
