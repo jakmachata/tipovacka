@@ -82,7 +82,7 @@ export default async function HraciPage({
     .eq("id", user!.id)
     .single();
   const isAdmin = !!meProfile?.is_admin;
-  let userMetrics: Record<string, { hcp_distance: number | null; margin_err: number | null; goals_err: number | null }> = {};
+  let userMetrics: Record<string, { hcp_distance: number | null; margin_err: number | null; goals_err: number | null; fav_pct: number | null }> = {};
   if (isAdmin) {
     const { data: metricsData } = await supabase.from("user_tip_metrics").select("*");
     for (const m of metricsData ?? []) {
@@ -90,6 +90,7 @@ export default async function HraciPage({
         hcp_distance: m.avg_hcp_distance,
         margin_err: m.avg_margin_error,
         goals_err: m.avg_goals_error,
+        fav_pct: m.fav_pct,
       };
     }
   }
@@ -123,11 +124,12 @@ export default async function HraciPage({
   let approvedPlayers = (allProfiles ?? []).filter(
     (p: any) => !p.is_admin && p.is_approved,
   );
-  if (isAdmin && sortBy && ["spread", "naskok", "goly"].includes(sortBy)) {
+  if (isAdmin && sortBy && ["spread", "naskok", "goly", "fav"].includes(sortBy)) {
     const fieldKey =
       sortBy === "spread" ? "hcp_distance"
         : sortBy === "naskok" ? "margin_err"
-        : "goals_err";
+        : sortBy === "goly" ? "goals_err"
+        : "fav_pct";
     approvedPlayers = approvedPlayers.slice().sort((a: any, b: any) => {
       const va = userMetrics[a.id]?.[fieldKey] ?? null;
       const vb = userMetrics[b.id]?.[fieldKey] ?? null;
@@ -225,6 +227,7 @@ export default async function HraciPage({
               <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.hcp_distance)}</td>
               <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.margin_err)}</td>
               <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.goals_err)}</td>
+              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.fav_pct == null ? "—" : Math.round(um.fav_pct) + " %"}</td>
             </>
           );
         })()}
@@ -363,6 +366,7 @@ export default async function HraciPage({
                 <SortableTh field="spread" label="Δ spread" title="Průměrná |pickDiff + hcp| napříč všemi tipy" />
                 <SortableTh field="naskok" label="Δ náskok" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy" />
                 <SortableTh field="goly" label="Δ góly" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy" />
+                <SortableTh field="fav" label="% Fav" title="% tipů, kde tipér zvolil favorita (záporný handicap)" />
                 <EmailTh />
               </>
             )}
@@ -391,6 +395,7 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
@@ -417,6 +422,7 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
@@ -443,6 +449,7 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
