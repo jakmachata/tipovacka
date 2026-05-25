@@ -363,9 +363,9 @@ export default async function HraciPage({
           <tr>
             {isAdmin && (
               <>
-                <SortableTh field="spread" label="Δ spread" title="Průměrná |pickDiff + hcp| napříč všemi tipy" />
-                <SortableTh field="naskok" label="Δ náskok" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy" />
-                <SortableTh field="goly" label="Δ góly" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy" />
+                <SortableTh field="spread" label="spread" title="Průměrná |pickDiff + hcp| napříč všemi tipy" />
+                <SortableTh field="naskok" label="náskok" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy" />
+                <SortableTh field="goly" label="góly" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy" />
                 <SortableTh field="fav" label="% Fav" title="% tipů, kde tipér zvolil favorita (záporný handicap)" />
                 <EmailTh />
               </>
@@ -392,9 +392,9 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
@@ -419,9 +419,9 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
@@ -446,9 +446,9 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">Δ spread</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">Δ náskok</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">Δ góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
