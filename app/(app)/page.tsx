@@ -200,7 +200,7 @@ export default async function SchedulePage() {
     const cards: TickerCard[] = [];
     // A1: avg_margin_error TOP 3
     {
-      const t = topN("avg_margin_error", randInt(2, 5), true);
+      const t = topN("avg_margin_error", randInt(3, 6), true);
       if (t.length >= 2)
         cards.push({
           icon: "🔮",
@@ -210,7 +210,7 @@ export default async function SchedulePage() {
     }
     // A2: avg_goals_error TOP 3
     {
-      const t = topN("avg_goals_error", randInt(2, 5), true);
+      const t = topN("avg_goals_error", randInt(3, 6), true);
       if (t.length >= 2)
         cards.push({
           icon: "🏒",
@@ -220,7 +220,7 @@ export default async function SchedulePage() {
     }
     // B1: exact_count TOP 3 (higher = better)
     {
-      const t = topN("exact_count", randInt(2, 5), false);
+      const t = topN("exact_count", randInt(3, 6), false);
       if (t.length >= 2 && t[0].v > 0)
         cards.push({
           icon: "✨",
@@ -230,7 +230,7 @@ export default async function SchedulePage() {
     }
     // B2: off_by_one_count TOP 3
     {
-      const t = topN("off_by_one_count", randInt(2, 5), false);
+      const t = topN("off_by_one_count", randInt(3, 6), false);
       if (t.length >= 2 && t[0].v > 0)
         cards.push({
           icon: "😅",
@@ -240,7 +240,7 @@ export default async function SchedulePage() {
     }
     // C1: avg_hcp_distance TOP 2 + BOTTOM 2
     {
-      const n_c1 = randInt(2, 5);
+      const n_c1 = randInt(2, 3);
       const hi = topN("avg_hcp_distance", n_c1, false);
       const lo = topN("avg_hcp_distance", n_c1, true);
       if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
@@ -252,7 +252,7 @@ export default async function SchedulePage() {
     }
     // C2: fav_pct TOP 2 + BOTTOM 2
     {
-      const n_c2 = randInt(2, 5);
+      const n_c2 = randInt(2, 3);
       const hi = topN("fav_pct", n_c2, false);
       const lo = topN("fav_pct", n_c2, true);
       if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
@@ -271,7 +271,7 @@ export default async function SchedulePage() {
       { key: "pct_cze", icon: "🦁", title: "Body z českého handicapu" },
     ];
     for (const c of dCats) {
-      const n_d = randInt(2, 5);
+      const n_d = randInt(2, 3);
       const hi = topN(c.key, n_d, false);
       const lo = topN(c.key, n_d, true);
       const av = teamAvg(c.key);
