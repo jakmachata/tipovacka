@@ -237,7 +237,7 @@ export default async function SchedulePage() {
     }
     // C1: avg_hcp_distance TOP 2 + BOTTOM 2
     {
-      const n_c1 = randInt(1, 3);
+      const n_c1 = randInt(3, 6);
       const hi = topN("avg_hcp_distance", n_c1, false);
       const lo = topN("avg_hcp_distance", n_c1, true);
       if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
@@ -249,7 +249,7 @@ export default async function SchedulePage() {
     }
     // C2: fav_pct TOP 2 + BOTTOM 2
     {
-      const n_c2 = randInt(1, 3);
+      const n_c2 = randInt(3, 6);
       const hi = topN("fav_pct", n_c2, false);
       const lo = topN("fav_pct", n_c2, true);
       if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
@@ -268,7 +268,7 @@ export default async function SchedulePage() {
       { key: "pct_cze", icon: "🦁", title: "Body z českého handicapu" },
     ];
     for (const c of dCats) {
-      const n_d = randInt(1, 3);
+      const n_d = randInt(3, 6);
       const hi = topN(c.key, n_d, false);
       const lo = topN(c.key, n_d, true);
       const av = teamAvg(c.key);
