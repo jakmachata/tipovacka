@@ -6,9 +6,10 @@ interface Props {
   field: string;
   label: string;
   title?: string;
+  width?: string;
 }
 
-export function SortableTh({ field, label, title }: Props) {
+export function SortableTh({ field, label, title, width }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -28,7 +29,7 @@ export function SortableTh({ field, label, title }: Props) {
     <th
       className={
         "cursor-pointer select-none py-2 pr-3 text-right text-xs font-medium hover:text-neutral-900 " +
-        (isActive ? "text-neutral-900" : "text-neutral-500")
+        (isActive ? "text-neutral-900" : "text-neutral-500") + (width ? " " + width : "")
       }
       title={title}
       onClick={onClick}
