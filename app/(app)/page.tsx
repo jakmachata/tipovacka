@@ -1,6 +1,7 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { TipMatrix } from "@/components/tip-matrix";
 import { Chat, type ChatMessage, type ChatProfileInfo } from "@/components/chat";
+import { StatsTicker, type TickerCard } from "@/components/stats-ticker";
 import type { Profile } from "@/lib/types";
 
 export default async function SchedulePage() {
@@ -34,6 +35,7 @@ export default async function SchedulePage() {
     pendingRes,
     chatMessagesRes,
     chatProfilesRes,
+    metricsRes,
   ] = await Promise.all([
     supabase.from("matches").select("*").not("starts_at", "is", null).order("starts_at"),
     supabase.from("teams").select("*"),
@@ -65,6 +67,7 @@ export default async function SchedulePage() {
           .from("profiles")
           .select("id, display_name, is_admin, bg_color, text_color")
       : Promise.resolve({ data: [] as Array<{ id: string; display_name: string; is_admin: boolean; bg_color: string | null; text_color: string | null }> }),
+    createServiceClient().from("user_tip_metrics").select("*"),
   ]);
 
   // Pickovaná políčka pro každého hráče — pro non-admin viewers načteme přes
@@ -134,14 +137,145 @@ export default async function SchedulePage() {
     };
   }
 
+  // Build ticker cards from user_tip_metrics view
+  const tickerCards: TickerCard[] = (() => {
+    const metricsMap: Record<string, any> = {};
+    for (const mm of ((metricsRes as any)?.data ?? []) as any[]) {
+      metricsMap[mm.user_id] = mm;
+    }
+    const pl = (players as any[]).filter((p) => metricsMap[p.id]);
+    // Inject computed pct_* fields
+    for (const p of pl) {
+      const m = metricsMap[p.id];
+      const ptsExact = Number(m.pts_exact ?? 0);
+      const ptsP1 = Number(m.pts_p1 ?? 0);
+      const ptsGrp = Number(m.pts_hcp_group ?? 0);
+      const ptsPo = Number(m.pts_hcp_playoff ?? 0);
+      const ptsCze = Number(m.pts_hcp_czech ?? 0);
+      const tot = ptsExact + ptsP1 + ptsGrp + ptsPo + ptsCze;
+      if (tot > 0) {
+        m.pct_exact = (ptsExact / tot) * 100;
+        m.pct_p1 = (ptsP1 / tot) * 100;
+        m.pct_grp = (ptsGrp / tot) * 100;
+        m.pct_po = (ptsPo / tot) * 100;
+        m.pct_cze = (ptsCze / tot) * 100;
+      }
+    }
+    function topN(key: string, n: number, asc: boolean) {
+      return pl
+        .filter((p) => metricsMap[p.id]?.[key] != null)
+        .map((p) => ({ p, v: Number(metricsMap[p.id][key]) }))
+        .sort((a, b) => (asc ? a.v - b.v : b.v - a.v))
+        .slice(0, n);
+    }
+    function teamAvg(key: string): number | null {
+      const vs = pl.map((p) => Number(metricsMap[p.id]?.[key] ?? NaN)).filter((v) => !isNaN(v));
+      if (vs.length === 0) return null;
+      return vs.reduce((a, b) => a + b, 0) / vs.length;
+    }
+    const cards: TickerCard[] = [];
+    // A1: avg_margin_error TOP 3
+    {
+      const t = topN("avg_margin_error", 3, true);
+      if (t.length >= 2)
+        cards.push({
+          icon: "🔮",
+          title: "Nejmenší chyba v náskoku",
+          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v.toFixed(2)})`).join(", "),
+        });
+    }
+    // A2: avg_goals_error TOP 3
+    {
+      const t = topN("avg_goals_error", 3, true);
+      if (t.length >= 2)
+        cards.push({
+          icon: "⚽",
+          title: "Nejmenší celková chyba ve skóre",
+          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v.toFixed(2)})`).join(", "),
+        });
+    }
+    // B1: exact_count TOP 3 (higher = better)
+    {
+      const t = topN("exact_count", 3, false);
+      if (t.length >= 2 && t[0].v > 0)
+        cards.push({
+          icon: "✨",
+          title: "Nejvíc přesných výsledků",
+          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v}×)`).join(", "),
+        });
+    }
+    // B2: off_by_one_count TOP 3
+    {
+      const t = topN("off_by_one_count", 3, false);
+      if (t.length >= 2 && t[0].v > 0)
+        cards.push({
+          icon: "😅",
+          title: "„O jeden gól vedle" mistři",
+          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v}×)`).join(", "),
+        });
+    }
+    // C1: avg_hcp_distance TOP 2 + BOTTOM 2
+    {
+      const hi = topN("avg_hcp_distance", 2, false);
+      const lo = topN("avg_hcp_distance", 2, true);
+      if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
+        cards.push({
+          icon: "🎯",
+          title: "Vzdálenost od handicapové čáry",
+          body: `daleko: ${hi.map((x) => `${x.p.display_name} (${x.v.toFixed(2)})`).join(", ")} • blízko: ${lo.map((x) => `${x.p.display_name} (${x.v.toFixed(2)})`).join(", ")}`,
+        });
+    }
+    // C2: fav_pct TOP 2 + BOTTOM 2
+    {
+      const hi = topN("fav_pct", 2, false);
+      const lo = topN("fav_pct", 2, true);
+      if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
+        cards.push({
+          icon: "💫",
+          title: "Sázka na favority",
+          body: `favoritáři: ${hi.map((x) => `${x.p.display_name} (${Math.round(x.v)}%)`).join(", ")} • underdogové: ${lo.map((x) => `${x.p.display_name} (${Math.round(x.v)}%)`).join(", ")}`,
+        });
+    }
+    // D1-D5: composition pct
+    const dCats: Array<{ key: string; icon: string; title: string }> = [
+      { key: "pct_exact", icon: "🏒", title: "Body z přesných výsledků" },
+      { key: "pct_p1", icon: "🥅", title: "Body z 1. třetin" },
+      { key: "pct_grp", icon: "🎲", title: "Body z handicapů skupiny" },
+      { key: "pct_po", icon: "🏆", title: "Body z handicapů playoff" },
+      { key: "pct_cze", icon: "🇨🇿", title: "Body z českého handicapu" },
+    ];
+    for (const c of dCats) {
+      const hi = topN(c.key, 1, false);
+      const lo = topN(c.key, 1, true);
+      const av = teamAvg(c.key);
+      if (hi.length === 0 || lo.length === 0 || av === null) continue;
+      if (hi[0].p.id === lo[0].p.id) continue;
+      cards.push({
+        icon: c.icon,
+        title: c.title,
+        avgNote: `(průměr tipovačky: ${Math.round(av)}%)`,
+        body: `nejvíc ${hi[0].p.display_name} ${Math.round(hi[0].v)}% • nejmíň ${lo[0].p.display_name} ${Math.round(lo[0].v)}%`,
+      });
+    }
+    // Shuffle
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    return cards;
+  })();
+
   const chatSlot = user ? (
-    <Chat
+    <>
+      <StatsTicker cards={tickerCards} />
+      <Chat
       initialMessages={(chatMessagesRes?.data ?? []) as ChatMessage[]}
       profiles={chatProfileMap}
       currentUserId={myId}
       canPost={canChat}
       isAdmin={isAdmin}
     />
+    </>
   ) : undefined;
 
   return (
