@@ -210,7 +210,7 @@ export default async function SchedulePage() {
       if (t.length >= 2 && t[0].v > 0)
         cards.push({
           icon: "😅",
-          title: "„O jeden gól vedle" mistři",
+          title: "„O jeden gól vedle\" mistři",
           body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v}×)`).join(", "),
         });
     }
