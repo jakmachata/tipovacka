@@ -38,12 +38,11 @@ export function StatsTicker({ cards }: { cards: TickerCard[] }) {
         title={`${c.icon} ${c.title}: ${c.body}`}
       >
         <span className="mr-1.5 text-xl">{c.icon}</span>
-        <strong className="font-semibold">{c.title}</strong>
+        <strong className="font-semibold">{c.title}:</strong>
         {c.avgNote && (
-          <span className="ml-1 italic text-amber-700">{c.avgNote}</span>
+          <span className="ml-1.5 italic text-amber-700">{c.avgNote}</span>
         )}
-        <span className="mx-1.5 text-amber-600">:</span>
-        <span>{c.body}</span>
+        <span className="ml-1.5">{c.body}</span>
       </div>
     </div>
   );
