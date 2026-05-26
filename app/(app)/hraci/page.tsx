@@ -247,14 +247,14 @@ export default async function HraciPage({
               <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.hcp_distance)}</td>
               <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.margin_err)}</td>
               <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.goals_err)}</td>
-              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.fav_pct == null ? "—" : Math.round(um.fav_pct) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.fav_pct == null ? "—" : Math.round(um.fav_pct) + "%"}</td>
               <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.exact_count ?? 0}</td>
               <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.off_one ?? 0}</td>
-              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_exact == null ? "—" : Math.round(um.pct_exact) + " %"}</td>
-              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_p1 == null ? "—" : Math.round(um.pct_p1) + " %"}</td>
-              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_grp == null ? "—" : Math.round(um.pct_grp) + " %"}</td>
-              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_po == null ? "—" : Math.round(um.pct_po) + " %"}</td>
-              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_cze == null ? "—" : Math.round(um.pct_cze) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_exact == null ? "—" : Math.round(um.pct_exact) + "%"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_p1 == null ? "—" : Math.round(um.pct_p1) + "%"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_grp == null ? "—" : Math.round(um.pct_grp) + "%"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_po == null ? "—" : Math.round(um.pct_po) + "%"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_cze == null ? "—" : Math.round(um.pct_cze) + "%"}</td>
             </>
           );
         })()}
@@ -394,8 +394,8 @@ export default async function HraciPage({
                 <SortableTh field="naskok" label="náskok" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy" width="w-[64px]" />
                 <SortableTh field="goly" label="góly" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy" width="w-[64px]" />
                 <SortableTh field="fav" label="%Fav" title="% tipů, kde tipér zvolil favorita (záporný handicap)" width="w-[64px]" />
-                <SortableTh field="exact" label="Přesné" title="Počet přesných výsledků" width="w-[64px]" />
-                <SortableTh field="off1" label="±1" title="Počet tipů netrefených o jeden gól" width="w-[64px]" />
+                <SortableTh field="exact" label="Výsledky" title="Počet přesných výsledků" width="w-[64px]" />
+                <SortableTh field="off1" label="O jeden" title="Počet tipů netrefených o jeden gól" width="w-[64px]" />
                 <SortableTh field="ex_pct" label="%Výs" title="Podíl bodů z přesných výsledků" width="w-[64px]" />
                 <SortableTh field="p1_pct" label="%P1" title="Podíl bodů z 1. třetin" width="w-[64px]" />
                 <SortableTh field="grp_pct" label="%Grp" title="Podíl bodů z handicapů skupiny" width="w-[64px]" />
@@ -415,6 +415,43 @@ export default async function HraciPage({
           {approvedPlayers.map((p: any) =>
             renderRow(p, { showDelete: isAdmin, showZaplatil: true }),
           )}
+          {isAdmin && approvedPlayers.length > 0 && (() => {
+            const keys = ["hcp_distance","margin_err","goals_err","fav_pct","exact_count","off_one","pct_exact","pct_p1","pct_grp","pct_po","pct_cze"] as const;
+            const sums: Record<string, number> = {};
+            const counts: Record<string, number> = {};
+            for (const p of approvedPlayers as any[]) {
+              const um = userMetrics[p.id];
+              if (!um) continue;
+              for (const k of keys) {
+                const v = (um as any)[k];
+                if (v == null) continue;
+                sums[k] = (sums[k] ?? 0) + Number(v);
+                counts[k] = (counts[k] ?? 0) + 1;
+              }
+            }
+            const avg: Record<string, number | null> = {};
+            for (const k of keys) avg[k] = counts[k] ? sums[k] / counts[k] : null;
+            const fmt = (v: number | null) => v == null ? "—" : v.toFixed(2);
+            const fmtPct = (v: number | null) => v == null ? "—" : Math.round(v) + "%";
+            const fmtCount = (v: number | null) => v == null ? "—" : v.toFixed(1);
+            const tc = "w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700 font-medium";
+            return (
+              <tr className="border-t-2 border-neutral-400 bg-neutral-100 font-medium">
+                <td className={tc}>{fmt(avg.hcp_distance)}</td>
+                <td className={tc}>{fmt(avg.margin_err)}</td>
+                <td className={tc}>{fmt(avg.goals_err)}</td>
+                <td className={tc}>{fmtPct(avg.fav_pct)}</td>
+                <td className={tc}>{fmtCount(avg.exact_count)}</td>
+                <td className={tc}>{fmtCount(avg.off_one)}</td>
+                <td className={tc}>{fmtPct(avg.pct_exact)}</td>
+                <td className={tc}>{fmtPct(avg.pct_p1)}</td>
+                <td className={tc}>{fmtPct(avg.pct_grp)}</td>
+                <td className={tc}>{fmtPct(avg.pct_po)}</td>
+                <td className={tc}>{fmtPct(avg.pct_cze)}</td>
+                <td className="py-2 text-xs italic text-neutral-600" colSpan={6}>Průměr týmu ({approvedPlayers.length} hráčů)</td>
+              </tr>
+            );
+          })()}
         </tbody>
       </table>
 
@@ -430,8 +467,8 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="% tipů, kde tipér zvolil favorita (záporný handicap)">%Fav</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Přesné</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">±1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Výsledky</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">O jeden</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z přesných výsledků">%Výs</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z 1. třetin">%P1</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů skupiny">%Grp</th>
@@ -464,8 +501,8 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="% tipů, kde tipér zvolil favorita (záporný handicap)">%Fav</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Přesné</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">±1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Výsledky</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">O jeden</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z přesných výsledků">%Výs</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z 1. třetin">%P1</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů skupiny">%Grp</th>
@@ -498,8 +535,8 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="% tipů, kde tipér zvolil favorita (záporný handicap)">%Fav</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Přesné</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">±1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Výsledky</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">O jeden</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z přesných výsledků">%Výs</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z 1. třetin">%P1</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů skupiny">%Grp</th>
