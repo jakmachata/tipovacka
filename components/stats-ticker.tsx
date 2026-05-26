@@ -21,7 +21,7 @@ export function StatsTicker({ cards }: { cards: TickerCard[] }) {
         setIdx((i) => (i + 1) % cards.length);
         setVisible(true);
       }, 400);
-    }, 7000);
+    }, 9000);
     return () => clearInterval(interval);
   }, [cards.length]);
 
