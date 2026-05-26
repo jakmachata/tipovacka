@@ -82,15 +82,28 @@ export default async function HraciPage({
     .eq("id", user!.id)
     .single();
   const isAdmin = !!meProfile?.is_admin;
-  let userMetrics: Record<string, { hcp_distance: number | null; margin_err: number | null; goals_err: number | null; fav_pct: number | null }> = {};
+  let userMetrics: Record<string, { hcp_distance: number | null; margin_err: number | null; goals_err: number | null; fav_pct: number | null; exact_count: number | null; off_one: number | null; pct_exact: number | null; pct_p1: number | null; pct_grp: number | null; pct_po: number | null; pct_cze: number | null }> = {};
   if (isAdmin) {
     const { data: metricsData } = await supabase.from("user_tip_metrics").select("*");
     for (const m of metricsData ?? []) {
+      const ptsExact = Number(m.pts_exact ?? 0);
+      const ptsP1 = Number(m.pts_p1 ?? 0);
+      const ptsGrp = Number(m.pts_hcp_group ?? 0);
+      const ptsPo = Number(m.pts_hcp_playoff ?? 0);
+      const ptsCze = Number(m.pts_hcp_czech ?? 0);
+      const totalPts = ptsExact + ptsP1 + ptsGrp + ptsPo + ptsCze;
       userMetrics[m.user_id] = {
         hcp_distance: m.avg_hcp_distance,
         margin_err: m.avg_margin_error,
         goals_err: m.avg_goals_error,
         fav_pct: m.fav_pct,
+        exact_count: m.exact_count,
+        off_one: m.off_by_one_count,
+        pct_exact: totalPts > 0 ? (ptsExact / totalPts) * 100 : null,
+        pct_p1: totalPts > 0 ? (ptsP1 / totalPts) * 100 : null,
+        pct_grp: totalPts > 0 ? (ptsGrp / totalPts) * 100 : null,
+        pct_po: totalPts > 0 ? (ptsPo / totalPts) * 100 : null,
+        pct_cze: totalPts > 0 ? (ptsCze / totalPts) * 100 : null,
       };
     }
   }
@@ -124,12 +137,19 @@ export default async function HraciPage({
   let approvedPlayers = (allProfiles ?? []).filter(
     (p: any) => !p.is_admin && p.is_approved,
   );
-  if (isAdmin && sortBy && ["spread", "naskok", "goly", "fav"].includes(sortBy)) {
+  if (isAdmin && sortBy && ["spread", "naskok", "goly", "fav", "exact", "off1", "ex_pct", "p1_pct", "grp_pct", "po_pct", "cze_pct"].includes(sortBy)) {
     const fieldKey =
       sortBy === "spread" ? "hcp_distance"
         : sortBy === "naskok" ? "margin_err"
         : sortBy === "goly" ? "goals_err"
-        : "fav_pct";
+        : sortBy === "fav" ? "fav_pct"
+        : sortBy === "exact" ? "exact_count"
+        : sortBy === "off1" ? "off_one"
+        : sortBy === "ex_pct" ? "pct_exact"
+        : sortBy === "p1_pct" ? "pct_p1"
+        : sortBy === "grp_pct" ? "pct_grp"
+        : sortBy === "po_pct" ? "pct_po"
+        : "pct_cze";
     approvedPlayers = approvedPlayers.slice().sort((a: any, b: any) => {
       const va = userMetrics[a.id]?.[fieldKey] ?? null;
       const vb = userMetrics[b.id]?.[fieldKey] ?? null;
@@ -224,10 +244,17 @@ export default async function HraciPage({
           const fmt = (v: number | null | undefined) => v == null ? "–" : v.toFixed(2);
           return (
             <>
-              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.hcp_distance)}</td>
-              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.margin_err)}</td>
-              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.goals_err)}</td>
-              <td className="py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.fav_pct == null ? "—" : Math.round(um.fav_pct) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.hcp_distance)}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.margin_err)}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{fmt(um?.goals_err)}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.fav_pct == null ? "—" : Math.round(um.fav_pct) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.exact_count ?? 0}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.off_one ?? 0}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_exact == null ? "—" : Math.round(um.pct_exact) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_p1 == null ? "—" : Math.round(um.pct_p1) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_grp == null ? "—" : Math.round(um.pct_grp) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_po == null ? "—" : Math.round(um.pct_po) + " %"}</td>
+              <td className="w-[64px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_cze == null ? "—" : Math.round(um.pct_cze) + " %"}</td>
             </>
           );
         })()}
@@ -363,10 +390,17 @@ export default async function HraciPage({
           <tr>
             {isAdmin && (
               <>
-                <SortableTh field="spread" label="spread" title="Průměrná |pickDiff + hcp| napříč všemi tipy" />
-                <SortableTh field="naskok" label="náskok" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy" />
-                <SortableTh field="goly" label="góly" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy" />
-                <SortableTh field="fav" label="% Fav" title="% tipů, kde tipér zvolil favorita (záporný handicap)" />
+                <SortableTh field="spread" label="spread" title="Průměrná |pickDiff + hcp| napříč všemi tipy" width="w-[64px]" />
+                <SortableTh field="naskok" label="náskok" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy" width="w-[64px]" />
+                <SortableTh field="goly" label="góly" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy" width="w-[64px]" />
+                <SortableTh field="fav" label="%Fav" title="% tipů, kde tipér zvolil favorita (záporný handicap)" width="w-[64px]" />
+                <SortableTh field="exact" label="Přesné" title="Počet přesných výsledků" width="w-[64px]" />
+                <SortableTh field="off1" label="±1" title="Počet tipů netrefených o jeden gól" width="w-[64px]" />
+                <SortableTh field="ex_pct" label="%Výs" title="Podíl bodů z přesných výsledků" width="w-[64px]" />
+                <SortableTh field="p1_pct" label="%P1" title="Podíl bodů z 1. třetin" width="w-[64px]" />
+                <SortableTh field="grp_pct" label="%Grp" title="Podíl bodů z handicapů skupiny" width="w-[64px]" />
+                <SortableTh field="po_pct" label="%Po" title="Podíl bodů z handicapů playoff" width="w-[64px]" />
+                <SortableTh field="cze_pct" label="%ČZ" title="Podíl bodů z handicapů českého týmu" width="w-[64px]" />
                 <EmailTh />
               </>
             )}
@@ -392,10 +426,17 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="% tipů, kde tipér zvolil favorita (záporný handicap)">%Fav</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Přesné</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">±1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z přesných výsledků">%Výs</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z 1. třetin">%P1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů skupiny">%Grp</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů playoff">%Po</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů českého týmu">%ČZ</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
@@ -419,10 +460,17 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="% tipů, kde tipér zvolil favorita (záporný handicap)">%Fav</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Přesné</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">±1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z přesných výsledků">%Výs</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z 1. třetin">%P1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů skupiny">%Grp</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů playoff">%Po</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů českého týmu">%ČZ</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
@@ -446,10 +494,17 @@ export default async function HraciPage({
           <table className="text-sm">
             <thead className="border-b text-left text-neutral-500">
               <tr>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
-                <th className="py-2 pr-3 text-right text-xs font-medium" title="% tipů, kde tipér zvolil favorita (záporný handicap)">% Fav</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff + hcp| napříč všemi tipy">spread</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickDiff - actualDiff| nad finalizovanými zápasy">náskok</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Průměrná |pickHome - actualHome| + |pickAway - actualAway| nad finalizovanými zápasy">góly</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="% tipů, kde tipér zvolil favorita (záporný handicap)">%Fav</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet přesných výsledků">Přesné</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Počet tipů netrefených o jeden gól">±1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z přesných výsledků">%Výs</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z 1. třetin">%P1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů skupiny">%Grp</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů playoff">%Po</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[64px]" title="Podíl bodů z handicapů českého týmu">%ČZ</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
