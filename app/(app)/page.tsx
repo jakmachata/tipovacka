@@ -174,6 +174,26 @@ export default async function SchedulePage() {
       return vs.reduce((a, b) => a + b, 0) / vs.length;
     }
     function randInt(lo: number, hi: number) { return Math.floor(Math.random() * (hi - lo + 1)) + lo; }
+    function formatTopList(items: Array<{ p: any; v: number }>, valueFmt: (v: number) => string): string {
+      const result: string[] = [];
+      let i = 0;
+      while (i < items.length) {
+        let j = i + 1;
+        while (j < items.length && items[j].v === items[i].v) j++;
+        const groupSize = j - i;
+        const rank = i + 1;
+        const valStr = valueFmt(items[i].v);
+        if (groupSize === 1) {
+          result.push(`${rank}. ${items[i].p.display_name} (${valStr})`);
+        } else {
+          const names = items.slice(i, j).map((x) => x.p.display_name).join(" a ");
+          const word = groupSize === 2 ? "oba" : "všichni";
+          result.push(`T-${rank}. ${names} (${word} ${valStr})`);
+        }
+        i = j;
+      }
+      return result.join(", ");
+    }
     const cards: TickerCard[] = [];
     // A1: avg_margin_error TOP 3
     {
@@ -182,7 +202,7 @@ export default async function SchedulePage() {
         cards.push({
           icon: "🔮",
           title: "Nejmenší chyba v náskoku",
-          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v.toFixed(2)})`).join(", "),
+          body: formatTopList(t, (v) => v.toFixed(2)),
         });
     }
     // A2: avg_goals_error TOP 3
@@ -190,9 +210,9 @@ export default async function SchedulePage() {
       const t = topN("avg_goals_error", randInt(3, 6), true);
       if (t.length >= 2)
         cards.push({
-          icon: "⚽",
+          icon: "🏒",
           title: "Nejmenší celková chyba ve skóre",
-          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v.toFixed(2)})`).join(", "),
+          body: formatTopList(t, (v) => v.toFixed(2)),
         });
     }
     // B1: exact_count TOP 3 (higher = better)
@@ -202,7 +222,7 @@ export default async function SchedulePage() {
         cards.push({
           icon: "✨",
           title: "Nejvíc přesných výsledků",
-          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v}×)`).join(", "),
+          body: formatTopList(t, (v) => `${v}×`),
         });
     }
     // B2: off_by_one_count TOP 3
@@ -212,7 +232,7 @@ export default async function SchedulePage() {
         cards.push({
           icon: "😅",
           title: "„O jeden gól vedle\" mistři",
-          body: t.map((x, i) => `${i + 1}. ${x.p.display_name} (${x.v}×)`).join(", "),
+          body: formatTopList(t, (v) => `${v}×`),
         });
     }
     // C1: avg_hcp_distance TOP 2 + BOTTOM 2
@@ -241,7 +261,7 @@ export default async function SchedulePage() {
     }
     // D1-D5: composition pct
     const dCats: Array<{ key: string; icon: string; title: string }> = [
-      { key: "pct_exact", icon: "🏒", title: "Body z přesných výsledků" },
+      { key: "pct_exact", icon: "💯", title: "Body z přesných výsledků" },
       { key: "pct_p1", icon: "🥅", title: "Body z 1. třetin" },
       { key: "pct_grp", icon: "🎲", title: "Body z handicapů skupiny" },
       { key: "pct_po", icon: "🏆", title: "Body z handicapů playoff" },
