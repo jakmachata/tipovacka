@@ -32,17 +32,17 @@ export function StatsTicker({ cards }: { cards: TickerCard[] }) {
     <div className="border-b border-amber-200 bg-amber-50 px-3 py-1.5">
       <div
         className={
-          "truncate text-xs text-amber-900 transition-opacity duration-300 " +
+          "truncate text-base text-amber-900 transition-opacity duration-300 " +
           (visible ? "opacity-100" : "opacity-0")
         }
         title={`${c.icon} ${c.title}: ${c.body}`}
       >
-        <span className="mr-1.5">{c.icon}</span>
+        <span className="mr-1.5 text-xl">{c.icon}</span>
         <strong className="font-semibold">{c.title}</strong>
         {c.avgNote && (
           <span className="ml-1 italic text-amber-700">{c.avgNote}</span>
         )}
-        <span className="mx-1.5 text-amber-600">—</span>
+        <span className="mx-1.5 text-amber-600">:</span>
         <span>{c.body}</span>
       </div>
     </div>
