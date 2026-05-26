@@ -173,10 +173,11 @@ export default async function SchedulePage() {
       if (vs.length === 0) return null;
       return vs.reduce((a, b) => a + b, 0) / vs.length;
     }
+    function randInt(lo: number, hi: number) { return Math.floor(Math.random() * (hi - lo + 1)) + lo; }
     const cards: TickerCard[] = [];
     // A1: avg_margin_error TOP 3
     {
-      const t = topN("avg_margin_error", 3, true);
+      const t = topN("avg_margin_error", randInt(3, 6), true);
       if (t.length >= 2)
         cards.push({
           icon: "🔮",
@@ -186,7 +187,7 @@ export default async function SchedulePage() {
     }
     // A2: avg_goals_error TOP 3
     {
-      const t = topN("avg_goals_error", 3, true);
+      const t = topN("avg_goals_error", randInt(3, 6), true);
       if (t.length >= 2)
         cards.push({
           icon: "⚽",
@@ -196,7 +197,7 @@ export default async function SchedulePage() {
     }
     // B1: exact_count TOP 3 (higher = better)
     {
-      const t = topN("exact_count", 3, false);
+      const t = topN("exact_count", randInt(3, 6), false);
       if (t.length >= 2 && t[0].v > 0)
         cards.push({
           icon: "✨",
@@ -206,7 +207,7 @@ export default async function SchedulePage() {
     }
     // B2: off_by_one_count TOP 3
     {
-      const t = topN("off_by_one_count", 3, false);
+      const t = topN("off_by_one_count", randInt(3, 6), false);
       if (t.length >= 2 && t[0].v > 0)
         cards.push({
           icon: "😅",
@@ -216,8 +217,9 @@ export default async function SchedulePage() {
     }
     // C1: avg_hcp_distance TOP 2 + BOTTOM 2
     {
-      const hi = topN("avg_hcp_distance", 2, false);
-      const lo = topN("avg_hcp_distance", 2, true);
+      const n_c1 = randInt(1, 3);
+      const hi = topN("avg_hcp_distance", n_c1, false);
+      const lo = topN("avg_hcp_distance", n_c1, true);
       if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
         cards.push({
           icon: "🎯",
@@ -227,8 +229,9 @@ export default async function SchedulePage() {
     }
     // C2: fav_pct TOP 2 + BOTTOM 2
     {
-      const hi = topN("fav_pct", 2, false);
-      const lo = topN("fav_pct", 2, true);
+      const n_c2 = randInt(1, 3);
+      const hi = topN("fav_pct", n_c2, false);
+      const lo = topN("fav_pct", n_c2, true);
       if (hi.length >= 2 && lo.length >= 2 && hi[0].p.id !== lo[0].p.id)
         cards.push({
           icon: "💫",
@@ -242,19 +245,22 @@ export default async function SchedulePage() {
       { key: "pct_p1", icon: "🥅", title: "Body z 1. třetin" },
       { key: "pct_grp", icon: "🎲", title: "Body z handicapů skupiny" },
       { key: "pct_po", icon: "🏆", title: "Body z handicapů playoff" },
-      { key: "pct_cze", icon: "🇨🇿", title: "Body z českého handicapu" },
+      { key: "pct_cze", icon: "🦁", title: "Body z českého handicapu" },
     ];
     for (const c of dCats) {
-      const hi = topN(c.key, 1, false);
-      const lo = topN(c.key, 1, true);
+      const n_d = randInt(1, 3);
+      const hi = topN(c.key, n_d, false);
+      const lo = topN(c.key, n_d, true);
       const av = teamAvg(c.key);
       if (hi.length === 0 || lo.length === 0 || av === null) continue;
       if (hi[0].p.id === lo[0].p.id) continue;
+      const hiStr = hi.map((x) => `${x.p.display_name} ${Math.round(x.v)}%`).join(", ");
+      const loStr = lo.map((x) => `${x.p.display_name} ${Math.round(x.v)}%`).join(", ");
       cards.push({
         icon: c.icon,
         title: c.title,
         avgNote: `(průměr tipovačky: ${Math.round(av)}%)`,
-        body: `nejvíc ${hi[0].p.display_name} ${Math.round(hi[0].v)}% • nejmíň ${lo[0].p.display_name} ${Math.round(lo[0].v)}%`,
+        body: `nejvíc ${hiStr} • nejmíň ${loStr}`,
       });
     }
     // Shuffle
