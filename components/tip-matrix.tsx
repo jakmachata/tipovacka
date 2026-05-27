@@ -468,10 +468,10 @@ export function TipMatrix({
         */}
         <table
           className="text-xs border-separate border-spacing-0 table-fixed"
-          style={{ width: 60 + (teamColWidth < 160 ? teamColWidth * 2 - 35 : teamColWidth * 2) + 75 + players.length * 77 }}
+          style={{ width: 68 + (teamColWidth < 160 ? teamColWidth * 2 - 35 : teamColWidth * 2) + 75 + players.length * 77 }}
         >
           <colgroup>
-            <col style={{ width: 60 }} />
+            <col style={{ width: 68 }} />
             {/* Zápas col — viditelný jen na mobilu (=teamColWidth*2). Desktop má 0. */}
             <col style={{ width: teamColWidth < 160 ? teamColWidth * 2 - 35 : 0 }} />
             {/* Domácí/Hosté cols — viditelné jen na desktopu. Mobile má 0. */}
@@ -484,9 +484,9 @@ export function TipMatrix({
           </colgroup>
           <thead>
             <tr className="bg-neutral-900">
-              <th className={headerBase + " border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center w-[60px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
+              <th className={headerBase + " border-r-[1px] border-r-neutral-900 bg-neutral-900 text-center w-[68px] sticky left-0 md:left-auto z-40 md:z-10"}>Buly</th>
               {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-              <th className={headerBase + " border-r-[1px] border-r-neutral-900 md:invisible md:overflow-hidden bg-neutral-900 text-left sticky left-[60px] z-40"}>Zápas</th>
+              <th className={headerBase + " border-r-[1px] border-r-neutral-900 md:invisible md:overflow-hidden bg-neutral-900 text-left sticky left-[68px] z-40"}>Zápas</th>
               {/* Desktop-only Domácí/Hosté */}
               <th className={headerBase + " border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Domácí</th>
               <th className={headerBase + " border-r-[1px] border-r-neutral-900 invisible overflow-hidden md:visible md:overflow-visible bg-neutral-900 text-left md:w-[160px]"}>Hosté</th>
@@ -594,17 +594,17 @@ export function TipMatrix({
                   className={stripeBg}
                   style={{ ["--cell-bg" as any]: m.is_czech ? "#fef2f2" : "#ffffff" }}
                 >
-                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[60px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
+                  <td className={"px-2 py-2 whitespace-nowrap text-center text-neutral-600 w-[68px] sticky left-0 md:static z-30 md:z-auto " + stripeBg}>
                     <div className="leading-tight">{fmtDate(m.starts_at)}</div>
                     <div className="text-[11px] text-neutral-500 leading-tight">{fmtTime(m.starts_at)}</div>
                     {m.tag && (
-                      <div className="mt-0.5 inline-block min-w-[30px] rounded bg-violet-100 px-1.5 py-0.5 text-center text-[10px] font-semibold tracking-wide text-violet-800">
+                      <div className="mt-0.5 inline-block rounded bg-violet-100 px-1.5 py-0.5 text-center text-[10px] font-semibold tracking-wide text-violet-800">
                         {m.tag}
                       </div>
                     )}
                   </td>
                   {/* Mobile-only Zápas (merged Domácí + Hosté) */}
-                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium sticky left-[60px] z-30 " + stripeBg}>
+                  <td className={"md:invisible md:overflow-hidden px-2 py-2 whitespace-nowrap font-medium sticky left-[68px] z-30 " + stripeBg}>
                     <div className="flex flex-col gap-y-1 leading-tight text-xs">
                       <div className="flex items-center gap-1.5">
                         {home && (() => {
