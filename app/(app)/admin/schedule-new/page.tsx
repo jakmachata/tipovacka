@@ -323,7 +323,7 @@ export default async function ScheduleNewPage({
                       <input
                         name="tag"
                         type="text"
-                        maxLength={6}
+                        maxLength={7}
                         defaultValue={m.tag ?? ""}
                         className="w-full rounded border px-2 py-1 text-center text-sm"
                       />
