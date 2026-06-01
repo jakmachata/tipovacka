@@ -82,7 +82,7 @@ export default async function HraciPage({
     .eq("id", user!.id)
     .single();
   const isAdmin = !!meProfile?.is_admin;
-  let userMetrics: Record<string, { hcp_distance: number | null; margin_err: number | null; goals_err: number | null; fav_pct: number | null; exact_count: number | null; off_one: number | null; pct_exact: number | null; pct_p1: number | null; pct_grp: number | null; pct_po: number | null; pct_cze: number | null }> = {};
+  let userMetrics: Record<string, { hcp_distance: number | null; margin_err: number | null; goals_err: number | null; fav_pct: number | null; exact_count: number | null; off_one: number | null; pct_exact: number | null; pct_p1: number | null; pct_grp: number | null; pct_po: number | null; pct_cze: number | null; b_exact: number | null; b_p1: number | null; b_grp: number | null; b_po: number | null; b_cze: number | null; hit_rate: number | null }> = {};
   if (isAdmin) {
     const { data: metricsData } = await supabase.from("user_tip_metrics").select("*");
     for (const m of metricsData ?? []) {
@@ -104,6 +104,12 @@ export default async function HraciPage({
         pct_grp: totalPts > 0 ? (ptsGrp / totalPts) * 100 : null,
         pct_po: totalPts > 0 ? (ptsPo / totalPts) * 100 : null,
         pct_cze: totalPts > 0 ? (ptsCze / totalPts) * 100 : null,
+        b_exact: ptsExact,
+        b_p1: ptsP1,
+        b_grp: ptsGrp,
+        b_po: ptsPo,
+        b_cze: ptsCze,
+        hit_rate: m.hcp_hit_rate,
       };
     }
   }
@@ -137,7 +143,7 @@ export default async function HraciPage({
   let approvedPlayers = (allProfiles ?? []).filter(
     (p: any) => !p.is_admin && p.is_approved,
   );
-  if (isAdmin && sortBy && ["spread", "naskok", "goly", "fav", "exact", "off1", "ex_pct", "p1_pct", "grp_pct", "po_pct", "cze_pct"].includes(sortBy)) {
+  if (isAdmin && sortBy && ["spread", "naskok", "goly", "fav", "exact", "off1", "ex_pct", "p1_pct", "grp_pct", "po_pct", "cze_pct", "b_ex", "b_p1", "b_grp", "b_po", "b_cze", "hit"].includes(sortBy)) {
     const fieldKey =
       sortBy === "spread" ? "hcp_distance"
         : sortBy === "naskok" ? "margin_err"
@@ -149,7 +155,13 @@ export default async function HraciPage({
         : sortBy === "p1_pct" ? "pct_p1"
         : sortBy === "grp_pct" ? "pct_grp"
         : sortBy === "po_pct" ? "pct_po"
-        : "pct_cze";
+        : sortBy === "cze_pct" ? "pct_cze"
+        : sortBy === "b_ex" ? "b_exact"
+        : sortBy === "b_p1" ? "b_p1"
+        : sortBy === "b_grp" ? "b_grp"
+        : sortBy === "b_po" ? "b_po"
+        : sortBy === "b_cze" ? "b_cze"
+        : "hit_rate";
     approvedPlayers = approvedPlayers.slice().sort((a: any, b: any) => {
       const va = userMetrics[a.id]?.[fieldKey] ?? null;
       const vb = userMetrics[b.id]?.[fieldKey] ?? null;
@@ -255,6 +267,12 @@ export default async function HraciPage({
               <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_grp == null ? "—" : Math.round(um.pct_grp) + "%"}</td>
               <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_po == null ? "—" : Math.round(um.pct_po) + "%"}</td>
               <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.pct_cze == null ? "—" : Math.round(um.pct_cze) + "%"}</td>
+              <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.b_exact ?? 0}</td>
+              <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.b_p1 ?? 0}</td>
+              <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.b_grp ?? 0}</td>
+              <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.b_po ?? 0}</td>
+              <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.b_cze ?? 0}</td>
+              <td className="w-[69px] py-2 pr-3 text-right text-xs tabular-nums text-neutral-700">{um?.hit_rate == null ? "—" : Math.round(um.hit_rate) + "%"}</td>
             </>
           );
         })()}
@@ -401,6 +419,12 @@ export default async function HraciPage({
                 <SortableTh field="grp_pct" label="%Hcp Grp" title="Podíl bodů z handicapů skupiny" width="w-[69px]" />
                 <SortableTh field="po_pct" label="%Hcp Po" title="Podíl bodů z handicapů playoff" width="w-[69px]" />
                 <SortableTh field="cze_pct" label="%Hcp ČR" title="Podíl bodů z handicapů českého týmu" width="w-[69px]" />
+                <SortableTh field="b_ex" label="BVýs" title="Surové body z přesných výsledků" width="w-[69px]" />
+                <SortableTh field="b_p1" label="BP1" title="Surové body z 1. třetin" width="w-[69px]" />
+                <SortableTh field="b_grp" label="BGrp" title="Surové body z handicapů skupiny" width="w-[69px]" />
+                <SortableTh field="b_po" label="BPo" title="Surové body z handicapů playoff" width="w-[69px]" />
+                <SortableTh field="b_cze" label="BČR" title="Surové body z handicapů českého týmu" width="w-[69px]" />
+                <SortableTh field="hit" label="%Trefy" title="% trefených handicapů ze všech finalizovaných handicapových tipů" width="w-[69px]" />
                 <EmailTh />
               </>
             )}
@@ -416,7 +440,7 @@ export default async function HraciPage({
             renderRow(p, { showDelete: isAdmin, showZaplatil: true }),
           )}
           {isAdmin && approvedPlayers.length > 0 && (() => {
-            const keys = ["hcp_distance","margin_err","goals_err","fav_pct","exact_count","off_one","pct_exact","pct_p1","pct_grp","pct_po","pct_cze"] as const;
+            const keys = ["hcp_distance","margin_err","goals_err","fav_pct","exact_count","off_one","pct_exact","pct_p1","pct_grp","pct_po","pct_cze","b_exact","b_p1","b_grp","b_po","b_cze","hit_rate"] as const;
             const sums: Record<string, number> = {};
             const counts: Record<string, number> = {};
             for (const p of approvedPlayers as any[]) {
@@ -448,6 +472,12 @@ export default async function HraciPage({
                 <td className={tc}>{fmtPct(avg.pct_grp)}</td>
                 <td className={tc}>{fmtPct(avg.pct_po)}</td>
                 <td className={tc}>{fmtPct(avg.pct_cze)}</td>
+                <td className={tc}>{fmtCount(avg.b_exact)}</td>
+                <td className={tc}>{fmtCount(avg.b_p1)}</td>
+                <td className={tc}>{fmtCount(avg.b_grp)}</td>
+                <td className={tc}>{fmtCount(avg.b_po)}</td>
+                <td className={tc}>{fmtCount(avg.b_cze)}</td>
+                <td className={tc}>{fmtPct(avg.hit_rate)}</td>
                 <td className="py-2 text-xs italic text-neutral-600" colSpan={6}>Průměr týmu ({approvedPlayers.length} hráčů)</td>
               </tr>
             );
@@ -474,6 +504,12 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů skupiny">%Hcp Grp</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů playoff">%Hcp Po</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů českého týmu">%Hcp ČR</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z přesných výsledků">BVýs</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z 1. třetin">BP1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů skupiny">BGrp</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů playoff">BPo</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů českého týmu">BČR</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="% trefených handicapů ze všech finalizovaných handicapových tipů">%Trefy</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
@@ -508,6 +544,12 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů skupiny">%Hcp Grp</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů playoff">%Hcp Po</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů českého týmu">%Hcp ČR</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z přesných výsledků">BVýs</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z 1. třetin">BP1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů skupiny">BGrp</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů playoff">BPo</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů českého týmu">BČR</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="% trefených handicapů ze všech finalizovaných handicapových tipů">%Trefy</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
@@ -542,6 +584,12 @@ export default async function HraciPage({
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů skupiny">%Hcp Grp</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů playoff">%Hcp Po</th>
                 <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Podíl bodů z handicapů českého týmu">%Hcp ČR</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z přesných výsledků">BVýs</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z 1. třetin">BP1</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů skupiny">BGrp</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů playoff">BPo</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="Surové body z handicapů českého týmu">BČR</th>
+                <th className="py-2 pr-3 text-right text-xs font-medium w-[69px]" title="% trefených handicapů ze všech finalizovaných handicapových tipů">%Trefy</th>
                 <EmailTh />
                 <th className="py-2 pr-4" style={{ width: "200px" }}>Přezdívka</th>
                 <th className="pr-4" style={{ width: "130px" }}>Status</th>
