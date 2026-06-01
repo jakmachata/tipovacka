@@ -286,6 +286,33 @@ export default async function SchedulePage() {
         body: `nejvíc ${hiStr} • nejmíň ${loStr}`,
       });
     }
+    // E1-E5: raw points per category (top 3-6)
+    const eCats: Array<{ key: string; icon: string; title: string }> = [
+      { key: "pts_exact", icon: "💯", title: "Nejvíc bodů z přesných výsledků" },
+      { key: "pts_p1", icon: "🥅", title: "Nejvíc bodů z 1. třetin" },
+      { key: "pts_hcp_group", icon: "🎲", title: "Nejvíc bodů z handicapů skupiny" },
+      { key: "pts_hcp_playoff", icon: "🏆", title: "Nejvíc bodů z handicapů playoff" },
+      { key: "pts_hcp_czech", icon: "🦁", title: "Nejvíc bodů z handicapů ČR" },
+    ];
+    for (const c of eCats) {
+      const t = topN(c.key, randInt(3, 6), false);
+      if (t.length < 2 || t[0].v <= 0) continue;
+      cards.push({
+        icon: c.icon,
+        title: c.title,
+        body: formatTopList(t, (v) => `${v} b.`),
+      });
+    }
+    // F1: %Trefy — % trefených handicapů (top 3-6)
+    {
+      const t = topN("hcp_hit_rate", randInt(3, 6), false);
+      if (t.length >= 2 && t[0].v > 0)
+        cards.push({
+          icon: "🎯",
+          title: "% trefených handicapů",
+          body: formatTopList(t, (v) => `${Math.round(v)}%`),
+        });
+    }
     // Shuffle
     for (let i = cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
